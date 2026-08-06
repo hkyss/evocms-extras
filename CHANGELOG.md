@@ -6,6 +6,12 @@ those cases are called out.
 
 ## [Unreleased]
 
+### Added
+
+- phpstan level 6 and php-cs-fixer, wired into `composer check` and CI.
+- Issue and pull request templates, code of conduct.
+- Release workflow that takes its notes from this file and fails when the tag has no entry.
+
 ## [0.1.0] - 2026-08-06
 
 First release. Targets Evolution CMS CE 3.1.x.

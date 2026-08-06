@@ -113,10 +113,6 @@ class PackagistSource implements CatalogSource
         $latestStable = '';
 
         foreach ($releases as $release) {
-            if (!is_array($release)) {
-                continue;
-            }
-
             $version = (string) ($release['version'] ?? '');
 
             if ($version === '') {
@@ -130,7 +126,7 @@ class PackagistSource implements CatalogSource
             }
         }
 
-        $newest = is_array($releases[0] ?? null) ? $releases[0] : [];
+        $newest = $releases[0];
 
         return new Extra(
             $coordinate,

@@ -233,10 +233,10 @@ runtime instead.
 
 ```bash
 composer install
-composer test
+composer check
 ```
 
-Unit tests cover the planning side — descriptor parsing, SQL splitting, property merging, tree
+`composer check` is php-cs-fixer, phpstan level 6 and phpunit. Unit tests cover the planning side — descriptor parsing, SQL splitting, property merging, tree
 comparison, catalog assembly — and need no network, database or Evolution install. Fixtures are
 unmodified files from real extras. Plan execution is covered separately against a real CE checkout.
 

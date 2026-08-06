@@ -1,0 +1,27 @@
+parameters:
+    level: 6
+    paths:
+        - src
+        - tests
+    excludePaths:
+        - tests/Fixtures
+    ignoreErrors:
+        # Eloquent's static entry points resolve to the query builder without larastan,
+        # which this package does not pull in for two methods.
+        -
+            identifier: return.type
+            path: src/Record/InstallRecordStore.php
+        -
+            identifier: catch.neverThrown
+            path: src/Record/InstallRecordStore.php
+
+        # composer/composer comes from the Evolution core, not from our own require.
+        -
+            identifier: class.notFound
+            path: src/Installer/ComposerRunner.php
+
+        # config.platform pins PHP to the lowest supported version, so phpstan reads the
+        # check as constant. It still fires when the package is copied in by hand.
+        -
+            identifier: greaterOrEqual.alwaysTrue
+            path: src/Console/Commands/DoctorCommand.php

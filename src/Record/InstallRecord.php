@@ -10,10 +10,10 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $format
  * @property string $version
  * @property string $title
- * @property array  $files
- * @property array  $backups
- * @property array  $elements
- * @property array  $sql_hashes
+ * @property array<string,string>        $files
+ * @property array<string,string>        $backups
+ * @property list<array<string,mixed>>   $elements
+ * @property list<string>                $sql_hashes
  */
 class InstallRecord extends Model
 {
@@ -33,6 +33,7 @@ class InstallRecord extends Model
         'sql_hashes',
     ];
 
+    /** @var array<string,string> */
     protected $casts = [
         'files' => 'array',
         'backups' => 'array',

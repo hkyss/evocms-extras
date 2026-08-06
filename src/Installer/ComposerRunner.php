@@ -73,7 +73,7 @@ class ComposerRunner
         } catch (\Throwable $e) {
             return new ComposerResult(1, [$e->getMessage()]);
         } finally {
-            if (is_string($previousCwd) && $previousCwd !== '') {
+            if (is_string($previousCwd)) {
                 @chdir($previousCwd);
             }
 

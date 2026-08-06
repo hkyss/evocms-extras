@@ -85,7 +85,7 @@ class PropertyMerger
                 continue;
             }
 
-            $entries[$name] = array_values(array_map('trim', explode(';', substr($chunk, $position + 1))));
+            $entries[$name] = array_map('trim', explode(';', substr($chunk, $position + 1)));
         }
 
         return $entries;

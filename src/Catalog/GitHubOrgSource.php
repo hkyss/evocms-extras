@@ -90,7 +90,7 @@ class GitHubOrgSource implements CatalogSource
             fn () => $this->http->json(self::API . '/repos/' . $coordinate, [], true) ?? []
         );
 
-        if (!is_array($repo) || !isset($repo['name'])) {
+        if (!isset($repo['name'])) {
             return null;
         }
 
@@ -135,7 +135,7 @@ class GitHubOrgSource implements CatalogSource
             return $all;
         });
 
-        if (!is_array($cached) || $cached === []) {
+        if ($cached === []) {
             $this->unavailable = $this->http->hasGithubToken()
                 ? "GitHub returned nothing for organisation '{$this->organization}'"
                 : "GitHub returned nothing for organisation '{$this->organization}'; "
@@ -187,10 +187,6 @@ class GitHubOrgSource implements CatalogSource
             'github-tags-' . $coordinate->key(),
             fn () => $this->http->json(self::API . '/repos/' . $coordinate . '/tags', ['per_page' => 20], true) ?? []
         );
-
-        if (!is_array($payload)) {
-            return [];
-        }
 
         $tags = [];
 

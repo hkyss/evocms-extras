@@ -2,6 +2,7 @@
 
 namespace hkyss\Extras\Legacy;
 
+use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Support\Facades\DB;
 
@@ -229,8 +230,11 @@ class ElementWriter
         $key = $table . '.' . $column;
 
         if (!isset($this->columnCache[$key])) {
+            $connection = $this->db();
+
             try {
-                $this->columnCache[$key] = $this->db()->getSchemaBuilder()->hasColumn($table, $column);
+                $this->columnCache[$key] = $connection instanceof Connection
+                    && $connection->getSchemaBuilder()->hasColumn($table, $column);
             } catch (\Throwable) {
                 $this->columnCache[$key] = false;
             }

@@ -16,7 +16,7 @@ class Catalog
     /** @param list<CatalogSource> $sources */
     public function __construct(array $sources = [])
     {
-        $this->sources = array_values($sources);
+        $this->sources = $sources;
     }
 
     public function addSource(CatalogSource $source): void

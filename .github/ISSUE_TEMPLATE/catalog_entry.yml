@@ -1,0 +1,48 @@
+name: Catalog entry
+description: Add an extra to the snapshot, or change its compatibility status
+labels: [catalog]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The bundled snapshot covers a fraction of the legacy ecosystem, and every legacy entry
+        starts as `unknown`. Both are fixed here.
+
+  - type: input
+    id: coordinate
+    attributes:
+      label: Coordinate
+      placeholder: extras-evolution/Ditto
+    validations:
+      required: true
+
+  - type: dropdown
+    id: request
+    attributes:
+      label: What for
+      options:
+        - Add it to the snapshot
+        - Mark it verified on Evolution CMS 3
+        - Mark it incompatible
+        - Fix its metadata
+    validations:
+      required: true
+
+  - type: input
+    id: evolution
+    attributes:
+      label: Evolution CMS version you tested on
+      description: Required for a verified or incompatible claim; leave empty otherwise.
+      placeholder: 3.1.30
+    validations:
+      required: false
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: What you checked
+      description: >
+        For verified: what you installed, what you exercised, what worked. For incompatible: what
+        broke and how. "It seems fine" is not enough to put a status in front of other people.
+    validations:
+      required: true

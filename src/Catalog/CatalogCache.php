@@ -135,9 +135,7 @@ class CatalogCache
     /** @return list<string> */
     private function files(): array
     {
-        $found = glob($this->directory . '*.json');
-
-        return is_array($found) ? array_values($found) : [];
+        return glob($this->directory . '*.json') ?: [];
     }
 
     private function path(string $key): string

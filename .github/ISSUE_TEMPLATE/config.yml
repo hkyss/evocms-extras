@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/hkyss/evocms-extras/security
+    about: Report it privately, not as an issue.
+  - name: A broken extra, not a broken manager
+    url: https://github.com/hkyss/evocms-extras/blob/main/SECURITY.md#what-installing-an-extra-does
+    about: If the extra installed correctly but misbehaves, its own repository is the place.

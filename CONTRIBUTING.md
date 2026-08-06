@@ -6,8 +6,10 @@
 git clone https://github.com/hkyss/evocms-extras.git
 cd evocms-extras
 composer install
-composer test
+composer check
 ```
+
+`composer check` runs php-cs-fixer, phpstan and phpunit; `composer cs:fix` applies the style fixes.
 
 Parsing and planning code needs no Evolution install. Anything inside `apply()` does.
 
@@ -16,7 +18,7 @@ supported runtime rather than whatever PHP you happen to have installed.
 
 ## Pull requests
 
-- `composer test` passes.
+- `composer check` passes.
 - New behaviour has a test. If it's pure, it goes in `tests/Unit`.
 - No inline comments. A one-sentence annotation above a method is fine where the code can't say it
   itself.

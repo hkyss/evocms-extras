@@ -14,7 +14,7 @@ class InstallerRegistry
     /** @param list<Installer> $installers */
     public function __construct(array $installers = [])
     {
-        $this->installers = array_values($installers);
+        $this->installers = $installers;
     }
 
     public function add(Installer $installer): void

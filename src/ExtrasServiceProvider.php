@@ -197,7 +197,7 @@ class ExtrasServiceProvider extends ServiceProvider
     }
 
     /** @return mixed */
-    private function config(string $key, $default = null)
+    private function config(string $key, mixed $default = null)
     {
         try {
             return $this->app->make('config')->get($key, $default);

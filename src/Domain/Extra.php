@@ -44,7 +44,7 @@ final class Extra
         $this->latestVersion = $latestVersion;
         $this->versions = array_values(array_unique(array_filter(
             $versions,
-            static fn ($v) => is_string($v) && $v !== ''
+            static fn (string $v) => $v !== ''
         )));
         $this->defaultBranch = $defaultBranch;
         $this->compatibility = $compatibility ?? CompatibilityStatus::forFormat($format);

@@ -34,7 +34,7 @@ final class PlanStep
     }
 
     /** @return mixed */
-    public function get(string $key, $default = null)
+    public function get(string $key, mixed $default = null)
     {
         return $this->data[$key] ?? $default;
     }

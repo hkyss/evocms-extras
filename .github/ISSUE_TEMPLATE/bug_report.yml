@@ -1,0 +1,80 @@
+name: Bug report
+description: Something the manager gets wrong, or does not do at all
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Found something exploitable instead? Do not file it here — use
+        [private vulnerability reporting](https://github.com/hkyss/evocms-extras/security).
+
+  - type: textarea
+    id: what
+    attributes:
+      label: What happens
+      description: And what you expected instead.
+    validations:
+      required: true
+
+  - type: textarea
+    id: command
+    attributes:
+      label: The command and its output
+      description: >
+        Rerun it with --dry-run if you can. The plan says what the manager intended to do, which is
+        usually where the answer is.
+      render: shell
+    validations:
+      required: true
+
+  - type: input
+    id: extra
+    attributes:
+      label: Which extra
+      placeholder: evocms-community/pagebuilder, or none if the command failed on its own
+    validations:
+      required: false
+
+  - type: dropdown
+    id: format
+    attributes:
+      label: Format
+      options:
+        - Composer
+        - Legacy
+        - Not sure
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Manager version
+      placeholder: v0.1.0, or a commit sha
+    validations:
+      required: true
+
+  - type: input
+    id: evolution
+    attributes:
+      label: Evolution CMS version
+      placeholder: 3.1.30
+    validations:
+      required: true
+
+  - type: input
+    id: php
+    attributes:
+      label: PHP version
+      placeholder: 8.2.33
+    validations:
+      required: true
+
+  - type: textarea
+    id: doctor
+    attributes:
+      label: extra:doctor output
+      description: Optional, but it answers most environment questions in one paste.
+      render: shell
+    validations:
+      required: false

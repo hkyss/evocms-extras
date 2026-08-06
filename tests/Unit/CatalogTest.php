@@ -83,7 +83,7 @@ class CatalogTest extends TestCase
     /** A source may list nothing yet still answer a direct lookup, as GitHub does. */
     public function testFallsBackToPerSourceLookupWhenNotListed(): void
     {
-        $lazy = new class implements CatalogSource {
+        $lazy = new class () implements CatalogSource {
             public function name(): string
             {
                 return 'lazy';
@@ -94,7 +94,7 @@ class CatalogTest extends TestCase
                 return [];
             }
 
-            public function find(Coordinate $coordinate): ?Extra
+            public function find(Coordinate $coordinate): Extra
             {
                 return new Extra($coordinate, ExtraFormat::Legacy);
             }
