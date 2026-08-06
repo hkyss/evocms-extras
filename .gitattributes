@@ -1,0 +1,13 @@
+* text=auto eol=lf
+
+# Fixtures are verbatim copies of real extras; normalising them would break the parser tests.
+tests/Fixtures/** -text
+
+# Keep the dist archive to what an installation actually needs.
+/.github          export-ignore
+/.gitattributes   export-ignore
+/.editorconfig    export-ignore
+/.gitignore       export-ignore
+/tests            export-ignore
+/phpunit.xml      export-ignore
+/CONTRIBUTING.md  export-ignore

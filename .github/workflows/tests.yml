@@ -1,0 +1,108 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    name: PHP ${{ matrix.php }} / ${{ matrix.dependencies }}
+    runs-on: ubuntu-latest
+
+    # Not a full cross product: lowest means Illuminate 8, which is what Evolution CE 3.1.30
+    # actually ships, and nobody runs that on PHP 8.4.
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - php: '8.2'
+            dependencies: lowest
+          - php: '8.2'
+            dependencies: highest
+          - php: '8.3'
+            dependencies: highest
+          - php: '8.4'
+            dependencies: highest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: json, zip, mbstring
+          coverage: none
+          tools: composer:v2
+
+      - name: Cache Composer
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: composer-${{ matrix.php }}-${{ matrix.dependencies }}-${{ hashFiles('composer.json') }}
+          restore-keys: composer-${{ matrix.php }}-${{ matrix.dependencies }}-
+
+      # The package pins config.platform.php to the lowest supported runtime; drop it so the
+      # matrix actually exercises the PHP version it claims to.
+      - name: Unpin the platform
+        run: composer config --unset platform.php
+
+      - name: Install dependencies
+        run: composer update --prefer-dist --no-interaction --no-progress ${{ matrix.dependencies == 'lowest' && '--prefer-lowest' || '' }}
+
+      - name: Run tests
+        run: composer test
+
+  validate:
+    name: Validate
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: json, zip
+          coverage: none
+          tools: composer:v2
+
+      - name: Validate composer.json
+        run: composer validate --strict
+
+      - name: Validate the catalog snapshot
+        run: |
+          php -r '
+            $doc = json_decode(file_get_contents("resources/catalog.json"), true);
+            if (!is_array($doc) || ($doc["schema"] ?? null) !== 1 || !is_array($doc["extras"] ?? null)) {
+              fwrite(STDERR, "catalog.json is not a valid snapshot document\n");
+              exit(1);
+            }
+            $seen = [];
+            foreach ($doc["extras"] as $extra) {
+              $coordinate = $extra["coordinate"] ?? "";
+              if (!preg_match("~^[A-Za-z0-9][\w.-]*/[A-Za-z0-9][\w.-]*$~", $coordinate)) {
+                fwrite(STDERR, "bad coordinate: $coordinate\n");
+                exit(1);
+              }
+              if (isset($seen[strtolower($coordinate)])) {
+                fwrite(STDERR, "duplicate coordinate: $coordinate\n");
+                exit(1);
+              }
+              $seen[strtolower($coordinate)] = true;
+              if (!in_array($extra["format"] ?? "", ["composer", "legacy"], true)) {
+                fwrite(STDERR, "bad format for $coordinate\n");
+                exit(1);
+              }
+              if (!in_array($extra["compatibility"] ?? "", ["verified", "unknown", "incompatible"], true)) {
+                fwrite(STDERR, "bad compatibility for $coordinate\n");
+                exit(1);
+              }
+            }
+            printf("catalog.json ok: %d extras\n", count($doc["extras"]));
+          '

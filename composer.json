@@ -1,0 +1,66 @@
+{
+    "name": "hkyss/evocms-extras",
+    "description": "Console extras manager for Evolution CMS CE 3: catalog, install, update and removal for both Composer and legacy MODX Evolution Package extras",
+    "type": "evolutioncms-package",
+    "license": "MIT",
+    "keywords": [
+        "evolutioncms",
+        "evocms",
+        "extras",
+        "package-manager",
+        "console"
+    ],
+    "homepage": "https://github.com/hkyss/evocms-extras",
+    "authors": [
+        {
+            "name": "hkyss",
+            "email": "hkyss.work@protonmail.com",
+            "homepage": "https://github.com/hkyss"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/hkyss/evocms-extras/issues",
+        "source": "https://github.com/hkyss/evocms-extras",
+        "docs": "https://github.com/hkyss/evocms-extras#readme"
+    },
+    "require": {
+        "php": "^8.2",
+        "ext-json": "*",
+        "ext-zip": "*",
+        "illuminate/support": "^8.0|^9.0|^10.0|^11.0|^12.0",
+        "illuminate/console": "^8.0|^9.0|^10.0|^11.0|^12.0",
+        "illuminate/database": "^8.0|^9.0|^10.0|^11.0|^12.0",
+        "guzzlehttp/guzzle": "^7.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.6|^10.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "hkyss\\Extras\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "hkyss\\Extras\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "hkyss\\Extras\\ExtrasServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "platform": {
+            "php": "8.2.0"
+        }
+    },
+    "scripts": {
+        "test": "phpunit"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
