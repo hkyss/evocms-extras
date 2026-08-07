@@ -6,6 +6,8 @@ those cases are called out.
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-08-07
+
 ### Fixed
 
 - `extra:install` and `extra:update` could never run. Both declared their own `--version`, and
@@ -74,6 +76,7 @@ First release. Targets Evolution CMS CE 3.1.x.
 - Every legacy entry ships as `unknown`; none has been verified on Evolution CMS 3 yet.
 - Schema applied by a legacy extra is not rolled back on removal.
 
-[Unreleased]: https://github.com/hkyss/evocms-extras/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/hkyss/evocms-extras/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/hkyss/evocms-extras/releases/tag/v0.2.0
 [0.1.1]: https://github.com/hkyss/evocms-extras/releases/tag/v0.1.1
 [0.1.0]: https://github.com/hkyss/evocms-extras/releases/tag/v0.1.0
