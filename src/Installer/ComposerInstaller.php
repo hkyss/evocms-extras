@@ -68,12 +68,9 @@ class ComposerInstaller implements Installer
             ['coordinate' => $coordinate, 'mode' => 'package']
         );
 
-        $plan->step(
-            StepKind::RecordWrite,
-            "record {$coordinate} as installed",
-            ['coordinate' => $coordinate, 'version' => $constraint]
-        );
-
+        // No install record here on purpose: the manifest is the record for a
+        // composer extra, and installedState() reads it back. The record table
+        // exists for legacy extras, which have no uninstall metadata of their own.
         return $plan;
     }
 

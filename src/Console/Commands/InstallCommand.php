@@ -8,7 +8,7 @@ class InstallCommand extends AbstractExtraCommand
 {
     protected $signature = 'extra:install
         {coordinates?* : One or more vendor/package or org/repo coordinates}
-        {--version= : Version, tag or branch to install; defaults to the latest}
+        {--use-version= : Version, tag or branch to install; defaults to the latest}
         {--file= : Read coordinates from a file, one per line}
         {--dry-run : Show the plan and change nothing}
         {--force : Proceed even when the plan is blocked}
@@ -26,10 +26,10 @@ class InstallCommand extends AbstractExtraCommand
             return self::FAILURE;
         }
 
-        $version = (string) ($this->option('version') ?? '');
+        $version = (string) ($this->option('use-version') ?? '');
 
         if (count($coordinates) > 1 && $version !== '') {
-            $this->error('--version applies to a single extra; install them one at a time to pin versions.');
+            $this->error('--use-version applies to a single extra; install them one at a time to pin versions.');
 
             return self::FAILURE;
         }

@@ -8,7 +8,7 @@ class UpdateCommand extends AbstractExtraCommand
 {
     protected $signature = 'extra:update
         {coordinates?* : Coordinates to update; omit to update everything installed}
-        {--version= : Version, tag or branch to update to}
+        {--use-version= : Version, tag or branch to update to}
         {--file= : Read coordinates from a file, one per line}
         {--dry-run : Show the plan and change nothing}
         {--force : Proceed even when the plan is blocked}
@@ -32,10 +32,10 @@ class UpdateCommand extends AbstractExtraCommand
             $this->line(sprintf('<fg=gray>updating %d installed extra(s)</>', count($coordinates)));
         }
 
-        $version = (string) ($this->option('version') ?? '');
+        $version = (string) ($this->option('use-version') ?? '');
 
         if (count($coordinates) > 1 && $version !== '') {
-            $this->error('--version applies to a single extra; update them one at a time to pin versions.');
+            $this->error('--use-version applies to a single extra; update them one at a time to pin versions.');
 
             return self::FAILURE;
         }

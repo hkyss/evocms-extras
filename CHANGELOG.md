@@ -6,6 +6,24 @@ those cases are called out.
 
 ## [Unreleased]
 
+### Fixed
+
+- `extra:install` and `extra:update` could never run. Both declared their own `--version`, and
+  Symfony defines that option on the console application; `Command::run()` merges the two
+  definitions before parsing anything, so `InputDefinition::addOption()` threw
+  `An option named "version" already exists` on every invocation, flag or no flag. The option is
+  now `--use-version`. **Breaking:** scripts passing `--version` must be updated.
+- The plan for a composer extra listed a `record <coordinate> as installed` step that nothing ever
+  carried out — only `LegacyInstaller` applies `RecordWrite`. The step is gone; for a composer
+  extra the manifest is the record, and `installedState()` reads it back. `extra:doctor` no longer
+  looks wrong by reporting `0 record(s)` after a successful install.
+
+### Added
+
+- `CommandDefinitionTest` guards every command against option names Symfony reserves, both by
+  reading the signature and by registering the command on a real `Application`. The existing tests
+  missed the bug because they never went through `mergeApplicationDefinition()`.
+
 ## [0.1.1] - 2026-08-06
 
 No behaviour changes. Released because the v0.1.0 tag was moved after publication and Packagist

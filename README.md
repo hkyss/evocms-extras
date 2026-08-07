@@ -76,7 +76,7 @@ Evo 3.
 
 ```bash
 php artisan extra:install evolution-cms-extras/tinymce5
-php artisan extra:install evolution-cms-extras/tinymce5 --version=5.7.1
+php artisan extra:install evolution-cms-extras/tinymce5 --use-version=5.7.1
 php artisan extra:install a/one b/two c/three
 php artisan extra:install --file=extras.txt --continue-on-error
 php artisan extra:install extras-evolution/Ditto --dry-run
@@ -85,14 +85,17 @@ php artisan extra:install extras-evolution/Ditto --dry-run
 Pass as many coordinates as you like; there is no separate batch command. `--file` reads one per
 line and treats `#` as a comment.
 
-`--version` works on a single extra only. Applying one version string to several packages installs
-the wrong thing more often than not.
+`--use-version` works on a single extra only. Applying one version string to several packages
+installs the wrong thing more often than not. The flag is not called `--version` because Symfony
+defines that one on the console application itself, and a command that shadows it cannot run at
+all.
 
 ### `extra:update`
 
 ```bash
 php artisan extra:update
 php artisan extra:update evocms-community/commerce
+php artisan extra:update evocms-community/commerce --use-version=1.4.0
 php artisan extra:update --dry-run
 ```
 
