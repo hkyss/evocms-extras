@@ -8,7 +8,7 @@ or by email to hkyss.work@protonmail.com. Please don't use a public issue.
 Include the version, the extra or catalog source involved, and how to reproduce it. First reply
 within a week.
 
-Fixes go to the latest `0.x` release.
+Fixes go to the latest `1.x` release.
 
 ## What installing an extra does
 

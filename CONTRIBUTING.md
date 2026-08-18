@@ -61,5 +61,5 @@ which version and what you checked in the pull request.
 
 ## Releases
 
-Tags are `vX.Y.Z`, [CHANGELOG.md](CHANGELOG.md) follows Keep a Changelog. On `0.x` a minor version
-may break compatibility; the changelog will say so.
+Tags are `vX.Y.Z`, [CHANGELOG.md](CHANGELOG.md) follows Keep a Changelog. From 1.0.0 a breaking
+change needs a major version; the changelog says which ones they were.

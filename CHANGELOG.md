@@ -1,10 +1,25 @@
 # Changelog
 
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), versioning follows
-[SemVer](https://semver.org/spec/v2.0.0.html). On `0.x` a minor version may break compatibility;
-those cases are called out.
+[SemVer](https://semver.org/spec/v2.0.0.html). From 1.0.0 the public surface — the commands and
+their options, the `Installer` interface, the catalog snapshot schema — is stable: a breaking
+change needs a major version.
 
 ## [Unreleased]
+
+## [1.0.0] - 2026-08-18
+
+First stable release. Everything below is relative to 0.2.0.
+
+### Breaking
+
+- `extra:list` run in a terminal shows the browsable list rather than the table. Nothing
+  non-interactive changed — a pipe, a redirect, `--no-ansi`, `--no-interaction` and CI all still
+  get the table, and `--format=table` asks for it explicitly. `--format` takes `auto` (the
+  default), `list`, `table` or `json`; the previous default was `table`.
+- `--force` no longer overrides a platform requirement. It still passes every other blocker.
+- `Installer` gained `installed()` and `format()`. Anything implementing the interface outside
+  this package must add them.
 
 ### Added
 
@@ -159,7 +174,8 @@ First release. Targets Evolution CMS CE 3.1.x.
 - Every legacy entry ships as `unknown`; none has been verified on Evolution CMS 3 yet.
 - Schema applied by a legacy extra is not rolled back on removal.
 
-[Unreleased]: https://github.com/hkyss/evocms-extras/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/hkyss/evocms-extras/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/hkyss/evocms-extras/compare/v0.2.0...v1.0.0
 [0.2.0]: https://github.com/hkyss/evocms-extras/releases/tag/v0.2.0
 [0.1.1]: https://github.com/hkyss/evocms-extras/releases/tag/v0.1.1
 [0.1.0]: https://github.com/hkyss/evocms-extras/releases/tag/v0.1.0

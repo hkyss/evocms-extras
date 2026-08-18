@@ -23,7 +23,7 @@ success and leaves the requirement in the manifest.
 
 ```bash
 cd core
-php artisan package:installrequire hkyss/evocms-extras "^0.1"
+php artisan package:installrequire hkyss/evocms-extras "^1.0"
 php artisan migrate
 php artisan extra:doctor
 ```
