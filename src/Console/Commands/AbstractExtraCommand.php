@@ -3,6 +3,12 @@
 namespace hkyss\Extras\Console\Commands;
 
 use hkyss\Extras\Catalog\Catalog;
+use hkyss\Extras\Console\ExtraPresenter;
+use hkyss\Extras\Console\Prompt\ConfirmPrompt;
+use hkyss\Extras\Console\Prompt\SelectPrompt;
+use hkyss\Extras\Console\Prompt\Spinner;
+use hkyss\Extras\Console\Tty;
+use hkyss\Extras\Console\Ui;
 use hkyss\Extras\Domain\Coordinate;
 use hkyss\Extras\Domain\Extra;
 use hkyss\Extras\Exceptions\ExtrasException;
@@ -15,8 +21,16 @@ use Illuminate\Console\Command;
 
 abstract class AbstractExtraCommand extends Command
 {
+    protected const STEPS_SHOWN = 20;
+
     protected Catalog $catalog;
     protected InstallerRegistry $installers;
+
+    private ?Ui $ui = null;
+
+    private ?ExtraPresenter $presenter = null;
+
+    private ?Tty $tty = null;
 
     public function __construct(Catalog $catalog, InstallerRegistry $installers)
     {
@@ -25,12 +39,98 @@ abstract class AbstractExtraCommand extends Command
         $this->installers = $installers;
     }
 
+    protected function ui(): Ui
+    {
+        return $this->ui ??= new Ui($this->output);
+    }
+
+    protected function isInteractive(): bool
+    {
+        return $this->input->isInteractive() && Tty::isAvailable() && $this->ui()->isDecorated();
+    }
+
+    protected function tty(): Tty
+    {
+        return $this->tty ??= new Tty();
+    }
+
+    /**
+     * @param list<array{value:string,label?:string,hint?:string,search?:string}> $rows
+     * @return list<string>|null null when the user backed out
+     */
+    protected function choose(string $title, array $rows, bool $multiple = true): ?array
+    {
+        return (new SelectPrompt($this->ui(), $this->tty()))->open($title, $rows, $multiple);
+    }
+
+    /** @return array{value:string,label:string,hint:string,search:string} */
+    protected function optionFor(Extra $extra, string $hint = ''): array
+    {
+        return $this->presenter()->option($extra, $hint);
+    }
+
+    protected function chooseVersion(Extra $extra): string
+    {
+        $versions = $extra->versions();
+
+        if (count($versions) < 2) {
+            return '';
+        }
+
+        $rows = [[
+            'value' => '',
+            'label' => 'latest',
+            'hint' => $extra->defaultVersion(),
+            'search' => 'latest default',
+        ]];
+
+        foreach ($versions as $version) {
+            $rows[] = ['value' => $version, 'label' => $version, 'hint' => '', 'search' => mb_strtolower($version)];
+        }
+
+        $chosen = $this->choose('Version of ' . $extra->coordinate(), $rows, false);
+
+        return $chosen === null ? '' : ($chosen[0] ?? '');
+    }
+
+    protected function confirmStep(string $question, bool $default = true): bool
+    {
+        return (new ConfirmPrompt($this->ui(), $this->tty()))->ask($question, $default);
+    }
+
+    /**
+     * @template T
+     * @param callable(): T $work
+     * @return T
+     */
+    protected function spin(string $label, callable $work)
+    {
+        if (!$this->isInteractive()) {
+            return $work();
+        }
+
+        return (new Spinner($this->ui()))->spin($label, $work);
+    }
+
+    protected function presenter(): ExtraPresenter
+    {
+        return $this->presenter ??= new ExtraPresenter($this->ui());
+    }
+
+    protected function bail(string $message): int
+    {
+        $this->ui()->note('fail', $message);
+
+        return self::FAILURE;
+    }
+
     protected function resolve(string $input): ?Extra
     {
+        $ui = $this->ui();
         $coordinate = Coordinate::tryParse($input);
 
         if ($coordinate === null) {
-            $this->error("Invalid coordinate '{$input}'. Expected vendor/package or org/repo.");
+            $ui->note('fail', "Invalid coordinate '{$input}'. Expected vendor/package or org/repo.");
 
             return null;
         }
@@ -38,9 +138,10 @@ abstract class AbstractExtraCommand extends Command
         $extra = $this->catalog->find($coordinate);
 
         if ($extra === null) {
-            $this->error("'{$coordinate}' was not found in the catalog.");
+            $ui->note('fail', "'{$coordinate}' was not found in the catalog.");
             $this->reportCatalogProblems();
-            $this->line("Try <info>extra:list --search={$coordinate->name()}</info> to see what is available.");
+            $ui->blank();
+            $ui->write('  Try <info>extra:list --search=' . $coordinate->name() . '</info> to see what is available.');
 
             return null;
         }
@@ -56,33 +157,41 @@ abstract class AbstractExtraCommand extends Command
             return;
         }
 
-        $this->newLine();
-        $this->warn('Some catalog sources did not answer:');
+        $ui = $this->ui();
+        $ui->blank();
+        $ui->section('sources that did not answer');
+
+        $checks = [];
 
         foreach ($problems as $source => $reason) {
-            $this->line("  <comment>{$source}</comment>: {$reason}");
+            $checks[] = ['level' => 'warn', 'name' => (string) $source, 'detail' => $reason];
         }
+
+        $ui->checks($checks);
     }
 
     protected function renderPlan(InstallPlan $plan): void
     {
-        $this->newLine();
-        $this->line(sprintf(
-            '<options=bold>%s</> %s  <fg=gray>[%s]</>',
-            $plan->intent()->verb(),
+        $ui = $this->ui();
+
+        $ui->blank();
+        $ui->write(sprintf(
+            '%s %s  %s',
+            $ui->strong($plan->intent()->verb()),
             $plan->coordinate(),
-            $plan->format()->label()
+            $ui->dim('[' . $plan->format()->label() . ']')
         ));
 
         if ($plan->fromVersion() !== '' || $plan->toVersion() !== '') {
-            $this->line(sprintf(
-                '  version: %s → %s',
-                $plan->fromVersion() !== '' ? $plan->fromVersion() : '—',
-                $plan->toVersion() !== '' ? $plan->toVersion() : '—'
-            ));
+            $ui->details([[
+                'version',
+                ($plan->fromVersion() !== '' ? $plan->fromVersion() : $ui->absent())
+                    . ' ' . $ui->dim($ui->glyph('arrow')) . ' '
+                    . ($plan->toVersion() !== '' ? $plan->toVersion() : $ui->absent()),
+            ]]);
         }
 
-        $this->newLine();
+        $ui->blank();
 
         $grouped = [];
 
@@ -95,25 +204,36 @@ abstract class AbstractExtraCommand extends Command
         }
 
         if ($grouped === []) {
-            $this->line('  <fg=gray>nothing to do</>');
+            $ui->write('  ' . $ui->dim('nothing to do'));
         }
 
         foreach ($grouped as $group => $steps) {
-            $this->line("  <fg=cyan>{$group}</>");
+            $ui->section($group);
 
-            foreach (array_slice($steps, 0, 20) as $step) {
-                $marker = $step->kind()->mutates() ? '·' : ' ';
-                $this->line("    {$marker} " . $step->summary());
+            $shown = array_slice($steps, 0, self::STEPS_SHOWN);
+            $hidden = count($steps) - count($shown);
+
+            foreach ($shown as $index => $step) {
+                $ui->treeItem(
+                    $step->summary(),
+                    $hidden === 0 && $index === count($shown) - 1,
+                    $step->kind()->mutates()
+                );
             }
 
-            if (count($steps) > 20) {
-                $this->line(sprintf('      <fg=gray>… and %d more</>', count($steps) - 20));
+            if ($hidden > 0) {
+                $ui->write('  ' . $ui->dim(sprintf(
+                    '%s %s and %d more',
+                    $ui->glyph('corner'),
+                    $ui->glyph('ellipsis'),
+                    $hidden
+                )));
             }
         }
 
         foreach ($plan->warnings() as $warning) {
-            $this->newLine();
-            $this->warn('  ' . $warning);
+            $ui->blank();
+            $ui->note('warn', $warning, 2);
         }
     }
 
@@ -123,44 +243,56 @@ abstract class AbstractExtraCommand extends Command
             return true;
         }
 
-        $this->newLine();
+        $ui = $this->ui();
+        $ui->blank();
+
+        foreach ($plan->forbidden() as $reason) {
+            $ui->note('fail', $reason, 2);
+        }
 
         foreach ($plan->blockers() as $blocker) {
-            $this->error('  ' . $blocker);
+            $ui->note('fail', $blocker, 2);
+        }
+
+        if ($plan->isForbidden()) {
+            $ui->blank();
+            $ui->write('  ' . $ui->dim('This cannot be overridden: Composer would refuse for the same reason.'));
+
+            return false;
         }
 
         if ($force) {
-            $this->warn('  proceeding anyway because --force was given');
+            $ui->note('warn', 'proceeding anyway because --force was given', 2);
 
             return true;
         }
 
-        $this->newLine();
-        $this->line('  Pass <info>--force</info> to proceed regardless.');
+        $ui->blank();
+
+        if ($this->isInteractive()) {
+            return $this->confirmStep('Proceed anyway?', false);
+        }
+
+        $ui->write('  Pass <info>--force</info> to proceed regardless.');
 
         return false;
     }
 
     protected function renderOutcome(Outcome $outcome): int
     {
-        $this->newLine();
-
-        if ($outcome->isSuccessful()) {
-            $this->info($outcome->message());
-        } else {
-            $this->error($outcome->message());
-        }
+        $ui = $this->ui();
+        $ui->banner($outcome->isSuccessful(), $outcome->message());
 
         foreach ($outcome->notes() as $note) {
-            $this->line('  <comment>' . $note . '</comment>');
+            $ui->write('  <comment>' . $note . '</comment>');
         }
 
         if (!$outcome->isSuccessful() && $outcome->output() !== []) {
-            $this->newLine();
-            $this->line('<fg=gray>composer output:</>');
+            $ui->blank();
+            $ui->section('composer output');
 
             foreach ($outcome->output() as $line) {
-                $this->line('  <fg=gray>' . $line . '</>');
+                $ui->write('  ' . $ui->dim($line));
             }
         }
 
@@ -169,12 +301,12 @@ abstract class AbstractExtraCommand extends Command
 
     protected function runOne(Extra $extra, Intent $intent, string $version, bool $dryRun, bool $force): int
     {
+        $ui = $this->ui();
+
         try {
             $plan = $this->installers->for($extra)->plan($extra, $intent, $version);
         } catch (ExtrasException $e) {
-            $this->error($e->getMessage());
-
-            return self::FAILURE;
+            return $this->bail($e->getMessage());
         }
 
         $this->renderPlan($plan);
@@ -184,25 +316,31 @@ abstract class AbstractExtraCommand extends Command
         }
 
         if ($dryRun) {
-            $this->newLine();
-            $this->line('<fg=gray>--dry-run: nothing was changed</>');
+            $ui->blank();
+            $ui->write($ui->dim('--dry-run: nothing was changed'));
 
             return self::SUCCESS;
         }
 
         if ($plan->isEmpty()) {
-            $this->newLine();
-            $this->info('Nothing to do.');
+            $ui->banner(true, 'Nothing to do.');
+
+            return self::SUCCESS;
+        }
+
+        if ($this->isInteractive() && !$this->confirmStep('Apply this plan?')) {
+            $ui->note('warn', 'Cancelled, nothing was changed.');
 
             return self::SUCCESS;
         }
 
         try {
-            return $this->renderOutcome($this->installers->for($extra)->apply($plan));
+            return $this->renderOutcome($this->spin(
+                'applying ' . $plan->coordinate(),
+                fn () => $this->installers->for($extra)->apply($plan)
+            ));
         } catch (ExtrasException $e) {
-            $this->error($e->getMessage());
-
-            return self::FAILURE;
+            return $this->bail($e->getMessage());
         }
     }
 
@@ -219,7 +357,7 @@ abstract class AbstractExtraCommand extends Command
         }
 
         if (!is_file($file)) {
-            $this->error("List file '{$file}' does not exist.");
+            $this->ui()->note('fail', "List file '{$file}' does not exist.");
 
             return $coordinates;
         }
@@ -237,9 +375,7 @@ abstract class AbstractExtraCommand extends Command
         return array_values(array_unique($coordinates));
     }
 
-    /**
-     * @param list<string> $coordinates
-     */
+    /** @param list<string> $coordinates */
     protected function runMany(array $coordinates, Intent $intent, string $version): int
     {
         $failed = 0;
@@ -276,8 +412,7 @@ abstract class AbstractExtraCommand extends Command
         }
 
         if ($failed > 0) {
-            $this->newLine();
-            $this->error(sprintf('%d of %d failed.', $failed, count($coordinates)));
+            $this->ui()->banner(false, sprintf('%d of %d failed.', $failed, count($coordinates)));
 
             return self::FAILURE;
         }

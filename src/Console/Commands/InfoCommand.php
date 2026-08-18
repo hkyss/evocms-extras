@@ -2,20 +2,25 @@
 
 namespace hkyss\Extras\Console\Commands;
 
+use hkyss\Extras\Domain\Extra;
+
 class InfoCommand extends AbstractExtraCommand
 {
     protected $signature = 'extra:info
-        {coordinate : vendor/package or org/repo}
+        {coordinate? : vendor/package or org/repo; omit to pick from the catalog}
         {--format=text : text or json}';
 
     protected $description = 'Show everything known about an extra';
 
     public function handle(): int
     {
-        $extra = $this->resolve((string) $this->argument('coordinate'));
+        $coordinate = $this->argument('coordinate');
+        $extra = is_string($coordinate) && $coordinate !== ''
+            ? $this->resolve($coordinate)
+            : $this->pick();
 
         if ($extra === null) {
-            return self::FAILURE;
+            return $this->failedToChoose($coordinate);
         }
 
         $state = $this->installers->stateOf($extra);
@@ -33,54 +38,54 @@ class InfoCommand extends AbstractExtraCommand
             return self::SUCCESS;
         }
 
-        $this->newLine();
-        $this->line('<options=bold>' . $extra->coordinate() . '</>');
-
-        if ($extra->description() !== '') {
-            $this->line($extra->description());
-        }
-
-        $this->newLine();
-
-        $rows = [
-            ['Format', $extra->format()->label()],
-            ['Source', $extra->sourceName() !== '' ? $extra->sourceName() : '—'],
-            ['Author', $extra->author()],
-            ['Latest', $extra->latestVersion() !== '' ? $extra->latestVersion() : '—'],
-            ['Default ref', $extra->defaultVersion()],
-            ['Installed', $state->isInstalled() ? $state->describe() : 'no'],
-            ['Evo 3', $extra->compatibility()->tag()],
-        ];
-
-        if ($extra->homepage() !== '') {
-            $rows[] = ['Homepage', $extra->homepage()];
-        }
-
-        $this->table([], $rows);
-
-        if ($extra->versions() !== []) {
-            $this->line('<fg=cyan>versions</>');
-            $this->line('  ' . implode(', ', array_slice($extra->versions(), 0, 15)));
-
-            if (count($extra->versions()) > 15) {
-                $this->line(sprintf('  <fg=gray>… and %d more</>', count($extra->versions()) - 15));
-            }
-
-            $this->newLine();
-        }
-
-        if ($extra->requires() !== []) {
-            $this->line('<fg=cyan>requires</>');
-
-            foreach ($extra->requires() as $name => $constraint) {
-                $this->line("  {$name}: {$constraint}");
-            }
-
-            $this->newLine();
-        }
-
-        $this->line('<fg=gray>' . $extra->compatibility()->explain() . '</>');
+        $this->presenter()->card($extra, $state);
 
         return self::SUCCESS;
+    }
+
+    private function failedToChoose(mixed $coordinate): int
+    {
+        if (is_string($coordinate) && $coordinate !== '') {
+            return self::FAILURE;
+        }
+
+        if ($this->isInteractive()) {
+            return self::SUCCESS;
+        }
+
+        return $this->bail('Which extra? Pass a coordinate, or run this in a terminal to pick one.');
+    }
+
+    private function pick(): ?Extra
+    {
+        if (!$this->isInteractive()) {
+            return null;
+        }
+
+        $extras = $this->spin('loading catalog', fn () => $this->catalog->all());
+
+        if ($extras === []) {
+            $this->reportCatalogProblems();
+
+            return null;
+        }
+
+        $rows = [];
+        $byCoordinate = [];
+
+        foreach ($extras as $extra) {
+            $state = $this->installers->stateOf($extra);
+
+            $rows[] = $this->optionFor(
+                $extra,
+                $state->isInstalled() ? 'installed ' . $state->describe() : ''
+            );
+
+            $byCoordinate[(string) $extra->coordinate()] = $extra;
+        }
+
+        $chosen = $this->choose('Which extra?', $rows, false);
+
+        return $chosen === null || $chosen === [] ? null : ($byCoordinate[$chosen[0]] ?? null);
     }
 }

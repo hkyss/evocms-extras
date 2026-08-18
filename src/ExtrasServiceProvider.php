@@ -10,6 +10,7 @@ use hkyss\Extras\Catalog\PackagistSource;
 use hkyss\Extras\Catalog\SnapshotSource;
 use hkyss\Extras\Console\Commands\CacheCommand;
 use hkyss\Extras\Console\Commands\DoctorCommand;
+use hkyss\Extras\Console\Commands\HelpCommand;
 use hkyss\Extras\Console\Commands\InfoCommand;
 use hkyss\Extras\Console\Commands\InstallCommand;
 use hkyss\Extras\Console\Commands\ListCommand;
@@ -47,6 +48,7 @@ class ExtrasServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->commands([
+                HelpCommand::class,
                 ListCommand::class,
                 InstallCommand::class,
                 UpdateCommand::class,
@@ -206,7 +208,6 @@ class ExtrasServiceProvider extends ServiceProvider
         }
     }
 
-    /** Evolution's config_path() takes a second argument that targets core/custom/config. */
     private function configTarget(): string
     {
         if (!function_exists('config_path')) {

@@ -10,10 +10,6 @@ use hkyss\Extras\Record\InstallRecordStore;
 use hkyss\Extras\Support\Http;
 use hkyss\Extras\Support\Paths;
 
-/**
- * Checks what Composer cannot: the CMS itself is not expressible as a dependency, so the
- * platform has to be verified at runtime.
- */
 class DoctorCommand extends AbstractExtraCommand
 {
     protected $signature = 'extra:doctor';
@@ -45,43 +41,69 @@ class DoctorCommand extends AbstractExtraCommand
 
     public function handle(): int
     {
-        $checks = array_merge(
-            $this->platformChecks(),
-            $this->composerChecks(),
-            $this->recordChecks(),
-            $this->catalogChecks()
-        );
+        $groups = [
+            'platform' => $this->platformChecks(),
+            'composer' => $this->composerChecks(),
+            'records' => $this->recordChecks(),
+            'catalog' => $this->catalogChecks(),
+        ];
 
-        $this->newLine();
-        $this->table(
-            ['', 'Check', 'Detail'],
-            array_map(static fn (array $c) => [
-                $c['ok'] ? '<fg=green>ok</>' : ($c['fatal'] ? '<fg=red>fail</>' : '<fg=yellow>warn</>'),
-                $c['name'],
-                $c['detail'],
-            ], $checks)
-        );
+        $ui = $this->ui();
+        $ui->heading('extra:doctor', 'can this installation install extras?');
+
+        $checks = [];
+        $first = true;
+
+        foreach ($groups as $group => $entries) {
+            if (!$first) {
+                $ui->blank();
+            }
+
+            $first = false;
+
+            $ui->section($group);
+            $ui->checks(array_map(static fn (array $c): array => [
+                'level' => $c['ok'] ? 'ok' : ($c['fatal'] ? 'fail' : 'warn'),
+                'name' => $c['name'],
+                'detail' => $c['detail'],
+            ], $entries));
+
+            $checks = array_merge($checks, $entries);
+        }
 
         $failures = array_filter($checks, static fn (array $c) => !$c['ok'] && $c['fatal']);
         $warnings = array_filter($checks, static fn (array $c) => !$c['ok'] && !$c['fatal']);
 
-        $this->newLine();
+        $ui->footer([
+            count($checks) . ' checks',
+            $failures !== [] ? count($failures) . ' blocking' : '',
+            $warnings !== [] ? count($warnings) . ' to fix' : '',
+        ]);
 
         if ($failures !== []) {
-            $this->error(sprintf('%d blocking problem(s).', count($failures)));
+            $ui->banner(false, $this->plural(count($failures), 'blocking problem', 'blocking problems') . '.');
 
             return self::FAILURE;
         }
 
         if ($warnings !== []) {
-            $this->warn(sprintf('%d thing(s) worth fixing, nothing blocking.', count($warnings)));
+            $ui->blank();
+            $ui->note('warn', sprintf(
+                '%s worth fixing, nothing blocking.',
+                $this->plural(count($warnings), 'thing', 'things')
+            ));
 
             return self::SUCCESS;
         }
 
-        $this->info('Everything checks out.');
+        $ui->banner(true, 'Everything checks out.');
 
         return self::SUCCESS;
+    }
+
+    private function plural(int $count, string $one, string $many): string
+    {
+        return $count . ' ' . ($count === 1 ? $one : $many);
     }
 
     /** @return list<array{name:string,ok:bool,fatal:bool,detail:string}> */
@@ -157,11 +179,7 @@ class DoctorCommand extends AbstractExtraCommand
         return $checks;
     }
 
-    /**
-     * Without the merge plugin our requirements never reach the core manifest.
-     *
-     * @return array{name:string,ok:bool,fatal:bool,detail:string}
-     */
+    /** @return array{name:string,ok:bool,fatal:bool,detail:string} */
     private function mergePluginCheck(): array
     {
         if ($this->paths === null) {
