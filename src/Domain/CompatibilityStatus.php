@@ -13,7 +13,6 @@ enum CompatibilityStatus: string
         return self::tryFrom((string) $value) ?? self::Unknown;
     }
 
-    /** Composer resolves its own requirements, so composer extras start out verified. */
     public static function forFormat(ExtraFormat $format): self
     {
         return $format === ExtraFormat::Composer ? self::Verified : self::Unknown;
@@ -22,6 +21,15 @@ enum CompatibilityStatus: string
     public function label(): string
     {
         return $this->value;
+    }
+
+    public function level(): string
+    {
+        return match ($this) {
+            self::Verified => 'ok',
+            self::Unknown => 'warn',
+            self::Incompatible => 'fail',
+        };
     }
 
     public function tag(): string
