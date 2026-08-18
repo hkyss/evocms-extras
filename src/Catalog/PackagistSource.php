@@ -140,12 +140,27 @@ class PackagistSource implements CatalogSource
             $this->name,
             (string) ($newest['homepage'] ?? ''),
             $coordinate->namespace(),
-            array_filter(
-                (array) ($newest['require'] ?? []),
-                static fn ($k) => $k !== 'php' && !str_starts_with((string) $k, 'ext-'),
-                ARRAY_FILTER_USE_KEY
-            )
+            self::requirements((array) ($newest['require'] ?? []))
         );
+    }
+
+    /**
+     * @param array<mixed, mixed> $require
+     * @return array<string, string>
+     */
+    public static function requirements(array $require): array
+    {
+        $requirements = [];
+
+        foreach ($require as $name => $constraint) {
+            if (!is_string($name) || $name === '' || !is_string($constraint)) {
+                continue;
+            }
+
+            $requirements[$name] = $constraint;
+        }
+
+        return $requirements;
     }
 
     /**

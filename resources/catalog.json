@@ -1,669 +1,697 @@
 {
-  "schema": 1,
-  "generated_at": "2026-08-06T08:16:06Z",
-  "extras": [
-    {
-      "coordinate": "ambrion/evocms-evo-package-manager",
-      "format": "composer",
-      "title": "ambrion/evocms-evo-package-manager",
-      "description": "Evo Package Manager module for EvolutionCMS CE 3",
-      "latest_release": "v0.1.0-alpha",
-      "versions": [
-        "v0.1.0-alpha"
-      ],
-      "default_branch": "",
-      "compatibility": "verified",
-      "homepage": "",
-      "author": "ambrion",
-      "require": {}
-    },
-    {
-      "coordinate": "ambrion/evocms-feature-flags",
-      "format": "composer",
-      "title": "ambrion/evocms-feature-flags",
-      "description": "Feature Flags module for EvolutionCMS CE 3 with rules engine, A/B testing and analytics",
-      "latest_release": "v0.1.1-alpha",
-      "versions": [
-        "v0.1.1-alpha",
-        "v0.1.0-alpha"
-      ],
-      "default_branch": "",
-      "compatibility": "verified",
-      "homepage": "",
-      "author": "ambrion",
-      "require": {
-        "ambrion/feature-flags-core": "^1.4@alpha"
-      }
-    },
-    {
-      "coordinate": "dmi3yy/ddocs",
-      "format": "composer",
-      "title": "dmi3yy/ddocs",
-      "description": "File-first documentation browser for Evolution CMS manager.",
-      "latest_release": "v1.0.0",
-      "versions": [
-        "v1.0.0"
-      ],
-      "default_branch": "",
-      "compatibility": "verified",
-      "homepage": "",
-      "author": "dmi3yy",
-      "require": {
-        "dmi3yy/dtui-editor": "^1.0",
-        "evolution-cms/evolution": "^3.5.7",
-        "evolution-cms/evo-ui": "^1.0"
-      }
-    },
-    {
-      "coordinate": "dmi3yy/dtui-editor",
-      "format": "composer",
-      "title": "dmi3yy/dtui-editor",
-      "description": "TOAST UI Editor integration for Evolution CMS",
-      "latest_release": "v1.0.2",
-      "versions": [
-        "v1.0.2",
-        "v1.0.1",
-        "v1.0.0"
-      ],
-      "default_branch": "",
-      "compatibility": "verified",
-      "homepage": "",
-      "author": "dmi3yy",
-      "require": {
-        "evolution-cms/evolution": "^3.5.7"
-      }
-    },
-    {
-      "coordinate": "elcreator/a-latte-x",
-      "format": "composer",
-      "title": "elcreator/a-latte-x",
-      "description": "A Latte eXtended template parser for Evolution CMS",
-      "latest_release": "",
-      "versions": [
-        "dev-main",
-        "dev-cursor/document-alattex-parser-flow-7043"
-      ],
-      "default_branch": "",
-      "compatibility": "verified",
-      "homepage": "",
-      "author": "elcreator",
-      "require": {
-        "evolution-cms/evolution": "^3.5.2",
-        "latte/latte": "^3.1"
-      }
-    },
-    {
-      "coordinate": "evocms-community/clientsettings",
-      "format": "legacy",
-      "title": "ClientSettings",
-      "description": "Client Settings for Evolution CMS",
-      "latest_release": "",
-      "versions": [],
-      "default_branch": "master",
-      "compatibility": "unknown",
-      "homepage": "https://github.com/evocms-community/clientsettings",
-      "author": "evocms-community",
-      "require": {}
-    },
-    {
-      "coordinate": "evocms-community/commerce",
-      "format": "legacy",
-      "title": "Commerce",
-      "description": "Commerce for Evolution CMS",
-      "latest_release": "",
-      "versions": [],
-      "default_branch": "master",
-      "compatibility": "unknown",
-      "homepage": "https://github.com/evocms-community/commerce",
-      "author": "evocms-community",
-      "require": {}
-    },
-    {
-      "coordinate": "evocms-community/DLInstagram",
-      "format": "legacy",
-      "title": "DLInstagram",
-      "description": "Instagram controller for DocLister",
-      "latest_release": "",
-      "versions": [],
-      "default_branch": "master",
-      "compatibility": "unknown",
-      "homepage": "https://github.com/evocms-community/DLInstagram",
-      "author": "evocms-community",
-      "require": {}
-    },
-    {
-      "coordinate": "evocms-community/faviconcreator",
-      "format": "legacy",
-      "title": "FaviconCreator",
-      "description": "Favicon Creator for Evolution CMS",
-      "latest_release": "",
-      "versions": [],
-      "default_branch": "master",
-      "compatibility": "unknown",
-      "homepage": "https://github.com/evocms-community/faviconcreator",
-      "author": "evocms-community",
-      "require": {}
-    },
-    {
-      "coordinate": "evocms-community/lesscompiler",
-      "format": "legacy",
-      "title": "LessCompiler",
-      "description": "LESS Compiler for Evolution CMS",
-      "latest_release": "",
-      "versions": [],
-      "default_branch": "master",
-      "compatibility": "unknown",
-      "homepage": "https://github.com/evocms-community/lesscompiler",
-      "author": "evocms-community",
-      "require": {}
-    },
-    {
-      "coordinate": "evocms-community/pagebuilder",
-      "format": "legacy",
-      "title": "PageBuilder",
-      "description": "Creates form for manage content sections",
-      "latest_release": "",
-      "versions": [],
-      "default_branch": "master",
-      "compatibility": "unknown",
-      "homepage": "https://github.com/evocms-community/pagebuilder",
-      "author": "evocms-community",
-      "require": {}
-    },
-    {
-      "coordinate": "evolution-cms-extras/doclister",
-      "format": "composer",
-      "title": "evolution-cms-extras/doclister",
-      "description": "evocms package for work with documents",
-      "latest_release": "2.5.2.4",
-      "versions": [
-        "2.5.2.4",
-        "2.5.2.3",
-        "2.5.2.2",
-        "2.5.2.1",
-        "2.5.2",
-        "2.5.1",
-        "2.5.0",
-        "2.4.1",
-        "2.4.0",
-        "2.3.17",
-        "2.3.16",
-        "2.3.15"
-      ],
-      "default_branch": "",
-      "compatibility": "verified",
-      "homepage": "",
-      "author": "evolution-cms-extras",
-      "require": {}
-    },
-    {
-      "coordinate": "evolution-cms-extras/multifields",
-      "format": "composer",
-      "title": "evolution-cms-extras/multifields",
-      "description": "evocms package multifields",
-      "latest_release": "v3.1.0",
-      "versions": [
-        "v3.1.0",
-        "3.0.0"
-      ],
-      "default_branch": "",
-      "compatibility": "verified",
-      "homepage": "",
-      "author": "evolution-cms-extras",
-      "require": {}
-    },
-    {
-      "coordinate": "evolution-cms-extras/tinymce5",
-      "format": "composer",
-      "title": "evolution-cms-extras/tinymce5",
-      "description": "evocms package tinymce5",
-      "latest_release": "5.7.1",
-      "versions": [
-        "5.7.1",
-        "5.7.0",
-        "5.6.1.2",
-        "5.6.1.1",
-        "5.6.1"
-      ],
-      "default_branch": "",
-      "compatibility": "verified",
-      "homepage": "",
-      "author": "evolution-cms-extras",
-      "require": {}
-    },
-    {
-      "coordinate": "evolution-cms/eai",
-      "format": "composer",
-      "title": "evolution-cms/eai",
-      "description": "Evolution CMS library that integrates Laravel AI SDK capabilities into Evolution-based projects",
-      "latest_release": "",
-      "versions": [
-        "dev-main",
-        "dev-middleDuck/eai-php83-compat"
-      ],
-      "default_branch": "",
-      "compatibility": "verified",
-      "homepage": "",
-      "author": "evolution-cms",
-      "require": {
-        "evolution-cms/evolution": "^3.5.2",
-        "laravel/ai": "^0.4.4",
-        "seiger/stask": "^1.0 || ^2.0"
-      }
-    },
-    {
-      "coordinate": "evolution-cms/ecodemirror",
-      "format": "composer",
-      "title": "evolution-cms/ecodemirror",
-      "description": "CodeMirror 6 for Evolution CMS",
-      "latest_release": "",
-      "versions": [
-        "dev-main"
-      ],
-      "default_branch": "",
-      "compatibility": "verified",
-      "homepage": "",
-      "author": "evolution-cms",
-      "require": {
-        "evolution-cms/evolution": "^3.5.2"
-      }
-    },
-    {
-      "coordinate": "evolution-cms/efilemanager",
-      "format": "composer",
-      "title": "evolution-cms/efilemanager",
-      "description": "UniSharp Laravel Filemanager for Evolution CMS",
-      "latest_release": "",
-      "versions": [
-        "dev-main"
-      ],
-      "default_branch": "",
-      "compatibility": "verified",
-      "homepage": "",
-      "author": "evolution-cms",
-      "require": {
-        "evolution-cms/evolution": "^3.5.2",
-        "unisharp/laravel-filemanager": "^v2.12.1"
-      }
-    },
-    {
-      "coordinate": "evolution-cms/emcp",
-      "format": "composer",
-      "title": "evolution-cms/emcp",
-      "description": "Official MCP platform layer for Evolution CMS",
-      "latest_release": "",
-      "versions": [
-        "dev-main"
-      ],
-      "default_branch": "",
-      "compatibility": "verified",
-      "homepage": "",
-      "author": "evolution-cms",
-      "require": {
-        "evolution-cms/evolution": "^3.5.2",
-        "laravel/mcp": "^0.5.9",
-        "seiger/sapi": "*",
-        "seiger/stask": "*"
-      }
-    },
-    {
-      "coordinate": "evolution-cms/epasskeys",
-      "format": "composer",
-      "title": "evolution-cms/epasskeys",
-      "description": "Passkeys (WebAuthn) for Evolution CMS",
-      "latest_release": "",
-      "versions": [
-        "dev-main"
-      ],
-      "default_branch": "",
-      "compatibility": "verified",
-      "homepage": "",
-      "author": "evolution-cms",
-      "require": {
-        "evolution-cms/evolution": "^3.5.2",
-        "web-auth/webauthn-lib": "^5.0"
-      }
-    },
-    {
-      "coordinate": "evolution-cms/etinymce",
-      "format": "composer",
-      "title": "evolution-cms/etinymce",
-      "description": "TinyMCE 8 for Evolution CMS",
-      "latest_release": "8.3.2",
-      "versions": [
-        "8.3.2"
-      ],
-      "default_branch": "",
-      "compatibility": "verified",
-      "homepage": "",
-      "author": "evolution-cms",
-      "require": {
-        "evolution-cms/evolution": "^3.5.2",
-        "tinymce/tinymce": "^8.3"
-      }
-    },
-    {
-      "coordinate": "evolution-cms/evo-ai",
-      "format": "composer",
-      "title": "evolution-cms/evo-ai",
-      "description": "Evolution CMS library that integrates Laravel AI SDK capabilities into Evolution-based projects",
-      "latest_release": "",
-      "versions": [
-        "dev-main",
-        "dev-middleDuck/eai-php83-compat"
-      ],
-      "default_branch": "",
-      "compatibility": "verified",
-      "homepage": "",
-      "author": "evolution-cms",
-      "require": {
-        "evolution-cms/evolution": "^3.5.2",
-        "laravel/ai": "^0.4.4",
-        "seiger/stask": "^1.0 || ^2.0"
-      }
-    },
-    {
-      "coordinate": "extras-evolution/ajaxSearch",
-      "format": "legacy",
-      "title": "ajaxSearch",
-      "description": "Ajax and non-Ajax search",
-      "latest_release": "",
-      "versions": [],
-      "default_branch": "master",
-      "compatibility": "unknown",
-      "homepage": "https://github.com/extras-evolution/ajaxSearch",
-      "author": "extras-evolution",
-      "require": {}
-    },
-    {
-      "coordinate": "extras-evolution/Ditto",
-      "format": "legacy",
-      "title": "Ditto",
-      "description": "Document lister for MODX Evolution",
-      "latest_release": "",
-      "versions": [],
-      "default_branch": "master",
-      "compatibility": "unknown",
-      "homepage": "https://github.com/extras-evolution/Ditto",
-      "author": "extras-evolution",
-      "require": {}
-    },
-    {
-      "coordinate": "extras-evolution/DocInfo",
-      "format": "legacy",
-      "title": "DocInfo",
-      "description": "Take any field from any document",
-      "latest_release": "",
-      "versions": [],
-      "default_branch": "master",
-      "compatibility": "unknown",
-      "homepage": "https://github.com/extras-evolution/DocInfo",
-      "author": "extras-evolution",
-      "require": {}
-    },
-    {
-      "coordinate": "extras-evolution/eForm",
-      "format": "legacy",
-      "title": "eForm",
-      "description": "Form processing snippet",
-      "latest_release": "",
-      "versions": [],
-      "default_branch": "master",
-      "compatibility": "unknown",
-      "homepage": "https://github.com/extras-evolution/eForm",
-      "author": "extras-evolution",
-      "require": {}
-    },
-    {
-      "coordinate": "extras-evolution/ManagerManager",
-      "format": "legacy",
-      "title": "ManagerManager",
-      "description": "Customise the document editing panel",
-      "latest_release": "",
-      "versions": [],
-      "default_branch": "master",
-      "compatibility": "unknown",
-      "homepage": "https://github.com/extras-evolution/ManagerManager",
-      "author": "extras-evolution",
-      "require": {}
-    },
-    {
-      "coordinate": "extras-evolution/MinifyX-for-Evolution",
-      "format": "legacy",
-      "title": "MinifyX",
-      "description": "Component MinifyX for MODX Evolution",
-      "latest_release": "",
-      "versions": [],
-      "default_branch": "master",
-      "compatibility": "unknown",
-      "homepage": "https://github.com/extras-evolution/MinifyX-for-Evolution",
-      "author": "extras-evolution",
-      "require": {}
-    },
-    {
-      "coordinate": "extras-evolution/multiTV",
-      "format": "legacy",
-      "title": "multiTV",
-      "description": "Custom TV for Evolution CMS",
-      "latest_release": "",
-      "versions": [],
-      "default_branch": "master",
-      "compatibility": "unknown",
-      "homepage": "https://github.com/extras-evolution/multiTV",
-      "author": "extras-evolution",
-      "require": {}
-    },
-    {
-      "coordinate": "extras-evolution/Shopkeeper",
-      "format": "legacy",
-      "title": "Shopkeeper",
-      "description": "Complete solution for creating an online shop",
-      "latest_release": "",
-      "versions": [],
-      "default_branch": "master",
-      "compatibility": "unknown",
-      "homepage": "https://github.com/extras-evolution/Shopkeeper",
-      "author": "extras-evolution",
-      "require": {}
-    },
-    {
-      "coordinate": "extras-evolution/sitemap",
-      "format": "legacy",
-      "title": "sitemap",
-      "description": "Outputs a machine readable site map",
-      "latest_release": "",
-      "versions": [],
-      "default_branch": "master",
-      "compatibility": "unknown",
-      "homepage": "https://github.com/extras-evolution/sitemap",
-      "author": "extras-evolution",
-      "require": {}
-    },
-    {
-      "coordinate": "extras-evolution/Updater",
-      "format": "legacy",
-      "title": "Updater",
-      "description": "Updater for MODX Evolution",
-      "latest_release": "",
-      "versions": [],
-      "default_branch": "master",
-      "compatibility": "unknown",
-      "homepage": "https://github.com/extras-evolution/Updater",
-      "author": "extras-evolution",
-      "require": {}
-    },
-    {
-      "coordinate": "index-now-ru/evocms-index-now-ru",
-      "format": "composer",
-      "title": "index-now-ru/evocms-index-now-ru",
-      "description": "Evocms package that submits published document URLs to Index-Now.ru.",
-      "latest_release": "v1.0.0",
-      "versions": [
-        "v1.0.0"
-      ],
-      "default_branch": "",
-      "compatibility": "verified",
-      "homepage": "https://index-now.ru/?utm_source=evolutioncms_extras&utm_medium=referral&utm_campaign=cms_plugin",
-      "author": "index-now-ru",
-      "require": {
-        "evolution-cms/evolution": "^3.5"
-      }
-    },
-    {
-      "coordinate": "klym/multifields-configure",
-      "format": "composer",
-      "title": "klym/multifields-configure",
-      "description": "Evolution CMS plugin Multifields config manager",
-      "latest_release": "",
-      "versions": [
-        "dev-main"
-      ],
-      "default_branch": "",
-      "compatibility": "verified",
-      "homepage": "",
-      "author": "klym",
-      "require": {}
-    },
-    {
-      "coordinate": "klym/multifields-parser",
-      "format": "composer",
-      "title": "klym/multifields-parser",
-      "description": "Parsing multifields plugin values for Evolution CMS",
-      "latest_release": "",
-      "versions": [
-        "dev-main"
-      ],
-      "default_branch": "",
-      "compatibility": "verified",
-      "homepage": "",
-      "author": "klym",
-      "require": {}
-    },
-    {
-      "coordinate": "roilafx/packagenavigator",
-      "format": "composer",
-      "title": "roilafx/packagenavigator",
-      "description": "Package Navigator для Evolution CMS - Инструмент для управления и установки пакетов",
-      "latest_release": "",
-      "versions": [
-        "dev-main"
-      ],
-      "default_branch": "",
-      "compatibility": "verified",
-      "homepage": "",
-      "author": "roilafx",
-      "require": {}
-    },
-    {
-      "coordinate": "seiger/scommerce",
-      "format": "composer",
-      "title": "seiger/scommerce",
-      "description": "E-commerce tools package for Evolution CMS.",
-      "latest_release": "v1.2.2",
-      "versions": [
-        "v1.2.2",
-        "v1.2.1",
-        "v1.2.0",
-        "v1.1.1",
-        "v1.1.0",
-        "v1.0.12",
-        "v1.0.11",
-        "v1.0.10",
-        "v1.0.9",
-        "v1.0.8",
-        "v1.0.7",
-        "v1.0.6"
-      ],
-      "default_branch": "",
-      "compatibility": "verified",
-      "homepage": "",
-      "author": "seiger",
-      "require": {
-        "evolution-cms/evolution": "^3.5.7",
-        "seiger/sgallery": "^1.3",
-        "seiger/stask": "^1.0 || ^2.0"
-      }
-    },
-    {
-      "coordinate": "seiger/sgallery",
-      "format": "composer",
-      "title": "seiger/sgallery",
-      "description": "Evocms package for work with Gallery for Resource in Evolution CMS and manipulate images with an expressive API",
-      "latest_release": "v1.5.1",
-      "versions": [
-        "v1.5.1",
-        "v1.5.0",
-        "v1.4.2",
-        "v1.4.1",
-        "v1.4.0",
-        "v1.3.7",
-        "v1.3.6",
-        "v1.3.5",
-        "v1.3.4",
-        "v1.3.3",
-        "v1.3.2",
-        "v1.3.1"
-      ],
-      "default_branch": "",
-      "compatibility": "verified",
-      "homepage": "",
-      "author": "seiger",
-      "require": {
-        "evolution-cms/evolution": "^3.3",
-        "spatie/image": "3.*"
-      }
-    },
-    {
-      "coordinate": "seiger/smailer",
-      "format": "composer",
-      "title": "seiger/smailer",
-      "description": "Mailing lists Management Module for Evolution CMS admin panel.",
-      "latest_release": "v1.0.0",
-      "versions": [
-        "v1.0.0"
-      ],
-      "default_branch": "",
-      "compatibility": "verified",
-      "homepage": "",
-      "author": "seiger",
-      "require": {}
-    },
-    {
-      "coordinate": "seiger/soffers",
-      "format": "composer",
-      "title": "seiger/soffers",
-      "description": "Module for records management in the Evolution CMS admin panel.",
-      "latest_release": "v1.0.0",
-      "versions": [
-        "v1.0.0"
-      ],
-      "default_branch": "",
-      "compatibility": "verified",
-      "homepage": "",
-      "author": "seiger",
-      "require": {}
-    },
-    {
-      "coordinate": "seiger/ssettings",
-      "format": "composer",
-      "title": "seiger/ssettings",
-      "description": "Evocms package for work with Advanced settings for your website.",
-      "latest_release": "v1.0.7",
-      "versions": [
-        "v1.0.7",
-        "v1.0.6",
-        "v1.0.5",
-        "v1.0.4",
-        "v1.0.3",
-        "1.0.2",
-        "v1.0.1",
-        "v1.0.0"
-      ],
-      "default_branch": "",
-      "compatibility": "verified",
-      "homepage": "",
-      "author": "seiger",
-      "require": {}
-    }
-  ]
+    "schema": 1,
+    "generated_at": "2026-08-06T08:16:06Z",
+    "extras": [
+        {
+            "coordinate": "ambrion/evocms-evo-package-manager",
+            "format": "composer",
+            "title": "ambrion/evocms-evo-package-manager",
+            "description": "Evo Package Manager module for EvolutionCMS CE 3",
+            "latest_release": "v0.1.0-alpha",
+            "versions": [
+                "v0.1.0-alpha"
+            ],
+            "default_branch": "",
+            "compatibility": "verified",
+            "homepage": "",
+            "author": "ambrion",
+            "require": {
+                "php": "^8.3"
+            }
+        },
+        {
+            "coordinate": "ambrion/evocms-feature-flags",
+            "format": "composer",
+            "title": "ambrion/evocms-feature-flags",
+            "description": "Feature Flags module for EvolutionCMS CE 3 with rules engine, A/B testing and analytics",
+            "latest_release": "v0.1.1-alpha",
+            "versions": [
+                "v0.1.1-alpha",
+                "v0.1.0-alpha"
+            ],
+            "default_branch": "",
+            "compatibility": "verified",
+            "homepage": "",
+            "author": "ambrion",
+            "require": {
+                "php": "^8.3",
+                "ambrion/feature-flags-core": "^1.4@alpha"
+            }
+        },
+        {
+            "coordinate": "dmi3yy/ddocs",
+            "format": "composer",
+            "title": "dmi3yy/ddocs",
+            "description": "File-first documentation browser for Evolution CMS manager.",
+            "latest_release": "v1.0.0",
+            "versions": [
+                "v1.0.0"
+            ],
+            "default_branch": "",
+            "compatibility": "verified",
+            "homepage": "",
+            "author": "dmi3yy",
+            "require": {
+                "php": "^8.3",
+                "dmi3yy/dtui-editor": "^1.0",
+                "evolution-cms/evolution": "^3.5.7",
+                "evolution-cms/evo-ui": "^1.0"
+            }
+        },
+        {
+            "coordinate": "dmi3yy/dtui-editor",
+            "format": "composer",
+            "title": "dmi3yy/dtui-editor",
+            "description": "TOAST UI Editor integration for Evolution CMS",
+            "latest_release": "v1.0.2",
+            "versions": [
+                "v1.0.2",
+                "v1.0.1",
+                "v1.0.0"
+            ],
+            "default_branch": "",
+            "compatibility": "verified",
+            "homepage": "",
+            "author": "dmi3yy",
+            "require": {
+                "php": "^8.3",
+                "evolution-cms/evolution": "^3.5.7"
+            }
+        },
+        {
+            "coordinate": "elcreator/a-latte-x",
+            "format": "composer",
+            "title": "elcreator/a-latte-x",
+            "description": "A Latte eXtended template parser for Evolution CMS",
+            "latest_release": "",
+            "versions": [
+                "dev-main",
+                "dev-cursor/document-alattex-parser-flow-7043"
+            ],
+            "default_branch": "",
+            "compatibility": "verified",
+            "homepage": "",
+            "author": "elcreator",
+            "require": {
+                "php": "^8.3",
+                "evolution-cms/evolution": "^3.5.2",
+                "latte/latte": "^3.1"
+            }
+        },
+        {
+            "coordinate": "evocms-community/clientsettings",
+            "format": "legacy",
+            "title": "ClientSettings",
+            "description": "Client Settings for Evolution CMS",
+            "latest_release": "",
+            "versions": [],
+            "default_branch": "master",
+            "compatibility": "unknown",
+            "homepage": "https://github.com/evocms-community/clientsettings",
+            "author": "evocms-community",
+            "require": {}
+        },
+        {
+            "coordinate": "evocms-community/commerce",
+            "format": "legacy",
+            "title": "Commerce",
+            "description": "Commerce for Evolution CMS",
+            "latest_release": "",
+            "versions": [],
+            "default_branch": "master",
+            "compatibility": "unknown",
+            "homepage": "https://github.com/evocms-community/commerce",
+            "author": "evocms-community",
+            "require": {}
+        },
+        {
+            "coordinate": "evocms-community/DLInstagram",
+            "format": "legacy",
+            "title": "DLInstagram",
+            "description": "Instagram controller for DocLister",
+            "latest_release": "",
+            "versions": [],
+            "default_branch": "master",
+            "compatibility": "unknown",
+            "homepage": "https://github.com/evocms-community/DLInstagram",
+            "author": "evocms-community",
+            "require": {}
+        },
+        {
+            "coordinate": "evocms-community/faviconcreator",
+            "format": "legacy",
+            "title": "FaviconCreator",
+            "description": "Favicon Creator for Evolution CMS",
+            "latest_release": "",
+            "versions": [],
+            "default_branch": "master",
+            "compatibility": "unknown",
+            "homepage": "https://github.com/evocms-community/faviconcreator",
+            "author": "evocms-community",
+            "require": {}
+        },
+        {
+            "coordinate": "evocms-community/lesscompiler",
+            "format": "legacy",
+            "title": "LessCompiler",
+            "description": "LESS Compiler for Evolution CMS",
+            "latest_release": "",
+            "versions": [],
+            "default_branch": "master",
+            "compatibility": "unknown",
+            "homepage": "https://github.com/evocms-community/lesscompiler",
+            "author": "evocms-community",
+            "require": {}
+        },
+        {
+            "coordinate": "evocms-community/pagebuilder",
+            "format": "legacy",
+            "title": "PageBuilder",
+            "description": "Creates form for manage content sections",
+            "latest_release": "",
+            "versions": [],
+            "default_branch": "master",
+            "compatibility": "unknown",
+            "homepage": "https://github.com/evocms-community/pagebuilder",
+            "author": "evocms-community",
+            "require": {}
+        },
+        {
+            "coordinate": "evolution-cms-extras/doclister",
+            "format": "composer",
+            "title": "evolution-cms-extras/doclister",
+            "description": "evocms package for work with documents",
+            "latest_release": "2.5.2.4",
+            "versions": [
+                "2.5.2.4",
+                "2.5.2.3",
+                "2.5.2.2",
+                "2.5.2.1",
+                "2.5.2",
+                "2.5.1",
+                "2.5.0",
+                "2.4.1",
+                "2.4.0",
+                "2.3.17",
+                "2.3.16",
+                "2.3.15"
+            ],
+            "default_branch": "",
+            "compatibility": "verified",
+            "homepage": "",
+            "author": "evolution-cms-extras",
+            "require": {}
+        },
+        {
+            "coordinate": "evolution-cms-extras/multifields",
+            "format": "composer",
+            "title": "evolution-cms-extras/multifields",
+            "description": "evocms package multifields",
+            "latest_release": "v3.1.0",
+            "versions": [
+                "v3.1.0",
+                "3.0.0"
+            ],
+            "default_branch": "",
+            "compatibility": "verified",
+            "homepage": "",
+            "author": "evolution-cms-extras",
+            "require": {}
+        },
+        {
+            "coordinate": "evolution-cms-extras/tinymce5",
+            "format": "composer",
+            "title": "evolution-cms-extras/tinymce5",
+            "description": "evocms package tinymce5",
+            "latest_release": "5.7.1",
+            "versions": [
+                "5.7.1",
+                "5.7.0",
+                "5.6.1.2",
+                "5.6.1.1",
+                "5.6.1"
+            ],
+            "default_branch": "",
+            "compatibility": "verified",
+            "homepage": "",
+            "author": "evolution-cms-extras",
+            "require": {}
+        },
+        {
+            "coordinate": "evolution-cms/eai",
+            "format": "composer",
+            "title": "evolution-cms/eai",
+            "description": "Evolution CMS library that integrates Laravel AI SDK capabilities into Evolution-based projects",
+            "latest_release": "",
+            "versions": [
+                "dev-main",
+                "dev-middleDuck/eai-php83-compat"
+            ],
+            "default_branch": "",
+            "compatibility": "verified",
+            "homepage": "",
+            "author": "evolution-cms",
+            "require": {
+                "evolution-cms/evolution": "^3.5.2",
+                "php": "^8.3",
+                "laravel/ai": "^0.4.4",
+                "seiger/stask": "^1.0 || ^2.0"
+            }
+        },
+        {
+            "coordinate": "evolution-cms/ecodemirror",
+            "format": "composer",
+            "title": "evolution-cms/ecodemirror",
+            "description": "CodeMirror 6 for Evolution CMS",
+            "latest_release": "",
+            "versions": [
+                "dev-main"
+            ],
+            "default_branch": "",
+            "compatibility": "verified",
+            "homepage": "",
+            "author": "evolution-cms",
+            "require": {
+                "php": "^8.3",
+                "evolution-cms/evolution": "^3.5.2"
+            }
+        },
+        {
+            "coordinate": "evolution-cms/efilemanager",
+            "format": "composer",
+            "title": "evolution-cms/efilemanager",
+            "description": "UniSharp Laravel Filemanager for Evolution CMS",
+            "latest_release": "",
+            "versions": [
+                "dev-main"
+            ],
+            "default_branch": "",
+            "compatibility": "verified",
+            "homepage": "",
+            "author": "evolution-cms",
+            "require": {
+                "php": "^8.3",
+                "evolution-cms/evolution": "^3.5.2",
+                "unisharp/laravel-filemanager": "^v2.12.1"
+            }
+        },
+        {
+            "coordinate": "evolution-cms/emcp",
+            "format": "composer",
+            "title": "evolution-cms/emcp",
+            "description": "Official MCP platform layer for Evolution CMS",
+            "latest_release": "",
+            "versions": [
+                "dev-main"
+            ],
+            "default_branch": "",
+            "compatibility": "verified",
+            "homepage": "",
+            "author": "evolution-cms",
+            "require": {
+                "evolution-cms/evolution": "^3.5.2",
+                "php": "^8.3",
+                "laravel/mcp": "^0.5.9",
+                "seiger/sapi": "*",
+                "seiger/stask": "*"
+            }
+        },
+        {
+            "coordinate": "evolution-cms/epasskeys",
+            "format": "composer",
+            "title": "evolution-cms/epasskeys",
+            "description": "Passkeys (WebAuthn) for Evolution CMS",
+            "latest_release": "",
+            "versions": [
+                "dev-main"
+            ],
+            "default_branch": "",
+            "compatibility": "verified",
+            "homepage": "",
+            "author": "evolution-cms",
+            "require": {
+                "php": "^8.3",
+                "evolution-cms/evolution": "^3.5.2",
+                "web-auth/webauthn-lib": "^5.0"
+            }
+        },
+        {
+            "coordinate": "evolution-cms/etinymce",
+            "format": "composer",
+            "title": "evolution-cms/etinymce",
+            "description": "TinyMCE 8 for Evolution CMS",
+            "latest_release": "8.3.2",
+            "versions": [
+                "8.3.2"
+            ],
+            "default_branch": "",
+            "compatibility": "verified",
+            "homepage": "",
+            "author": "evolution-cms",
+            "require": {
+                "php": "^8.3",
+                "evolution-cms/evolution": "^3.5.2",
+                "tinymce/tinymce": "^8.3"
+            }
+        },
+        {
+            "coordinate": "evolution-cms/evo-ai",
+            "format": "composer",
+            "title": "evolution-cms/evo-ai",
+            "description": "Evolution CMS library that integrates Laravel AI SDK capabilities into Evolution-based projects",
+            "latest_release": "",
+            "versions": [
+                "dev-main",
+                "dev-middleDuck/eai-php83-compat"
+            ],
+            "default_branch": "",
+            "compatibility": "verified",
+            "homepage": "",
+            "author": "evolution-cms",
+            "require": {
+                "php": "^8.3",
+                "evolution-cms/evolution": "^3.5.2",
+                "laravel/ai": "^0.4.4",
+                "seiger/stask": "^1.0 || ^2.0"
+            }
+        },
+        {
+            "coordinate": "extras-evolution/ajaxSearch",
+            "format": "legacy",
+            "title": "ajaxSearch",
+            "description": "Ajax and non-Ajax search",
+            "latest_release": "",
+            "versions": [],
+            "default_branch": "master",
+            "compatibility": "unknown",
+            "homepage": "https://github.com/extras-evolution/ajaxSearch",
+            "author": "extras-evolution",
+            "require": {}
+        },
+        {
+            "coordinate": "extras-evolution/Ditto",
+            "format": "legacy",
+            "title": "Ditto",
+            "description": "Document lister for MODX Evolution",
+            "latest_release": "",
+            "versions": [],
+            "default_branch": "master",
+            "compatibility": "unknown",
+            "homepage": "https://github.com/extras-evolution/Ditto",
+            "author": "extras-evolution",
+            "require": {}
+        },
+        {
+            "coordinate": "extras-evolution/DocInfo",
+            "format": "legacy",
+            "title": "DocInfo",
+            "description": "Take any field from any document",
+            "latest_release": "",
+            "versions": [],
+            "default_branch": "master",
+            "compatibility": "unknown",
+            "homepage": "https://github.com/extras-evolution/DocInfo",
+            "author": "extras-evolution",
+            "require": {}
+        },
+        {
+            "coordinate": "extras-evolution/eForm",
+            "format": "legacy",
+            "title": "eForm",
+            "description": "Form processing snippet",
+            "latest_release": "",
+            "versions": [],
+            "default_branch": "master",
+            "compatibility": "unknown",
+            "homepage": "https://github.com/extras-evolution/eForm",
+            "author": "extras-evolution",
+            "require": {}
+        },
+        {
+            "coordinate": "extras-evolution/ManagerManager",
+            "format": "legacy",
+            "title": "ManagerManager",
+            "description": "Customise the document editing panel",
+            "latest_release": "",
+            "versions": [],
+            "default_branch": "master",
+            "compatibility": "unknown",
+            "homepage": "https://github.com/extras-evolution/ManagerManager",
+            "author": "extras-evolution",
+            "require": {}
+        },
+        {
+            "coordinate": "extras-evolution/MinifyX-for-Evolution",
+            "format": "legacy",
+            "title": "MinifyX",
+            "description": "Component MinifyX for MODX Evolution",
+            "latest_release": "",
+            "versions": [],
+            "default_branch": "master",
+            "compatibility": "unknown",
+            "homepage": "https://github.com/extras-evolution/MinifyX-for-Evolution",
+            "author": "extras-evolution",
+            "require": {}
+        },
+        {
+            "coordinate": "extras-evolution/multiTV",
+            "format": "legacy",
+            "title": "multiTV",
+            "description": "Custom TV for Evolution CMS",
+            "latest_release": "",
+            "versions": [],
+            "default_branch": "master",
+            "compatibility": "unknown",
+            "homepage": "https://github.com/extras-evolution/multiTV",
+            "author": "extras-evolution",
+            "require": {}
+        },
+        {
+            "coordinate": "extras-evolution/Shopkeeper",
+            "format": "legacy",
+            "title": "Shopkeeper",
+            "description": "Complete solution for creating an online shop",
+            "latest_release": "",
+            "versions": [],
+            "default_branch": "master",
+            "compatibility": "unknown",
+            "homepage": "https://github.com/extras-evolution/Shopkeeper",
+            "author": "extras-evolution",
+            "require": {}
+        },
+        {
+            "coordinate": "extras-evolution/sitemap",
+            "format": "legacy",
+            "title": "sitemap",
+            "description": "Outputs a machine readable site map",
+            "latest_release": "",
+            "versions": [],
+            "default_branch": "master",
+            "compatibility": "unknown",
+            "homepage": "https://github.com/extras-evolution/sitemap",
+            "author": "extras-evolution",
+            "require": {}
+        },
+        {
+            "coordinate": "extras-evolution/Updater",
+            "format": "legacy",
+            "title": "Updater",
+            "description": "Updater for MODX Evolution",
+            "latest_release": "",
+            "versions": [],
+            "default_branch": "master",
+            "compatibility": "unknown",
+            "homepage": "https://github.com/extras-evolution/Updater",
+            "author": "extras-evolution",
+            "require": {}
+        },
+        {
+            "coordinate": "index-now-ru/evocms-index-now-ru",
+            "format": "composer",
+            "title": "index-now-ru/evocms-index-now-ru",
+            "description": "Evocms package that submits published document URLs to Index-Now.ru.",
+            "latest_release": "v1.0.0",
+            "versions": [
+                "v1.0.0"
+            ],
+            "default_branch": "",
+            "compatibility": "verified",
+            "homepage": "https://index-now.ru/?utm_source=evolutioncms_extras&utm_medium=referral&utm_campaign=cms_plugin",
+            "author": "index-now-ru",
+            "require": {
+                "php": "^8.3",
+                "evolution-cms/evolution": "^3.5",
+                "ext-curl": "*",
+                "ext-json": "*"
+            }
+        },
+        {
+            "coordinate": "klym/multifields-configure",
+            "format": "composer",
+            "title": "klym/multifields-configure",
+            "description": "Evolution CMS plugin Multifields config manager",
+            "latest_release": "",
+            "versions": [
+                "dev-main"
+            ],
+            "default_branch": "",
+            "compatibility": "verified",
+            "homepage": "",
+            "author": "klym",
+            "require": {
+                "php": "^7.4 || ^8.0"
+            }
+        },
+        {
+            "coordinate": "klym/multifields-parser",
+            "format": "composer",
+            "title": "klym/multifields-parser",
+            "description": "Parsing multifields plugin values for Evolution CMS",
+            "latest_release": "",
+            "versions": [
+                "dev-main"
+            ],
+            "default_branch": "",
+            "compatibility": "verified",
+            "homepage": "",
+            "author": "klym",
+            "require": {
+                "php": "^7.4 || ^8.0"
+            }
+        },
+        {
+            "coordinate": "roilafx/packagenavigator",
+            "format": "composer",
+            "title": "roilafx/packagenavigator",
+            "description": "Package Navigator для Evolution CMS - Инструмент для управления и установки пакетов",
+            "latest_release": "",
+            "versions": [
+                "dev-main"
+            ],
+            "default_branch": "",
+            "compatibility": "verified",
+            "homepage": "",
+            "author": "roilafx",
+            "require": {}
+        },
+        {
+            "coordinate": "seiger/scommerce",
+            "format": "composer",
+            "title": "seiger/scommerce",
+            "description": "E-commerce tools package for Evolution CMS.",
+            "latest_release": "v1.2.2",
+            "versions": [
+                "v1.2.2",
+                "v1.2.1",
+                "v1.2.0",
+                "v1.1.1",
+                "v1.1.0",
+                "v1.0.12",
+                "v1.0.11",
+                "v1.0.10",
+                "v1.0.9",
+                "v1.0.8",
+                "v1.0.7",
+                "v1.0.6"
+            ],
+            "default_branch": "",
+            "compatibility": "verified",
+            "homepage": "",
+            "author": "seiger",
+            "require": {
+                "php": "^8.4",
+                "evolution-cms/evolution": "^3.5.8",
+                "seiger/sgallery": "^1.5",
+                "seiger/stask": "^2.0"
+            }
+        },
+        {
+            "coordinate": "seiger/sgallery",
+            "format": "composer",
+            "title": "seiger/sgallery",
+            "description": "Evocms package for work with Gallery for Resource in Evolution CMS and manipulate images with an expressive API",
+            "latest_release": "v1.5.1",
+            "versions": [
+                "v1.5.1",
+                "v1.5.0",
+                "v1.4.2",
+                "v1.4.1",
+                "v1.4.0",
+                "v1.3.7",
+                "v1.3.6",
+                "v1.3.5",
+                "v1.3.4",
+                "v1.3.3",
+                "v1.3.2",
+                "v1.3.1"
+            ],
+            "default_branch": "",
+            "compatibility": "verified",
+            "homepage": "",
+            "author": "seiger",
+            "require": {
+                "php": "^8.3",
+                "evolution-cms/evolution": "^3.3",
+                "spatie/image": "3.*"
+            }
+        },
+        {
+            "coordinate": "seiger/smailer",
+            "format": "composer",
+            "title": "seiger/smailer",
+            "description": "Mailing lists Management Module for Evolution CMS admin panel.",
+            "latest_release": "v1.0.0",
+            "versions": [
+                "v1.0.0"
+            ],
+            "default_branch": "",
+            "compatibility": "verified",
+            "homepage": "",
+            "author": "seiger",
+            "require": {
+                "php": "^8"
+            }
+        },
+        {
+            "coordinate": "seiger/soffers",
+            "format": "composer",
+            "title": "seiger/soffers",
+            "description": "Module for records management in the Evolution CMS admin panel.",
+            "latest_release": "v1.0.0",
+            "versions": [
+                "v1.0.0"
+            ],
+            "default_branch": "",
+            "compatibility": "verified",
+            "homepage": "",
+            "author": "seiger",
+            "require": {
+                "php": ">=7.4"
+            }
+        },
+        {
+            "coordinate": "seiger/ssettings",
+            "format": "composer",
+            "title": "seiger/ssettings",
+            "description": "Evocms package for work with Advanced settings for your website.",
+            "latest_release": "v1.0.7",
+            "versions": [
+                "v1.0.7",
+                "v1.0.6",
+                "v1.0.5",
+                "v1.0.4",
+                "v1.0.3",
+                "1.0.2",
+                "v1.0.1",
+                "v1.0.0"
+            ],
+            "default_branch": "",
+            "compatibility": "verified",
+            "homepage": "",
+            "author": "seiger",
+            "require": {
+                "php": "^8"
+            }
+        }
+    ]
 }
