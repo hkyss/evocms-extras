@@ -6,6 +6,89 @@ those cases are called out.
 
 ## [Unreleased]
 
+### Added
+
+- An interactive mode. `extra:install`, `extra:update` and `extra:remove` called without a
+  coordinate now open a filterable list — arrow keys to move, type to narrow, space to tick
+  several, enter to confirm — instead of failing with "nothing to install". Picking an extra
+  from the list also offers its published versions, and every plan is confirmed before it is
+  written. Long steps (walking the catalog, running Composer) show a spinner.
+- `extra:info` no longer requires a coordinate: without one it offers the catalog as a list.
+  It used to answer `Not enough arguments (missing: "coordinate")`, which is Symfony's error,
+  not an answer.
+- `extra:list` opens that list by default in a terminal: pick a row, read its card, then install,
+  update or remove it right there — the plan is printed and confirmed as usual — or go back to
+  the list; escape leaves. **Breaking for anyone reading it by eye:** the table is no longer
+  what an interactive run prints. Everything non-interactive is unchanged — a pipe, a redirect,
+  `--no-ansi` and `--no-interaction` all still get the table — and `--format=table` asks for it
+  explicitly. `--format` now takes `auto` (the default), `list`, `table` or `json`.
+- `extra:cache --clear` and `--rebuild-snapshot` ask before they destroy something. Clearing 39
+  cached responses is minutes of re-walking the sources, and without `GITHUB_PAT` it runs into
+  the anonymous rate limit; the snapshot rebuild overwrites a file that is checked in.
+- `extra:help`: what the package is, the seven commands with the flags worth knowing, and the
+  interactive keys — one screen, for someone meeting it for the first time. It reads the command
+  names off the console application, so a command added later cannot go missing from it.
+- A platform pre-flight check. An extra whose `require.php` the running PHP does not satisfy, or
+  which needs an extension this PHP does not load, is now blocked while the plan is built —
+  before the manifest is touched and before Composer resolves anything. Failing took a full
+  Composer run and a manifest rollback; it now takes 0.2s and writes nothing. `--force` does not
+  override it: the flag means "I know better than this heuristic", and a platform requirement is
+  not a heuristic — Composer would refuse for the same reason a moment later. Plans now separate
+  the two kinds of objection, `blockers()` (overridable) from `forbidden()` (not).
+- The bundled snapshot's `require` was refreshed from Packagist: 20 of its 24 composer entries
+  now carry a `php` constraint, where none did before. Nine of them publish only dev branches
+  and had to come from Packagist's `~dev` endpoint — the same fallback `PackagistSource` uses.
+- `Console\Ui`, one rendering layer for all seven commands: box-drawn tables, grouped status
+  lines with `✔ / ▲ / ✖` marks, borderless key/value blocks, plan steps as a tree, and counts in
+  a footer. `EXTRAS_ASCII=1` — and Windows outside Windows Terminal — falls back to ASCII.
+
+### Changed
+
+- `Console\ExtraPresenter` holds how one extra is drawn — table row, selector option, full card —
+  so `extra:info` and `extra:list --browse` render the same card from one place.
+- `extra:doctor` groups its checks (platform, composer, records, catalog) instead of printing one
+  flat table, and wraps long details under a hanging indent.
+
+### Fixed
+
+- `extra:list --installed` listed what is installed by walking the catalog and keeping the
+  entries marked installed, so its answer depended on Packagist and GitHub answering. A rate
+  limit, an offline run, or a package pulled from Packagist silently shortened the one list that
+  must always be complete. It is now driven by the manifest and the install records, with the
+  catalog used only to describe what it finds; anything installed that the catalog does not list
+  still appears, marked as such. `Installer` gained `installed()` and `format()` for this.
+- The catalog dropped `php` and `ext-*` from an extra's requirements, keeping only the packages
+  it depends on. Those are the two constraints that decide whether an extra can be installed at
+  all, so a rebuilt snapshot carried everything except the part worth knowing in advance —
+  `evolution-cms/etinymce` looked installable on PHP 8.2 right up to the Composer resolve.
+  `extra:cache --rebuild-snapshot` now records them, and `extra:info` shows them.
+- A failed Composer resolve printed only Composer's own wall of text, which opens with
+  "Your requirements could not be resolved" and buries the cause in an arrow expression three
+  lines down. Platform causes — a PHP constraint the installation does not meet, a missing
+  extension, a package Packagist does not serve — are now stated in one sentence above the raw
+  output. A genuine dependency conflict is left to Composer, which says it better than a
+  paraphrase would.
+- A blocked plan told the user to pass `--force`, which is unreachable from a menu — the command
+  they ran may not even accept it. Interactively it now asks `Proceed anyway?`, defaulting to no;
+  unattended it still points at the flag.
+- Each prompt built its own terminal reader, and a reader holds the bytes it has read but not yet
+  handed out. Typing ahead through a chain of prompts — browse, pick an action, answer — dropped
+  everything typed before the next prompt opened. One reader per command now.
+- Key columns were padded with `str_pad`, which counts bytes: a key holding a glyph or a
+  Cyrillic word came out one column short per continuation byte and broke the alignment of
+  everything under it.
+- Reading a keystroke assumed one `fread` returned one key. Holding a key down, typing fast,
+  pasting, or a terminal answering a query mid-stream all deliver several at once, and everything
+  after the first was silently dropped. Input is now buffered and split key by key.
+
+### Notes
+
+- Interactivity is additive: passing coordinates, `--no-interaction`, a pipe, or a terminal
+  without `stty` all take exactly the path they took before, so scripts and CI are unaffected.
+  `extra:update` with no argument still means "everything installed" when unattended.
+- `laravel/prompts` is deliberately not used: every version requires `symfony/console ^6.2`,
+  and Evolution CMS 3.1 ships 5.4.
+
 ## [0.2.0] - 2026-08-07
 
 ### Fixed
