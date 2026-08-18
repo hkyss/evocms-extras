@@ -46,6 +46,25 @@ final class Tty
         $this->stream = $stream ?? STDIN;
     }
 
+    /**
+     * A pty is not a person. CI runners allocate one to get coloured logs, and so does
+     * `docker exec -t` in a Makefile; a prompt there waits for a keypress that never comes and
+     * the job hangs instead of failing. Every runner worth naming sets CI, so that is the
+     * signal: no prompt, take the unattended path.
+     */
+    public static function runsUnattended(): bool
+    {
+        foreach (['CI', 'CONTINUOUS_INTEGRATION'] as $name) {
+            $value = getenv($name);
+
+            if ($value !== false && $value !== '' && $value !== '0' && strtolower($value) !== 'false') {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public static function isAvailable(): bool
     {
         if (DIRECTORY_SEPARATOR === '\\' || !function_exists('shell_exec')) {

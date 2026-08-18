@@ -13,6 +13,7 @@ class UpdateCommand extends AbstractExtraCommand
         {--file= : Read coordinates from a file, one per line}
         {--dry-run : Show the plan and change nothing}
         {--force : Proceed even when the plan is blocked}
+        {--ignore-platform-reqs : Install anyway when the php or ext-* requirement is unmet}
         {--continue-on-error : Keep going after a failure instead of stopping}';
 
     protected $description = 'Update installed Evolution CMS extras';

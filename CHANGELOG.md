@@ -13,13 +13,14 @@ First stable release. Everything below is relative to 0.2.0.
 
 ### Breaking
 
-- `extra:list` run in a terminal shows the browsable list rather than the table. Nothing
-  non-interactive changed — a pipe, a redirect, `--no-ansi`, `--no-interaction` and CI all still
-  get the table, and `--format=table` asks for it explicitly. `--format` takes `auto` (the
-  default), `list`, `table` or `json`; the previous default was `table`.
-- `--force` no longer overrides a platform requirement. It still passes every other blocker.
-- `Installer` gained `installed()` and `format()`. Anything implementing the interface outside
-  this package must add them.
+- `extra:list` run in a terminal shows the browsable list rather than the table; the previous
+  default was the table. `--format` takes `auto` (the default), `list`, `table` or `json`, so
+  `--format=table` asks for the old output explicitly.
+
+  Nothing unattended changed. A pipe, a redirect, `--no-ansi` and `--no-interaction` all still
+  get the table, and so does anything running with `CI` or `CONTINUOUS_INTEGRATION` set — a
+  runner allocates a pty to get coloured logs, and a prompt there would wait for a keypress that
+  never comes. The same guard covers every prompt, not just this one.
 
 ### Added
 
@@ -31,12 +32,8 @@ First stable release. Everything below is relative to 0.2.0.
 - `extra:info` no longer requires a coordinate: without one it offers the catalog as a list.
   It used to answer `Not enough arguments (missing: "coordinate")`, which is Symfony's error,
   not an answer.
-- `extra:list` opens that list by default in a terminal: pick a row, read its card, then install,
-  update or remove it right there — the plan is printed and confirmed as usual — or go back to
-  the list; escape leaves. **Breaking for anyone reading it by eye:** the table is no longer
-  what an interactive run prints. Everything non-interactive is unchanged — a pipe, a redirect,
-  `--no-ansi` and `--no-interaction` all still get the table — and `--format=table` asks for it
-  explicitly. `--format` now takes `auto` (the default), `list`, `table` or `json`.
+- `extra:list` browses: pick a row, read its card, then install, update or remove it right
+  there — the plan is printed and confirmed as usual — or go back to the list; escape leaves.
 - `extra:cache --clear` and `--rebuild-snapshot` ask before they destroy something. Clearing 39
   cached responses is minutes of re-walking the sources, and without `GITHUB_PAT` it runs into
   the anonymous rate limit; the snapshot rebuild overwrites a file that is checked in.
@@ -46,10 +43,13 @@ First stable release. Everything below is relative to 0.2.0.
 - A platform pre-flight check. An extra whose `require.php` the running PHP does not satisfy, or
   which needs an extension this PHP does not load, is now blocked while the plan is built —
   before the manifest is touched and before Composer resolves anything. Failing took a full
-  Composer run and a manifest rollback; it now takes 0.2s and writes nothing. `--force` does not
-  override it: the flag means "I know better than this heuristic", and a platform requirement is
-  not a heuristic — Composer would refuse for the same reason a moment later. Plans now separate
-  the two kinds of objection, `blockers()` (overridable) from `forbidden()` (not).
+  Composer run and a manifest rollback; it now takes 0.2s and writes nothing. Plans separate the
+  two kinds of objection, `blockers()` (overridable with `--force`) from `forbidden()` (not).
+
+  `--ignore-platform-reqs`, named after Composer's own flag, is the way past it. The constraint
+  comes from the catalog, which can be stale or wrong, so a check nothing could override would
+  make a bad entry unfixable from here. No invocation that used to succeed fails now — Composer
+  refused these already, just slower and after touching the manifest.
 - The bundled snapshot's `require` was refreshed from Packagist: 20 of its 24 composer entries
   now carry a `php` constraint, where none did before. Nine of them publish only dev branches
   and had to come from Packagist's `~dev` endpoint — the same fallback `PackagistSource` uses.
@@ -71,7 +71,9 @@ First stable release. Everything below is relative to 0.2.0.
   limit, an offline run, or a package pulled from Packagist silently shortened the one list that
   must always be complete. It is now driven by the manifest and the install records, with the
   catalog used only to describe what it finds; anything installed that the catalog does not list
-  still appears, marked as such. `Installer` gained `installed()` and `format()` for this.
+  still appears, marked as such. The enumeration is a separate `EnumeratesInstalled` interface,
+  so `Installer` itself is unchanged from 0.2.0 and an installer written against it still
+  works — it simply contributes nothing to the installed list.
 - The catalog dropped `php` and `ext-*` from an extra's requirements, keeping only the packages
   it depends on. Those are the two constraints that decide whether an extra can be installed at
   all, so a rebuilt snapshot carried everything except the part worth knowing in advance —

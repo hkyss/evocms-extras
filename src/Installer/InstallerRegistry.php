@@ -46,6 +46,10 @@ class InstallerRegistry
         $installed = [];
 
         foreach ($this->installers as $installer) {
+            if (!$installer instanceof EnumeratesInstalled) {
+                continue;
+            }
+
             foreach ($installer->installed() as $coordinate => $state) {
                 $installed[$coordinate] = ['state' => $state, 'format' => $installer->format()];
             }

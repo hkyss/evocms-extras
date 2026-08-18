@@ -46,7 +46,10 @@ abstract class AbstractExtraCommand extends Command
 
     protected function isInteractive(): bool
     {
-        return $this->input->isInteractive() && Tty::isAvailable() && $this->ui()->isDecorated();
+        return $this->input->isInteractive()
+            && !Tty::runsUnattended()
+            && Tty::isAvailable()
+            && $this->ui()->isDecorated();
     }
 
     protected function tty(): Tty
@@ -115,6 +118,19 @@ abstract class AbstractExtraCommand extends Command
     protected function presenter(): ExtraPresenter
     {
         return $this->presenter ??= new ExtraPresenter($this->ui());
+    }
+
+    /**
+     * Composer's own flag name, and the escape hatch the platform block needs: the constraint
+     * comes from the catalog, which can be stale or simply wrong, and a check that cannot be
+     * overridden at all would make a bad catalog entry unfixable from here.
+     *
+     * Commands that never meet a platform requirement do not declare it.
+     */
+    protected function ignoresPlatformRequirements(): bool
+    {
+        return $this->getDefinition()->hasOption('ignore-platform-reqs')
+            && (bool) $this->option('ignore-platform-reqs');
     }
 
     protected function bail(string $message): int
@@ -255,8 +271,15 @@ abstract class AbstractExtraCommand extends Command
         }
 
         if ($plan->isForbidden()) {
+            if ($this->ignoresPlatformRequirements()) {
+                $ui->note('warn', 'proceeding anyway because --ignore-platform-reqs was given', 2);
+
+                return true;
+            }
+
             $ui->blank();
-            $ui->write('  ' . $ui->dim('This cannot be overridden: Composer would refuse for the same reason.'));
+            $ui->write('  ' . $ui->dim('--force does not cover this; Composer would refuse for the same reason.'));
+            $ui->write('  Pass <info>--ignore-platform-reqs</info> if the catalog is wrong about it.');
 
             return false;
         }

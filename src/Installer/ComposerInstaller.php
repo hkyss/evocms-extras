@@ -8,7 +8,7 @@ use hkyss\Extras\Domain\InstalledState;
 use hkyss\Extras\Support\Paths;
 use hkyss\Extras\Support\PublishedAssets;
 
-class ComposerInstaller implements Installer
+class ComposerInstaller implements Installer, EnumeratesInstalled
 {
     private Paths $paths;
     private ComposerManifest $manifest;

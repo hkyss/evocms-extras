@@ -14,7 +14,7 @@ use hkyss\Extras\Support\Http;
 use hkyss\Extras\Support\Paths;
 
 /** Handles legacy extras, whose format supports no removal and so needs an install record. */
-class LegacyInstaller implements Installer
+class LegacyInstaller implements Installer, EnumeratesInstalled
 {
     private Paths $paths;
     private Http $http;

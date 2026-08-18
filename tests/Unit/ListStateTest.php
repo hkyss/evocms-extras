@@ -186,6 +186,32 @@ class ListStateTest extends TestCase
         self::assertSame('doc', $rest, 'the reply must be swallowed, not left to be typed');
     }
 
+    /** @dataProvider unattendedValues */
+    public function testCiTurnsInteractivityOff(string $value, bool $expected): void
+    {
+        $previous = getenv('CI');
+        $value === '' ? putenv('CI') : putenv("CI={$value}");
+
+        try {
+            self::assertSame($expected, Tty::runsUnattended());
+        } finally {
+            $previous === false ? putenv('CI') : putenv("CI={$previous}");
+        }
+    }
+
+    /** @return array<string, array{string, bool}> */
+    public static function unattendedValues(): array
+    {
+        return [
+            'unset' => ['', false],
+            'true' => ['true', true],
+            'one' => ['1', true],
+            'github actions' => ['true', true],
+            'explicitly off' => ['false', false],
+            'zero' => ['0', false],
+        ];
+    }
+
     /** @return array<string, array{string, string}> */
     public static function keys(): array
     {

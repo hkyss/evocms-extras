@@ -39,7 +39,8 @@ class HelpCommand extends AbstractExtraCommand
             ['--force', 'proceed when the plan is blocked'],
             ['--file=', 'read coordinates from a file, one per line'],
             ['--continue-on-error', 'keep going after a failure'],
-            ['--no-interaction', 'never ask; what CI and scripts get'],
+            ['--ignore-platform-reqs', 'install despite an unmet php or ext-* requirement'],
+            ['--no-interaction', 'never ask; CI and pipes get this anyway'],
         ], 2);
 
         $ui->blank();

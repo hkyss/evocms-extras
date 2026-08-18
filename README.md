@@ -90,8 +90,12 @@ is printed and confirmed before anything is written, exactly as it is for `extra
 rebuild, and the snapshot is a file under version control.
 
 This is additive. Passing coordinates, `--no-interaction`, piping the output, or running where
-`stty` is unavailable takes exactly the same path as before, so scripts and CI see no prompts —
-`extra:update` with no argument still means "everything installed" when unattended.
+`stty` is unavailable takes exactly the same path as before — `extra:update` with no argument
+still means "everything installed" when unattended.
+
+Setting `CI` or `CONTINUOUS_INTEGRATION` also turns every prompt off. A runner allocates a
+terminal to get coloured logs, and so does `docker exec -t` in a Makefile; without this a prompt
+there would wait for a keypress that never comes and the job would hang rather than fail.
 
 Set `EXTRAS_ASCII=1` to replace the box drawing and glyphs with plain ASCII; this happens
 automatically on Windows outside Windows Terminal.
@@ -149,9 +153,10 @@ Pass as many coordinates as you like; there is no separate batch command. `--fil
 line and treats `#` as a comment.
 
 `--force` proceeds past an objection such as an extra that has never been verified on Evo 3. It
-does not override a platform requirement — a `php` constraint the installation does not meet, or
-a missing extension. Those are checked before the manifest is touched, and Composer would refuse
-for the same reason anyway.
+does not cover a platform requirement — a `php` constraint the installation does not meet, or a
+missing extension. Those are checked before the manifest is touched, and Composer would refuse
+for the same reason anyway. `--ignore-platform-reqs` is the way past those, for when the catalog
+is wrong about what a package needs.
 
 `--use-version` works on a single extra only. Applying one version string to several packages
 installs the wrong thing more often than not. The flag is not called `--version` because Symfony
