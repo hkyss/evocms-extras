@@ -57,7 +57,49 @@ ajaxSearch, Shopkeeper and ManagerManager are all legacy.
 The legacy format has no uninstall of its own, which is why this package keeps its own
 [install record](#removal).
 
+## Interactive mode
+
+Run `extra:install`, `extra:update` or `extra:remove` without a coordinate in a terminal and the
+command asks instead of failing:
+
+```
+Install which extra?
+  → swa  (1/160)
+ ❯ ◉ vvvladv/evo-swagger  composer  OpenAPI / Swagger UI manager module and apidocs…
+
+  ↑↓ move  ·  space select  ·  enter confirm  ·  esc clear filter
+```
+
+Arrow keys move, typing narrows the list, space ticks several, enter confirms, escape clears the
+filter and then backs out. Picking one extra also offers its published versions, and the plan is
+always confirmed before anything is written.
+
+The read-only commands use the same list where it saves you a lookup:
+
+```bash
+php artisan extra:list                 # browse; enter opens a card, esc leaves
+php artisan extra:list --format=table  # the plain table, whatever the terminal
+php artisan extra:info                 # no coordinate: pick one from the catalog
+```
+
+Browsing is not read-only: the card is followed by what can be done with that extra — `install`
+for something absent, `update` and `remove` for something present, or back to the list. The plan
+is printed and confirmed before anything is written, exactly as it is for `extra:install`.
+
+`extra:cache --clear` and `extra:cache --rebuild-snapshot` ask first — the cache costs minutes to
+rebuild, and the snapshot is a file under version control.
+
+This is additive. Passing coordinates, `--no-interaction`, piping the output, or running where
+`stty` is unavailable takes exactly the same path as before, so scripts and CI see no prompts —
+`extra:update` with no argument still means "everything installed" when unattended.
+
+Set `EXTRAS_ASCII=1` to replace the box drawing and glyphs with plain ASCII; this happens
+automatically on Windows outside Windows Terminal.
+
 ## Commands
+
+Start with `php artisan extra:help` — one screen covering every command, the flags worth
+knowing and the interactive keys. `php artisan extra:<command> --help` has the full option list.
 
 ### `extra:list`
 
@@ -66,11 +108,29 @@ php artisan extra:list
 php artisan extra:list --search=commerce
 php artisan extra:list --installed
 php artisan extra:list --legacy --verified
+php artisan extra:list --format=table
 php artisan extra:list --format=json
 ```
 
 `--composer` and `--legacy` filter by format, `--verified` keeps only what has been checked on
 Evo 3.
+
+`--installed` is answered from `custom/composer.json` and the install records rather than from
+the catalog, so it stays complete when the catalog is stale, rate-limited or unreachable. An
+extra installed here that the catalog does not list is shown as `installed; not listed in the
+catalog`.
+
+`--format` decides how the result is shown:
+
+| | |
+|---|---|
+| `auto` (default) | the browsable list in a terminal, the table everywhere else |
+| `list` | the browsable list; degrades to the table when there is no terminal |
+| `table` | the table, always |
+| `json` | machine-readable, never interactive |
+
+Anything that is not a terminal — a pipe, a redirect, `--no-ansi`, `--no-interaction`, CI — gets
+the table under `auto`, so scripts do not need to pass a flag to stay scriptable.
 
 ### `extra:install`
 
@@ -82,8 +142,16 @@ php artisan extra:install --file=extras.txt --continue-on-error
 php artisan extra:install extras-evolution/Ditto --dry-run
 ```
 
+Called with no coordinate in a terminal it opens the catalog as a filterable list; see
+[Interactive mode](#interactive-mode).
+
 Pass as many coordinates as you like; there is no separate batch command. `--file` reads one per
 line and treats `#` as a comment.
+
+`--force` proceeds past an objection such as an extra that has never been verified on Evo 3. It
+does not override a platform requirement — a `php` constraint the installation does not meet, or
+a missing extension. Those are checked before the manifest is touched, and Composer would refuse
+for the same reason anyway.
 
 `--use-version` works on a single extra only. Applying one version string to several packages
 installs the wrong thing more often than not. The flag is not called `--version` because Symfony
@@ -99,7 +167,8 @@ php artisan extra:update evocms-community/commerce --use-version=1.4.0
 php artisan extra:update --dry-run
 ```
 
-With no arguments it updates everything installed.
+With no arguments it offers the installed extras as a list to tick, and updates everything
+installed when run unattended.
 
 ### `extra:remove`
 
@@ -108,9 +177,12 @@ php artisan extra:remove evolution-cms-extras/tinymce5
 php artisan extra:remove a/one b/two --continue-on-error
 ```
 
-### `extra:info`, `extra:cache`, `extra:doctor`
+### `extra:info`, `extra:cache`, `extra:doctor`, `extra:help`
 
 ```bash
+php artisan extra:help
+
+php artisan extra:info
 php artisan extra:info evocms-community/pagebuilder
 php artisan extra:info evocms-community/pagebuilder --format=json
 
