@@ -2,6 +2,7 @@
 
 namespace hkyss\Extras\Console\Commands;
 
+use hkyss\Extras\Domain\Extra;
 use hkyss\Extras\Installer\Intent;
 
 class UpdateCommand extends AbstractExtraCommand
@@ -21,36 +22,55 @@ class UpdateCommand extends AbstractExtraCommand
         $coordinates = $this->coordinates((array) $this->argument('coordinates'), $this->option('file'));
 
         if ($coordinates === []) {
-            $coordinates = $this->installedCoordinates();
+            $installed = $this->spin('reading installed extras', fn () => $this->installed());
 
-            if ($coordinates === []) {
-                $this->info('Nothing is installed.');
+            if ($installed === []) {
+                $this->ui()->note('ok', 'Nothing is installed.');
 
                 return self::SUCCESS;
             }
 
-            $this->line(sprintf('<fg=gray>updating %d installed extra(s)</>', count($coordinates)));
+            if ($this->isInteractive()) {
+                $coordinates = $this->choose('Update which extras?', array_map(
+                    fn (Extra $extra): array => $this->optionFor(
+                        $extra,
+                        'installed ' . $this->installers->stateOf($extra)->describe()
+                    ),
+                    $installed
+                ));
+
+                if ($coordinates === null) {
+                    return self::SUCCESS;
+                }
+            } else {
+                $coordinates = array_map(static fn (Extra $e): string => (string) $e->coordinate(), $installed);
+
+                $this->ui()->write($this->ui()->dim(sprintf(
+                    'updating %d installed extra(s)',
+                    count($coordinates)
+                )));
+            }
         }
 
         $version = (string) ($this->option('use-version') ?? '');
 
         if (count($coordinates) > 1 && $version !== '') {
-            $this->error('--use-version applies to a single extra; update them one at a time to pin versions.');
-
-            return self::FAILURE;
+            return $this->bail(
+                '--use-version applies to a single extra; update them one at a time to pin versions.'
+            );
         }
 
         return $this->runMany($coordinates, Intent::Update, $version);
     }
 
-    /** @return list<string> */
-    private function installedCoordinates(): array
+    /** @return list<Extra> */
+    private function installed(): array
     {
         $installed = [];
 
         foreach ($this->catalog->all() as $extra) {
             if ($this->installers->stateOf($extra)->isInstalled()) {
-                $installed[] = (string) $extra->coordinate();
+                $installed[] = $extra;
             }
         }
 

@@ -33,30 +33,57 @@ class CacheCommand extends AbstractExtraCommand
             return $this->rebuildSnapshot($snapshotTarget);
         }
 
+        $ui = $this->ui();
+
         if ($this->option('clear')) {
-            $this->info(sprintf('Cleared %d cached response(s).', $this->cache->clear()));
+            $entries = $this->cache->stats()['entries'];
+
+            if ($entries > 0 && $this->isInteractive()
+                && !$this->confirmStep(sprintf('Drop %d cached response(s)?', $entries))) {
+                $ui->note('warn', 'Cancelled, the cache is untouched.');
+
+                return self::SUCCESS;
+            }
+
+            $ui->banner(true, sprintf('Cleared %d cached response(s).', $this->cache->clear()));
 
             return self::SUCCESS;
         }
 
         $stats = $this->cache->stats();
 
-        $this->table([], [
-            ['Enabled', $stats['enabled'] ? 'yes' : 'no'],
-            ['Directory', $stats['directory']],
+        $ui->heading('extra:cache', 'catalog responses kept on disk');
+        $ui->details([
+            [
+                'Enabled',
+                $stats['enabled'] ? '<fg=green>yes</>' : '<fg=yellow>no</>',
+            ],
+            ['Directory', $ui->dim($stats['directory'])],
             ['Entries', (string) $stats['entries']],
-            ['Expired', (string) $stats['expired']],
+            [
+                'Expired',
+                $stats['expired'] > 0 ? '<fg=yellow>' . $stats['expired'] . '</>' : '0',
+            ],
             ['Size', $this->humanBytes($stats['bytes'])],
         ]);
 
         return self::SUCCESS;
     }
 
-    /** Walks every source with deep scanning, which needs GITHUB_PAT. */
     private function rebuildSnapshot(string $target): int
     {
-        $this->line('Rebuilding the catalog snapshot. This walks every source and needs GITHUB_PAT.');
-        $this->newLine();
+        $ui = $this->ui();
+        $ui->heading(
+            'extra:cache --rebuild-snapshot',
+            'walks every source and needs GITHUB_PAT'
+        );
+
+        if (is_file($target) && $this->isInteractive()
+            && !$this->confirmStep("Overwrite the snapshot at {$target}?")) {
+            $ui->note('warn', 'Cancelled, the snapshot is untouched.');
+
+            return self::SUCCESS;
+        }
 
         $known = [];
 
@@ -65,6 +92,11 @@ class CacheCommand extends AbstractExtraCommand
         }
 
         $collected = [];
+        $nameWidth = 0;
+
+        foreach ($this->catalog->sources() as $source) {
+            $nameWidth = max($nameWidth, mb_strlen($source->name()));
+        }
 
         foreach ($this->catalog->sources() as $source) {
             if ($source instanceof SnapshotSource) {
@@ -73,14 +105,15 @@ class CacheCommand extends AbstractExtraCommand
 
             $scanned = $source instanceof GitHubOrgSource ? $source->withDeepScan() : $source;
             $found = $scanned->all();
-
-            $this->line(sprintf('  %-24s %d extra(s)', $source->name(), count($found)));
-
             $reason = $scanned->unavailableReason();
 
-            if ($reason !== null) {
-                $this->warn('    ' . $reason);
-            }
+            $ui->checks([[
+                'level' => $reason === null ? 'ok' : 'warn',
+                'name' => str_pad($source->name(), $nameWidth),
+                'detail' => $reason === null
+                    ? sprintf('%d extra(s)', count($found))
+                    : sprintf('%d extra(s); %s', count($found), $reason),
+            ]]);
 
             foreach ($found as $extra) {
                 $key = $extra->coordinate()->key();
@@ -92,9 +125,7 @@ class CacheCommand extends AbstractExtraCommand
         }
 
         if ($collected === []) {
-            $this->error('No sources answered; the existing snapshot was left untouched.');
-
-            return self::FAILURE;
+            return $this->bail('No sources answered; the existing snapshot was left untouched.');
         }
 
         $preserved = 0;
@@ -115,18 +146,14 @@ class CacheCommand extends AbstractExtraCommand
         $encoded = json_encode($document, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
         if ($encoded === false || @file_put_contents($target, $encoded . "\n") === false) {
-            $this->error("Cannot write '{$target}'.");
-
-            return self::FAILURE;
+            return $this->bail("Cannot write '{$target}'.");
         }
 
-        $this->newLine();
-        $this->info(sprintf(
-            'Wrote %d extra(s) to %s (%d hand-set compatibility status(es) preserved).',
-            count($extras),
-            $target,
+        $ui->banner(true, sprintf('Wrote %d extra(s) to %s.', count($extras), $target));
+        $ui->write('  ' . $ui->dim(sprintf(
+            '%d hand-set compatibility status(es) preserved.',
             $preserved
-        ));
+        )));
 
         return self::SUCCESS;
     }

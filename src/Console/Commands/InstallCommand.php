@@ -2,6 +2,7 @@
 
 namespace hkyss\Extras\Console\Commands;
 
+use hkyss\Extras\Domain\CompatibilityStatus;
 use hkyss\Extras\Installer\Intent;
 
 class InstallCommand extends AbstractExtraCommand
@@ -19,21 +20,67 @@ class InstallCommand extends AbstractExtraCommand
     public function handle(): int
     {
         $coordinates = $this->coordinates((array) $this->argument('coordinates'), $this->option('file'));
+        $version = (string) ($this->option('use-version') ?? '');
+        $picked = false;
 
-        if ($coordinates === []) {
-            $this->error('Nothing to install. Pass a coordinate or use --file.');
+        if ($coordinates === [] && $this->isInteractive()) {
+            $chosen = $this->pick();
 
-            return self::FAILURE;
+            if ($chosen === null) {
+                return self::SUCCESS;
+            }
+
+            $coordinates = $chosen;
+            $picked = true;
         }
 
-        $version = (string) ($this->option('use-version') ?? '');
+        if ($coordinates === []) {
+            return $this->bail('Nothing to install. Pass a coordinate or use --file.');
+        }
 
         if (count($coordinates) > 1 && $version !== '') {
-            $this->error('--use-version applies to a single extra; install them one at a time to pin versions.');
+            return $this->bail(
+                '--use-version applies to a single extra; install them one at a time to pin versions.'
+            );
+        }
 
-            return self::FAILURE;
+        if ($picked && count($coordinates) === 1 && $version === '') {
+            $extra = $this->resolve($coordinates[0]);
+
+            if ($extra === null) {
+                return self::FAILURE;
+            }
+
+            $version = $this->chooseVersion($extra);
         }
 
         return $this->runMany($coordinates, Intent::Install, $version);
+    }
+
+    /** @return list<string>|null */
+    private function pick(): ?array
+    {
+        $rows = [];
+
+        foreach ($this->spin('loading catalog', fn () => $this->catalog->all()) as $extra) {
+            if ($this->installers->stateOf($extra)->isInstalled()) {
+                continue;
+            }
+
+            $rows[] = $this->optionFor(
+                $extra,
+                $extra->compatibility() === CompatibilityStatus::Verified
+                    ? ''
+                    : $extra->compatibility()->label() . '  ' . $this->ui()->truncate($extra->description(), 36)
+            );
+        }
+
+        if ($rows === []) {
+            $this->ui()->note('ok', 'Everything in the catalog is already installed.');
+
+            return null;
+        }
+
+        return $this->choose('Install which extra?', $rows);
     }
 }
