@@ -19,6 +19,8 @@ final class InstallPlan
     private array $warnings = [];
     /** @var list<string> */
     private array $blockers = [];
+    /** @var list<string> */
+    private array $forbidden = [];
 
     public function __construct(
         Coordinate $coordinate,
@@ -56,11 +58,19 @@ final class InstallPlan
         return $this;
     }
 
-    /** Unlike a warning, a blocker stops the run until --force is given. */
     public function block(string $reason): self
     {
         if (!in_array($reason, $this->blockers, true)) {
             $this->blockers[] = $reason;
+        }
+
+        return $this;
+    }
+
+    public function forbid(string $reason): self
+    {
+        if (!in_array($reason, $this->forbidden, true)) {
+            $this->forbidden[] = $reason;
         }
 
         return $this;
@@ -120,7 +130,18 @@ final class InstallPlan
 
     public function isBlocked(): bool
     {
-        return $this->blockers !== [];
+        return $this->blockers !== [] || $this->forbidden !== [];
+    }
+
+    /** @return list<string> */
+    public function forbidden(): array
+    {
+        return $this->forbidden;
+    }
+
+    public function isForbidden(): bool
+    {
+        return $this->forbidden !== [];
     }
 
     public function isEmpty(): bool
@@ -159,6 +180,7 @@ final class InstallPlan
             'steps' => array_map(static fn (PlanStep $s) => $s->toArray(), $this->steps),
             'warnings' => $this->warnings,
             'blockers' => $this->blockers,
+            'forbidden' => $this->forbidden,
         ];
     }
 }

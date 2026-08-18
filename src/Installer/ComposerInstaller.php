@@ -8,7 +8,6 @@ use hkyss\Extras\Domain\InstalledState;
 use hkyss\Extras\Support\Paths;
 use hkyss\Extras\Support\PublishedAssets;
 
-/** Handles composer extras; provider registration stays with the core's package:discover. */
 class ComposerInstaller implements Installer
 {
     private Paths $paths;
@@ -56,6 +55,16 @@ class ComposerInstaller implements Installer
             $plan->warn("'{$coordinate}' is already required as '{$constraint}'");
         }
 
+        $unmet = PlatformCheck::unmetPhpRequirement($extra->requires());
+
+        if ($unmet !== null) {
+            $plan->forbid("'{$coordinate}' {$unmet}");
+        }
+
+        foreach (PlatformCheck::missingExtensions($extra->requires()) as $extension) {
+            $plan->forbid("'{$coordinate}' needs the {$extension} extension, which this PHP does not load");
+        }
+
         $plan->step(
             StepKind::ManifestRequire,
             "require {$coordinate}:{$constraint} in " . $this->relative($this->manifest->path()),
@@ -68,9 +77,6 @@ class ComposerInstaller implements Installer
             ['coordinate' => $coordinate, 'mode' => 'package']
         );
 
-        // No install record here on purpose: the manifest is the record for a
-        // composer extra, and installedState() reads it back. The record table
-        // exists for legacy extras, which have no uninstall metadata of their own.
         return $plan;
     }
 
@@ -79,6 +85,26 @@ class ComposerInstaller implements Installer
         return $plan->intent() === Intent::Remove
             ? $this->applyRemoval($plan)
             : $this->applyInstall($plan);
+    }
+
+    public function format(): ExtraFormat
+    {
+        return ExtraFormat::Composer;
+    }
+
+    /** @return array<string, InstalledState> */
+    public function installed(): array
+    {
+        $installed = [];
+
+        foreach ($this->manifest->requirements() as $coordinate => $constraint) {
+            $installed[$coordinate] = InstalledState::present(
+                $this->installedVersion($coordinate) ?? $constraint,
+                $constraint
+            );
+        }
+
+        return $installed;
     }
 
     public function installedState(Extra $extra): InstalledState
@@ -93,7 +119,6 @@ class ComposerInstaller implements Installer
         return InstalledState::present($this->installedVersion($coordinate) ?? $constraint, $constraint);
     }
 
-    /** File lists are computed while the package is still in vendor. */
     private function planRemoval(Extra $extra, InstalledState $state): InstallPlan
     {
         $coordinate = (string) $extra->coordinate();
@@ -222,7 +247,7 @@ class ComposerInstaller implements Installer
                     $result->exitCode(),
                     $this->relative($this->manifest->path())
                 ),
-                [],
+                ComposerDiagnosis::explain($result->tail()),
                 $result->tail()
             );
         }
@@ -234,7 +259,6 @@ class ComposerInstaller implements Installer
         );
     }
 
-    /** Composer runs first, so a refusal leaves the site exactly as it was. */
     private function applyRemoval(InstallPlan $plan): Outcome
     {
         $coordinate = (string) $plan->coordinate();
@@ -253,7 +277,7 @@ class ComposerInstaller implements Installer
                     $result->exitCode(),
                     $this->relative($this->manifest->path())
                 ),
-                [],
+                ComposerDiagnosis::explain($result->tail()),
                 $result->tail()
             );
         }

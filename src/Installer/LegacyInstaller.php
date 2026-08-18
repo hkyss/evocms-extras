@@ -105,6 +105,23 @@ class LegacyInstaller implements Installer
             : $this->applyInstall($plan);
     }
 
+    public function format(): ExtraFormat
+    {
+        return ExtraFormat::Legacy;
+    }
+
+    /** @return array<string, InstalledState> */
+    public function installed(): array
+    {
+        $installed = [];
+
+        foreach ($this->records->all() as $record) {
+            $installed[(string) $record->coordinate] = InstalledState::present((string) $record->version);
+        }
+
+        return $installed;
+    }
+
     public function installedState(Extra $extra): InstalledState
     {
         return $this->records->stateOf($extra->coordinate());

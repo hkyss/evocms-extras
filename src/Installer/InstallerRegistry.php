@@ -3,6 +3,7 @@
 namespace hkyss\Extras\Installer;
 
 use hkyss\Extras\Domain\Extra;
+use hkyss\Extras\Domain\ExtraFormat;
 use hkyss\Extras\Domain\InstalledState;
 use hkyss\Extras\Exceptions\ExtrasException;
 
@@ -35,6 +36,24 @@ class InstallerRegistry
             $extra->format()->value,
             $extra->coordinate()
         ));
+    }
+
+    /**
+     * @return array<string, array{state:InstalledState,format:ExtraFormat}> keyed by coordinate
+     */
+    public function installed(): array
+    {
+        $installed = [];
+
+        foreach ($this->installers as $installer) {
+            foreach ($installer->installed() as $coordinate => $state) {
+                $installed[$coordinate] = ['state' => $state, 'format' => $installer->format()];
+            }
+        }
+
+        ksort($installed);
+
+        return $installed;
     }
 
     public function stateOf(Extra $extra): InstalledState
