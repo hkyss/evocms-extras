@@ -4,5 +4,5 @@ contact_links:
     url: https://github.com/hkyss/evocms-extras/security
     about: Report it privately, not as an issue.
   - name: A broken extra, not a broken manager
-    url: https://github.com/hkyss/evocms-extras/blob/main/SECURITY.md#what-installing-an-extra-does
+    url: https://github.com/hkyss/evocms-extras/blob/dev/SECURITY.md#what-installing-an-extra-does
     about: If the extra installed correctly but misbehaves, its own repository is the place.
