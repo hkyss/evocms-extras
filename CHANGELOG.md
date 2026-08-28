@@ -7,6 +7,13 @@ change needs a major version.
 
 ## [Unreleased]
 
+### Fixed
+
+- A legacy plan nobody applied left its unpacked archive behind. Planning downloads and unpacks the
+  extra to see what it would write, and only `apply` cleaned up afterwards, so a `--dry-run`, a plan
+  with nothing to do, a blocked plan and one that failed halfway each left a temp directory. The
+  console now releases it in a `finally`, through the new `HoldsArchives`.
+
 ## [1.0.1] - 2026-08-28
 
 Repository housekeeping; the package itself is unchanged from 1.0.0.

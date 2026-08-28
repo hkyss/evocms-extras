@@ -12,6 +12,8 @@ use hkyss\Extras\Console\Ui;
 use hkyss\Extras\Domain\Coordinate;
 use hkyss\Extras\Domain\Extra;
 use hkyss\Extras\Exceptions\ExtrasException;
+use hkyss\Extras\Installer\HoldsArchives;
+use hkyss\Extras\Installer\Installer;
 use hkyss\Extras\Installer\InstallerRegistry;
 use hkyss\Extras\Installer\InstallPlan;
 use hkyss\Extras\Installer\Intent;
@@ -324,13 +326,29 @@ abstract class AbstractExtraCommand extends Command
 
     protected function runOne(Extra $extra, Intent $intent, string $version, bool $dryRun, bool $force): int
     {
-        $ui = $this->ui();
+        $installer = null;
 
         try {
-            $plan = $this->installers->for($extra)->plan($extra, $intent, $version);
+            $installer = $this->installers->for($extra);
+
+            return $this->planAndApply($installer, $extra, $intent, $version, $dryRun, $force);
         } catch (ExtrasException $e) {
             return $this->bail($e->getMessage());
+        } finally {
+            $this->discardArchives($installer);
         }
+    }
+
+    private function planAndApply(
+        Installer $installer,
+        Extra $extra,
+        Intent $intent,
+        string $version,
+        bool $dryRun,
+        bool $force
+    ): int {
+        $ui = $this->ui();
+        $plan = $installer->plan($extra, $intent, $version);
 
         $this->renderPlan($plan);
 
@@ -357,13 +375,17 @@ abstract class AbstractExtraCommand extends Command
             return self::SUCCESS;
         }
 
-        try {
-            return $this->renderOutcome($this->spin(
-                'applying ' . $plan->coordinate(),
-                fn () => $this->installers->for($extra)->apply($plan)
-            ));
-        } catch (ExtrasException $e) {
-            return $this->bail($e->getMessage());
+        return $this->renderOutcome($this->spin(
+            'applying ' . $plan->coordinate(),
+            fn () => $installer->apply($plan)
+        ));
+    }
+
+    /** Planning a legacy extra unpacks it into a temp directory; a plan nobody applies still has to go. */
+    private function discardArchives(?Installer $installer): void
+    {
+        if ($installer instanceof HoldsArchives) {
+            $installer->discardArchives();
         }
     }
 
