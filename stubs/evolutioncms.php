@@ -32,6 +32,14 @@ namespace EvolutionCMS {
         public function registerModule(string $name, string $file, string $icon = 'fa fa-cube', array $params = [])
         {
         }
+
+        /**
+         * @param string|array<int, string> $type
+         * @return mixed
+         */
+        public function clearCache($type = '', bool $report = false)
+        {
+        }
     }
 }
 

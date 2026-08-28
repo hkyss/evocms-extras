@@ -12,6 +12,7 @@ use hkyss\Extras\Legacy\LegacyArchive;
 use hkyss\Extras\Record\InstallRecordStore;
 use hkyss\Extras\Support\Http;
 use hkyss\Extras\Support\Paths;
+use hkyss\Extras\Support\SiteCache;
 
 /** Handles legacy extras, whose format supports no removal and so needs an install record. */
 class LegacyInstaller implements Installer, EnumeratesInstalled, HoldsArchives
@@ -25,6 +26,7 @@ class LegacyInstaller implements Installer, EnumeratesInstalled, HoldsArchives
     /** @var list<string> */
     private array $requireConfirmation;
     private string $tablePrefix;
+    private SiteCache $cache;
     /** @var array<string,LegacyArchive> */
     private array $openArchives = [];
 
@@ -37,7 +39,8 @@ class LegacyInstaller implements Installer, EnumeratesInstalled, HoldsArchives
         string $tablePrefix = '',
         string $backupSuffix = '.old',
         string $installSet = 'base',
-        array $requireConfirmation = ['unknown', 'incompatible']
+        array $requireConfirmation = ['unknown', 'incompatible'],
+        ?SiteCache $cache = null
     ) {
         $this->paths = $paths;
         $this->http = $http;
@@ -47,6 +50,7 @@ class LegacyInstaller implements Installer, EnumeratesInstalled, HoldsArchives
         $this->backupSuffix = $backupSuffix;
         $this->installSet = $installSet;
         $this->requireConfirmation = $requireConfirmation;
+        $this->cache = $cache ?? new SiteCache();
     }
 
     public function supports(Extra $extra): bool
@@ -434,6 +438,7 @@ class LegacyInstaller implements Installer, EnumeratesInstalled, HoldsArchives
         ]);
 
         $this->discardArchives();
+        $this->cache->clear();
 
         return Outcome::success(
             sprintf(
@@ -506,6 +511,10 @@ class LegacyInstaller implements Installer, EnumeratesInstalled, HoldsArchives
         }
 
         $this->records->forget($plan->coordinate());
+
+        // The elements are gone from the tables and still in the compiled cache, where the
+        // next request would evaluate one whose files left with it.
+        $this->cache->clear();
 
         return Outcome::success(
             sprintf('%s removed (%d file(s) deleted, %d restored)', $plan->coordinate(), $deleted, $restored),
