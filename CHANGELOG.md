@@ -5,7 +5,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), version
 their options, the `Installer` interface, the catalog snapshot schema — is stable: a breaking
 change needs a major version.
 
-## [Unreleased]
+## [1.1.0] - 2026-08-28
 
 ### Added
 
@@ -221,7 +221,8 @@ First release. Targets Evolution CMS CE 3.1.x.
 - Every legacy entry ships as `unknown`; none has been verified on Evolution CMS 3 yet.
 - Schema applied by a legacy extra is not rolled back on removal.
 
-[Unreleased]: https://github.com/hkyss/evocms-extras/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/hkyss/evocms-extras/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/hkyss/evocms-extras/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/hkyss/evocms-extras/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/hkyss/evocms-extras/compare/v0.2.0...v1.0.0
 [0.2.0]: https://github.com/hkyss/evocms-extras/releases/tag/v0.2.0
