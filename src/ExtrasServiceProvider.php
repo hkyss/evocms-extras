@@ -22,9 +22,15 @@ use hkyss\Extras\Installer\ComposerRunner;
 use hkyss\Extras\Installer\InstallerRegistry;
 use hkyss\Extras\Installer\LegacyInstaller;
 use hkyss\Extras\Legacy\ElementWriter;
+use hkyss\Extras\Manager\CatalogListing;
+use hkyss\Extras\Manager\InstalledExtras;
+use hkyss\Extras\Manager\ManagerModule;
+use hkyss\Extras\Manager\MenuListener;
+use hkyss\Extras\Manager\Mutex;
 use hkyss\Extras\Record\InstallRecordStore;
 use hkyss\Extras\Support\Http;
 use hkyss\Extras\Support\Paths;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 
 class ExtrasServiceProvider extends ServiceProvider
@@ -36,15 +42,27 @@ class ExtrasServiceProvider extends ServiceProvider
         $this->registerFoundation();
         $this->registerCatalog();
         $this->registerInstallers();
+        $this->registerModuleServices();
     }
 
     public function boot(): void
     {
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'extras');
+
+        if ($this->app->bound('router')) {
+            $this->loadRoutesFrom(__DIR__ . '/Http/routes/api/v1.php');
+        }
+
+        $this->registerManagerModule();
 
         $this->publishes([
             __DIR__ . '/../config/extras.php' => $this->configTarget(),
         ], 'extras-config');
+
+        $this->publishes([
+            ManagerModule::assetsPath() => $this->assetsTarget(),
+        ], 'extras-assets');
 
         if ($this->app->runningInConsole()) {
             $this->commands([
@@ -187,6 +205,71 @@ class ExtrasServiceProvider extends ServiceProvider
             $this->app->make(InstallRecordStore::class),
             $this->app->make(Http::class)
         ));
+    }
+
+    private function registerModuleServices(): void
+    {
+        $this->app->singleton(InstalledExtras::class, fn () => new InstalledExtras(
+            $this->app->make(InstallerRegistry::class),
+            $this->app->make(InstallRecordStore::class),
+            $this->moduleSnapshot(),
+            Paths::isAvailable() ? $this->app->make(Paths::class) : null
+        ));
+
+        $this->app->singleton(CatalogListing::class, fn () => new CatalogListing(
+            $this->app->make(Catalog::class),
+            $this->app->make(InstalledExtras::class)
+        ));
+
+        $this->app->singleton(Mutex::class, function (): Mutex {
+            $directory = Paths::isAvailable()
+                ? $this->app->make(Paths::class)->cacheDir()
+                : sys_get_temp_dir();
+
+            @mkdir($directory, 0775, true);
+
+            return new Mutex(rtrim($directory, '/\\') . DIRECTORY_SEPARATOR . 'writer.lock');
+        });
+    }
+
+    /** The page never waits on the network, so it reads the snapshot rather than the catalog. */
+    private function moduleSnapshot(): SnapshotSource
+    {
+        foreach ((array) $this->config('extras.sources', []) as $definition) {
+            if (!is_array($definition) || ($definition['driver'] ?? '') !== 'snapshot') {
+                continue;
+            }
+
+            $path = $definition['path'] ?? null;
+
+            return new SnapshotSource('Bundled snapshot', is_string($path) && $path !== '' ? $path : null);
+        }
+
+        return new SnapshotSource();
+    }
+
+    private function registerManagerModule(): void
+    {
+        if (!method_exists($this->app, 'registerModule')) {
+            return;
+        }
+
+        /** Hidden keeps it off the Modules tab; the listener below puts it in the header instead. */
+        $this->app->registerModule(
+            ManagerModule::NAME,
+            ManagerModule::file(),
+            ManagerModule::ICON,
+            ['hidden' => true]
+        );
+
+        Event::listen('evolution.OnManagerMenuPrerender', MenuListener::class);
+    }
+
+    private function assetsTarget(): string
+    {
+        return defined('MODX_BASE_PATH')
+            ? rtrim((string) MODX_BASE_PATH, '/\\') . '/assets'
+            : base_path('assets');
     }
 
     private function tablePrefix(): string

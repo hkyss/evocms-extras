@@ -5,6 +5,8 @@ parameters:
         - tests
     excludePaths:
         - tests/Fixtures
+    scanFiles:
+        - stubs/evolutioncms.php
     ignoreErrors:
         # Eloquent's static entry points resolve to the query builder without larastan,
         # which this package does not pull in for two methods.

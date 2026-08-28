@@ -7,6 +7,29 @@ change needs a major version.
 
 ## [Unreleased]
 
+### Added
+
+- A module in the manager. The package registers it itself and puts an **Extras** entry in the
+  header, beside Modules rather than inside it — the Modules tab never lists it. It opens on two
+  tabs: what this tool has installed, and the catalog, where the installed rows are marked and
+  search and filters over format and installed state narrow the list.
+- Install and removal from that page. The plan is rendered first — the same one `--dry-run` prints,
+  including the files a removal will leave alone because they were edited — and the button appears
+  only under a plan that can be applied. An extra with several published versions gets a picker; an
+  unverified one needs a tick, which is what `--force` is on the console. A platform requirement
+  the installation does not meet is refused outright, as Composer would refuse it.
+- A lock around install and removal. A second request while one is running is answered `409`
+  instead of starting a second Composer resolution over the same `core/vendor`; the page cannot
+  grey out its own buttons for another tab.
+- `vendor:publish --tag=extras-assets`, which lays the module's stylesheet and script into the
+  doc root. The page needs it once per install and again after an update.
+
+### Changed
+
+- `illuminate/http`, `illuminate/routing` and `illuminate/view` join the requirements. The module
+  ships endpoints and a Blade page; Evolution has all three already.
+- `InstallRecord` declares `installed_at` and `updated_at`, which it always cast and never named.
+
 ### Fixed
 
 - A legacy plan nobody applied left its unpacked archive behind. Planning downloads and unpacks the

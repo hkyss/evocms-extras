@@ -25,11 +25,15 @@ success and leaves the requirement in the manifest.
 cd core
 php artisan package:installrequire hkyss/evocms-extras "^1.0"
 php artisan migrate
+php artisan vendor:publish --tag=extras-assets
 php artisan extra:doctor
 ```
 
 Run `migrate`. Legacy extras refuse to install without the record table, since there would be no
 way to remove them afterwards.
+
+`vendor:publish` lays the manager module's stylesheet and script into the doc root, where the
+browser can reach them. Skip it and the page opens unstyled; see [In the manager](#in-the-manager).
 
 `extra:doctor` checks the things Composer cannot: PHP version, `ext-zip`, a writable
 `custom/composer.json`, whether `composer-merge-plugin` is enabled, whether `GITHUB_PAT` is set.
@@ -40,6 +44,34 @@ Config is optional:
 ```bash
 php artisan vendor:publish --tag=extras-config
 ```
+
+## In the manager
+
+The package registers a module of its own and puts it in the manager header, beside Modules
+rather than inside it. It opens on two tabs.
+
+**Installed** is what this tool manages — the requirements in `core/custom/composer.json` and the
+legacy install records — with the version, the compatibility status and, for a legacy extra, how
+many files and elements it laid down and when. Nothing here waits on the network.
+
+**Catalog** is everything the configured sources know about, plus anything installed here that
+they do not list. Installed rows are marked and carry their version; search and filters over
+format and installed state narrow the list.
+
+Install and removal both show the plan before anything is written — the same plan `--dry-run`
+prints, down to the files a removal will leave alone because you edited them. Only then is there a
+button. An extra with more than one published version gets a picker, and one that has never been
+verified against Evo 3 needs a tick to go ahead, the way `--force` works on the console. A
+platform requirement this installation does not meet has no tick: Composer would refuse for the
+same reason.
+
+The package never offers to install or remove itself. A module cannot rebuild the code it is
+running from.
+
+One write at a time: an install or a removal takes a lock, and a second request while one is
+running is answered `409` rather than left to run two Composer resolutions over one `core/vendor`.
+
+The endpoints live under `/api/v1/extras/admin` and answer to a signed-in manager and nobody else.
 
 ## Formats
 
@@ -304,6 +336,7 @@ bundles `composer/composer` for the same reason.
 - Evolution CMS CE 3.1.x, tested on 3.1.30
 - `ext-json`, `ext-zip`
 - `composer/composer`, already a core dependency
+- Illuminate `http`, `routing` and `view`, which the manager module needs and Evolution ships
 
 The CMS cannot be declared as a Composer dependency: `evocms/evolution` is published as
 `type: project` and `evocms/core` is not published at all. `extra:doctor` checks the platform at

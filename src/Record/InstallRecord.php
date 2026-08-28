@@ -14,6 +14,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property array<string,string>        $backups
  * @property list<array<string,mixed>>   $elements
  * @property list<string>                $sql_hashes
+ * @property \Illuminate\Support\Carbon|null $installed_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
  */
 class InstallRecord extends Model
 {
