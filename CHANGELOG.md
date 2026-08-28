@@ -5,6 +5,21 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), version
 their options, the `Installer` interface, the catalog snapshot schema — is stable: a breaking
 change needs a major version.
 
+## [1.1.1] - 2026-08-28
+
+### Fixed
+
+- A composer extra could not be removed on a live site. The provider file was deleted only after
+  the Composer run, so `package:discover` — Composer's post-autoload hook — booted the CMS off the
+  compiled provider list and loaded a class the same run had just taken out of the vendor tree.
+  Composer exited 255 over its own hook, the removal rolled back a manifest whose package was
+  already gone, and the site was left with a provider file pointing at nothing. The provider file
+  and the compiled list now go before Composer, and a failed run puts both back.
+- A removal left the directories it emptied. An extra owns the tree it laid down and nothing else
+  can tell those directories were its, so `assets/plugins/<extra>` and `assets/modules/<extra>`
+  stayed behind after every file in them had gone. Both installers now take them with the files,
+  up to the tree they were written into, and say how many.
+
 ## [1.1.0] - 2026-08-28
 
 ### Added
@@ -221,7 +236,8 @@ First release. Targets Evolution CMS CE 3.1.x.
 - Every legacy entry ships as `unknown`; none has been verified on Evolution CMS 3 yet.
 - Schema applied by a legacy extra is not rolled back on removal.
 
-[Unreleased]: https://github.com/hkyss/evocms-extras/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/hkyss/evocms-extras/compare/v1.1.1...HEAD
+[1.1.1]: https://github.com/hkyss/evocms-extras/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/hkyss/evocms-extras/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/hkyss/evocms-extras/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/hkyss/evocms-extras/compare/v0.2.0...v1.0.0
