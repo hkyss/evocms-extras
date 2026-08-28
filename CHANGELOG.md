@@ -7,6 +7,21 @@ change needs a major version.
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-08-28
+
+Repository housekeeping; the package itself is unchanged from 1.0.0.
+
+### Fixed
+
+- The test workflow ran on pushes to `main`, a branch this repository does not have, so between
+  pull requests nothing was checked at all. It follows `dev` now, like the rest of the family.
+- The issue template pointed at `SECURITY.md` on `main` and answered 404.
+
+### Changed
+
+- The Packagist keyword is `evolution-cms`, the spelling everything else is published under; this
+  package alone said `evolutioncms` and fell out of the neighbouring search results.
+
 ## [1.0.0] - 2026-08-18
 
 First stable release. Everything below is relative to 0.2.0.
@@ -176,7 +191,8 @@ First release. Targets Evolution CMS CE 3.1.x.
 - Every legacy entry ships as `unknown`; none has been verified on Evolution CMS 3 yet.
 - Schema applied by a legacy extra is not rolled back on removal.
 
-[Unreleased]: https://github.com/hkyss/evocms-extras/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/hkyss/evocms-extras/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/hkyss/evocms-extras/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/hkyss/evocms-extras/compare/v0.2.0...v1.0.0
 [0.2.0]: https://github.com/hkyss/evocms-extras/releases/tag/v0.2.0
 [0.1.1]: https://github.com/hkyss/evocms-extras/releases/tag/v0.1.1
