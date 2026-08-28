@@ -60,6 +60,13 @@ final class Paths
             . 'app' . DIRECTORY_SEPARATOR . 'providers' . DIRECTORY_SEPARATOR;
     }
 
+    /** Evolution boots off this compiled copy of providersDir() until the file is gone. */
+    public function compiledProviders(): string
+    {
+        return $this->core . 'storage' . DIRECTORY_SEPARATOR . 'bootstrap'
+            . DIRECTORY_SEPARATOR . 'services.php';
+    }
+
     public function vendorDir(): string
     {
         return $this->core . 'vendor' . DIRECTORY_SEPARATOR;
@@ -111,5 +118,30 @@ final class Paths
         }
 
         return rtrim($path, '/\\') . DIRECTORY_SEPARATOR;
+    }
+
+    /**
+     * What a deletion emptied, back up to the tree it was written into. An extra owns the
+     * directories it laid down and nothing else can tell they were its, so a removal that only
+     * unlinks files leaves its own skeleton behind.
+     */
+    public function pruneEmptyDirectories(string $path, string $stopAt): int
+    {
+        $stop = rtrim($stopAt, '/\\');
+        $directory = rtrim(is_dir($path) ? $path : dirname($path), '/\\');
+        $removed = 0;
+
+        while (
+            $directory !== $stop
+            && str_starts_with($directory . DIRECTORY_SEPARATOR, $stop . DIRECTORY_SEPARATOR)
+            && is_dir($directory)
+            && (scandir($directory) ?: []) === ['.', '..']
+            && @rmdir($directory)
+        ) {
+            $removed++;
+            $directory = rtrim(dirname($directory), '/\\');
+        }
+
+        return $removed;
     }
 }

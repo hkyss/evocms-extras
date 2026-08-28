@@ -264,12 +264,19 @@ class ComposerInstaller implements Installer, EnumeratesInstalled
         $coordinate = (string) $plan->coordinate();
         $snapshot = $this->manifest->snapshot();
 
+        // Before Composer rather than after: its post-autoload hook is package:discover, which
+        // boots the CMS off the compiled provider list, and a provider file still naming the
+        // class this run deletes makes that boot fatal — over a package Composer has by then
+        // already taken out of the vendor tree.
+        $providers = $this->unregisterProviders($plan);
+
         $this->manifest->remove($coordinate);
 
         $result = $this->runner->updateAll();
 
         if (!$result->isSuccessful()) {
             $this->manifest->restore($snapshot);
+            $this->registerProviders($providers);
 
             return Outcome::failure(
                 sprintf(
@@ -283,12 +290,20 @@ class ComposerInstaller implements Installer, EnumeratesInstalled
         }
 
         $notes = [];
-        $deleted = 0;
+        $deleted = count($providers);
+        $pruned = 0;
 
-        foreach ($plan->stepsOf(StepKind::ProviderConfigDelete, StepKind::FileDelete) as $step) {
-            if (@unlink((string) $step->get('path'))) {
+        foreach ($plan->stepsOf(StepKind::FileDelete) as $step) {
+            $path = (string) $step->get('path');
+
+            if (@unlink($path)) {
                 $deleted++;
+                $pruned += $this->paths->pruneEmptyDirectories($path, $this->paths->publishBase());
             }
+        }
+
+        if ($pruned > 0) {
+            $notes[] = sprintf('%d empty directory(s) removed with them', $pruned);
         }
 
         $kept = $plan->stepsOf(StepKind::FileKeep);
@@ -310,6 +325,41 @@ class ComposerInstaller implements Installer, EnumeratesInstalled
             $notes,
             $result->tail(4)
         );
+    }
+
+    /**
+     * The provider files this removal plans to drop, taken out now and returned by path so a
+     * Composer run that fails can put them back. The compiled list goes with them: it is what
+     * the next boot reads, and it is rebuilt from the directory on its own.
+     *
+     * @return array<string,string>
+     */
+    private function unregisterProviders(InstallPlan $plan): array
+    {
+        $removed = [];
+
+        foreach ($plan->stepsOf(StepKind::ProviderConfigDelete) as $step) {
+            $path = (string) $step->get('path');
+            $contents = @file_get_contents($path);
+
+            if (is_string($contents) && @unlink($path)) {
+                $removed[$path] = $contents;
+            }
+        }
+
+        if ($removed !== []) {
+            @unlink($this->paths->compiledProviders());
+        }
+
+        return $removed;
+    }
+
+    /** @param array<string,string> $providers */
+    private function registerProviders(array $providers): void
+    {
+        foreach ($providers as $path => $contents) {
+            @file_put_contents($path, $contents);
+        }
     }
 
     private function constraint(Extra $extra, string $version): string

@@ -452,6 +452,7 @@ class LegacyInstaller implements Installer, EnumeratesInstalled, HoldsArchives
     {
         $deleted = 0;
         $restored = 0;
+        $pruned = 0;
         $notes = [];
 
         foreach ($plan->stepsOf(StepKind::FileDelete) as $step) {
@@ -468,7 +469,15 @@ class LegacyInstaller implements Installer, EnumeratesInstalled, HoldsArchives
             if (is_string($backup) && is_file($backup) && @copy($backup, $path)) {
                 @unlink($backup);
                 $restored++;
+
+                continue;
             }
+
+            $pruned += $this->paths->pruneEmptyDirectories($path, $this->paths->base());
+        }
+
+        if ($pruned > 0) {
+            $notes[] = sprintf('%d empty directory(s) removed with them', $pruned);
         }
 
         foreach ($plan->stepsOf(StepKind::ElementDelete) as $step) {
