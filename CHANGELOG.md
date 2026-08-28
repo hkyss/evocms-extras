@@ -5,6 +5,15 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), version
 their options, the `Installer` interface, the catalog snapshot schema — is stable: a breaking
 change needs a major version.
 
+## [1.1.2] - 2026-08-28
+
+### Fixed
+
+- A legacy removal left its elements in Evolution's compiled cache. The rows went from the
+  tables and the cache was not written again, so the plugins and modules kept being evaluated —
+  and one whose files had gone with them made every manager request a fatal
+  (`Failed opening required assets/modules/<extra>/…`). Both apply paths clear the cache now.
+
 ## [1.1.1] - 2026-08-28
 
 ### Fixed
@@ -236,7 +245,8 @@ First release. Targets Evolution CMS CE 3.1.x.
 - Every legacy entry ships as `unknown`; none has been verified on Evolution CMS 3 yet.
 - Schema applied by a legacy extra is not rolled back on removal.
 
-[Unreleased]: https://github.com/hkyss/evocms-extras/compare/v1.1.1...HEAD
+[Unreleased]: https://github.com/hkyss/evocms-extras/compare/v1.1.2...HEAD
+[1.1.2]: https://github.com/hkyss/evocms-extras/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/hkyss/evocms-extras/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/hkyss/evocms-extras/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/hkyss/evocms-extras/compare/v1.0.0...v1.0.1
