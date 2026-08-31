@@ -15,6 +15,7 @@ use hkyss\Extras\Console\Commands\InfoCommand;
 use hkyss\Extras\Console\Commands\InstallCommand;
 use hkyss\Extras\Console\Commands\ListCommand;
 use hkyss\Extras\Console\Commands\RemoveCommand;
+use hkyss\Extras\Console\Commands\TakeoverCommand;
 use hkyss\Extras\Console\Commands\UpdateCommand;
 use hkyss\Extras\Installer\ComposerInstaller;
 use hkyss\Extras\Installer\ComposerManifest;
@@ -28,8 +29,12 @@ use hkyss\Extras\Manager\ManagerModule;
 use hkyss\Extras\Manager\MenuListener;
 use hkyss\Extras\Manager\Mutex;
 use hkyss\Extras\Record\InstallRecordStore;
+use hkyss\Extras\Record\TakeoverRecordStore;
 use hkyss\Extras\Support\Http;
 use hkyss\Extras\Support\Paths;
+use hkyss\Extras\Takeover\SiteElements;
+use hkyss\Extras\Takeover\Takeover;
+use hkyss\Extras\Takeover\TakeoverPlanner;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 
@@ -43,6 +48,7 @@ class ExtrasServiceProvider extends ServiceProvider
         $this->registerCatalog();
         $this->registerInstallers();
         $this->registerModuleServices();
+        $this->registerTakeover();
     }
 
     public function boot(): void
@@ -71,6 +77,7 @@ class ExtrasServiceProvider extends ServiceProvider
                 InstallCommand::class,
                 UpdateCommand::class,
                 RemoveCommand::class,
+                TakeoverCommand::class,
                 InfoCommand::class,
                 CacheCommand::class,
                 DoctorCommand::class,
@@ -230,6 +237,27 @@ class ExtrasServiceProvider extends ServiceProvider
 
             return new Mutex(rtrim($directory, '/\\') . DIRECTORY_SEPARATOR . 'writer.lock');
         });
+    }
+
+    private function registerTakeover(): void
+    {
+        $this->app->singleton(SiteElements::class, static fn () => new SiteElements());
+        $this->app->singleton(TakeoverRecordStore::class, static fn () => new TakeoverRecordStore());
+
+        $this->app->singleton(TakeoverPlanner::class, fn () => new TakeoverPlanner(
+            $this->app->make(Catalog::class),
+            $this->app->make(SiteElements::class),
+            $this->app->make(InstallRecordStore::class),
+            $this->app->make(InstallerRegistry::class),
+            array_filter((array) $this->config('extras.takeover.replacements', []), 'is_string'),
+            array_values(array_filter((array) $this->config('extras.takeover.ignore', []), 'is_string'))
+        ));
+
+        $this->app->singleton(Takeover::class, fn () => new Takeover(
+            $this->app->make(InstallerRegistry::class),
+            $this->app->make(SiteElements::class),
+            $this->app->make(TakeoverRecordStore::class)
+        ));
     }
 
     /** The page never waits on the network, so it reads the snapshot rather than the catalog. */

@@ -5,6 +5,7 @@ namespace hkyss\Extras\Installer;
 final class Outcome
 {
     private bool $successful;
+    private bool $nothingHappened = false;
     private string $message;
     /** @var list<string> */
     private array $notes;
@@ -43,12 +44,21 @@ final class Outcome
 
     public static function noop(string $message): self
     {
-        return new self(true, $message);
+        $outcome = new self(true, $message);
+        $outcome->nothingHappened = true;
+
+        return $outcome;
     }
 
     public function isSuccessful(): bool
     {
         return $this->successful;
+    }
+
+    /** Successful and the site is untouched, which is not the same answer as done. */
+    public function isNoop(): bool
+    {
+        return $this->nothingHappened;
     }
 
     public function message(): string

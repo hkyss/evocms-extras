@@ -97,8 +97,10 @@ class CommandArchiveCleanupTest extends TestCase
     }
 
     /**
-     * runOne() is the one place that discards what planning unpacked, so a command that plans
-     * on its own leaks again; the browse path in extra:list is why this is worth guarding.
+     * runOne() is the one place that discards what planning unpacked, so a command that takes
+     * an installer of its own leaks again; the browse path in extra:list is why this is worth
+     * guarding. What plans outside a command — Takeover — discards for itself, and has a test
+     * of its own that says so.
      */
     public function testCommandsPlanOnlyThroughRunOne(): void
     {
@@ -108,7 +110,7 @@ class CommandArchiveCleanupTest extends TestCase
             }
 
             self::assertStringNotContainsString(
-                '->plan(',
+                'installers->for(',
                 (string) file_get_contents((string) $file),
                 basename((string) $file) . ' builds a plan of its own instead of going through runOne()'
             );

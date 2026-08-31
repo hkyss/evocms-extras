@@ -104,4 +104,25 @@ return [
         'install_set' => 'base',
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Takeover
+    |--------------------------------------------------------------------------
+    |
+    | What `extra:takeover` does with the elements the legacy manager left behind.
+    | An element is a candidate only where the catalog can name it and its
+    | description carries a version, which is what an installer of the legacy
+    | format writes and a hand-written element does not.
+    |
+    | Replacements name the ones the site does not call by the catalog's name;
+    | ignored ones are left exactly as they are.
+    |
+    */
+    'takeover' => [
+        'replacements' => [
+            'CodeMirror' => 'evolution-cms/ecodemirror',
+        ],
+        'ignore' => [],
+    ],
+
 ];

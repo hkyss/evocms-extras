@@ -23,10 +23,11 @@ success and leaves the requirement in the manifest.
 
 ```bash
 cd core
-php artisan package:installrequire hkyss/evocms-extras "^1.0"
+php artisan package:installrequire hkyss/evocms-extras "^1.3"
 php artisan migrate
 php artisan vendor:publish --tag=extras-assets
 php artisan extra:doctor
+php artisan extra:takeover --dry-run
 ```
 
 Run `migrate`. Legacy extras refuse to install without the record table, since there would be no
@@ -38,6 +39,9 @@ browser can reach them. Skip it and the page opens unstyled; see [In the manager
 `extra:doctor` checks the things Composer cannot: PHP version, `ext-zip`, a writable
 `custom/composer.json`, whether `composer-merge-plugin` is enabled, whether `GITHUB_PAT` is set.
 Start there when something misbehaves.
+
+`extra:takeover` says what the site is running that this package does not manage, and takes it
+over when you drop the `--dry-run`; see [Taking the legacy manager over](#taking-the-legacy-manager-over).
 
 Config is optional:
 
@@ -218,6 +222,14 @@ php artisan extra:remove evolution-cms-extras/tinymce5
 php artisan extra:remove a/one b/two --continue-on-error
 ```
 
+### `extra:takeover`
+
+```bash
+php artisan extra:takeover --dry-run
+php artisan extra:takeover
+php artisan extra:takeover --restore
+```
+
 ### `extra:info`, `extra:cache`, `extra:doctor`, `extra:help`
 
 ```bash
@@ -272,6 +284,80 @@ entry carries a status set by hand:
 
 `extra:list` shows all of them. `extra:install` refuses `unknown` and `incompatible` unless you
 pass `--force`.
+
+## Taking the legacy manager over
+
+Evolution ships an extras manager of its own — the module running out of `assets/modules/store` —
+and what a site installed through it is a set of rows and files nothing can take back: the legacy
+format has no uninstall, and this package removes only what it has a record of.
+
+`extra:takeover` reads the site against the catalog and does three things:
+
+- **retire** the legacy manager's own module. This package is what replaces it, so nothing is
+  installed in its place. A row the catalog answers for with a package that is *already* installed
+  is retired too, for the same reason.
+- **adopt** a legacy extra the site is already running: it is installed again through here, over
+  the rows that are already there, so it gains an install record and can be removed afterwards.
+  The version is the one the site is running, where the catalog publishes that one — taking a site
+  off the version it chose is an update, not a takeover.
+- **replace** a row the catalog answers for with a Composer package: the row goes dark and the
+  package is installed in its place. `CodeMirror` for `evolution-cms/ecodemirror` is the one
+  mapping shipped; the rest of the map is yours, under `takeover.replacements`.
+
+Everything else is left exactly as it is — **nothing the catalog cannot name is ever switched
+off**, the legacy manager's own module aside, which is what the command exists for — and the plan
+says why row by row: an element whose description carries no version was typed into the manager
+rather than written by a package; one the catalog cannot name has nothing to install in its place;
+and a replacement whose `php` or `ext-*` requirement this installation does not meet is left out,
+because Composer would refuse over the same line and the row it would have replaced is better off
+running. Plugins, modules and snippets are in scope; templates, chunks and TVs are content, and a
+template switched off is a page that stops working.
+
+An extra whose source turns out to hold no package at all — which only the download can say — is
+left as it was too, and the run says so and carries on. Nothing was attempted for it, so it is a
+row fewer in the takeover rather than a takeover that failed.
+
+A stock Evolution CE 3.1 install, on PHP 8.2:
+
+```
+$ php artisan extra:takeover --dry-run
+
+extra:takeover
+what the legacy manager left, under this one
+────────────────────────────────────────────
+
+retire
+  switched off and not replaced: this package is what replaces it
+  └─ ● switch off module Extras — this package is the manager now
+
+adopt
+  installed through this tool, over the rows already there
+  ├─ ● install evocms-community/AboutEvoWidget over plugin AboutEvoWidget
+  └─ ● install extras-evolution/Updater over plugin Updater
+
+skip
+  left as it is
+  ├─ · leave plugin CodeMirror alone — evolution-cms/ecodemirror needs PHP ^8.3; this installation runs 8.2.29
+  └─ · leave plugin TransAlias alone — nothing in the catalog answers to the name
+
+--dry-run: nothing was changed
+```
+
+On PHP 8.3 the `CodeMirror` row moves out of `skip` and into `replace`: the plugin goes dark and
+`evolution-cms/ecodemirror` is installed in its place.
+
+One install that fails takes the whole takeover with it: what the run had already switched off
+comes back on, and the site is left as it was found.
+
+`extra:takeover --restore` is the other direction — what the takeover installed is removed through
+the installer that put it there, and every row it switched off comes on again. **Run it before you
+remove this package**, while `extras_takeover_records` is still there: that table is the only thing
+that knows what a takeover did, and it leaves with the migrations.
+
+```bash
+php artisan extra:takeover --restore
+cd core && composer remove hkyss/evocms-extras
+```
 
 ## Removal
 

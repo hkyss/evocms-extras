@@ -16,6 +16,12 @@ parameters:
         -
             identifier: catch.neverThrown
             path: src/Record/InstallRecordStore.php
+        -
+            identifier: return.type
+            path: src/Record/TakeoverRecordStore.php
+        -
+            identifier: catch.neverThrown
+            path: src/Record/TakeoverRecordStore.php
 
         # composer/composer comes from the Evolution core, not from our own require.
         -

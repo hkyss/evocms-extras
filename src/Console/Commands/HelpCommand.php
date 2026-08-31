@@ -13,6 +13,7 @@ class HelpCommand extends AbstractExtraCommand
         'extra:install' => ['install one or more', '--use-version=  --dry-run  --force'],
         'extra:update' => ['update what is installed', '--dry-run  --force'],
         'extra:remove' => ['remove what is installed', '--dry-run  --force'],
+        'extra:takeover' => ['take the legacy manager over', '--restore  --dry-run'],
         'extra:doctor' => ['check this installation', ''],
         'extra:cache' => ['the catalog cache', '--clear  --rebuild-snapshot='],
     ];
