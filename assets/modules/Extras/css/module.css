@@ -85,6 +85,14 @@
         color: #777;
     }
 
+    .module__grid-repo {
+        color: #777;
+
+        &:hover {
+            color: #333;
+        }
+    }
+
     .module__grid-detail {
         font-size: 12px;
     }

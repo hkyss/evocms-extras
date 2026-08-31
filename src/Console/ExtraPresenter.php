@@ -86,6 +86,10 @@ final class ExtraPresenter
             $rows[] = ['Homepage', $ui->dim($extra->homepage())];
         }
 
+        if ($extra->repository() !== '') {
+            $rows[] = ['Repository', $ui->dim($extra->repository())];
+        }
+
         $ui->details($rows);
 
         $this->versions($extra->versions());

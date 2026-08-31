@@ -16,6 +16,12 @@ const Module = class {
       record: 'запись об установке',
     };
 
+    this.forges = {
+      'github.com': 'fa-github',
+      'gitlab.com': 'fa-gitlab',
+      'bitbucket.org': 'fa-bitbucket',
+    };
+
     this.compatibility = {
       verified: { label: 'проверено', level: 'ok' },
       unknown: { label: 'не проверено', level: 'warning' },
@@ -156,12 +162,23 @@ const Module = class {
     const named = extra.title && extra.title !== coordinate;
     const name = named ? extra.title : coordinate;
     const link = extra.homepage
-      ? `<a href="${this.text(extra.homepage)}" target="_blank" rel="noopener">${this.text(name)}</a>`
+      ? `<a href="${this.attr(extra.homepage)}" target="_blank" rel="noopener">${this.text(name)}</a>`
       : this.text(name);
 
-    return `${link}
+    return `${link}${this.repositoryLink(extra)}
       ${named ? `<small class="module__grid-note">${this.text(coordinate)}</small>` : ''}
       ${extra.description ? `<small class="module__grid-note">${this.text(extra.description)}</small>` : ''}`;
+  }
+
+  repositoryLink(extra) {
+    if (!extra.repository) {
+      return '';
+    }
+
+    const host = String(extra.repository).replace(/^https?:\/\//, '').split('/')[0].toLowerCase();
+
+    return ` <a class="module__grid-repo" href="${this.attr(extra.repository)}" target="_blank" rel="noopener"
+        title="${this.attr(extra.repository)}"><i class="fa ${this.forges[host] || 'fa-code-fork'}"></i></a>`;
   }
 
   formatBadge(extra) {
@@ -450,7 +467,7 @@ const Module = class {
   }
 
   attr(value) {
-    return String(value ?? '').replace(/'/g, '&#39;');
+    return this.text(value).replace(/'/g, '&#39;').replace(/"/g, '&quot;');
   }
 
   /** The server hands times over in iso: the timezone is the one the manager is sitting in. */

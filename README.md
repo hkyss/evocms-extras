@@ -58,6 +58,10 @@ many files and elements it laid down and when. Nothing here waits on the network
 they do not list. Installed rows are marked and carry their version; search and filters over
 format and installed state narrow the list.
 
+Rows on both tabs link out. The mark beside the name opens the repository the extra ships from —
+the url Composer clones for a package, the repository itself for a legacy extra — and the name
+opens the site the package declares, where it declares one.
+
 Install and removal both show the plan before anything is written — the same plan `--dry-run`
 prints, down to the files a removal will leave alone because you edited them. Only then is there a
 button. An extra with more than one published version gets a picker, and one that has never been

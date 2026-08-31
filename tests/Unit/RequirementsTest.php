@@ -48,16 +48,15 @@ class RequirementsTest extends TestCase
         $extra = new Extra(
             Coordinate::parse('evolution-cms/etinymce'),
             ExtraFormat::Composer,
-            'etinymce',
-            'TinyMCE 8 for Evolution CMS',
-            '8.3.2',
-            ['8.3.2'],
-            '',
-            CompatibilityStatus::Verified,
-            'Packagist',
-            '',
-            'evolution-cms',
-            ['php' => '^8.3', 'tinymce/tinymce' => '^8.3']
+            title: 'etinymce',
+            description: 'TinyMCE 8 for Evolution CMS',
+            latestVersion: '8.3.2',
+            versions: ['8.3.2'],
+            compatibility: CompatibilityStatus::Verified,
+            sourceName: 'Packagist',
+            repository: 'https://github.com/evolution-cms/etinymce',
+            author: 'evolution-cms',
+            requires: ['php' => '^8.3', 'tinymce/tinymce' => '^8.3']
         );
 
         $document = SnapshotSource::document([$extra], '2026-08-18T00:00:00+00:00');

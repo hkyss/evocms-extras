@@ -14,6 +14,7 @@
             "default_branch": "",
             "compatibility": "verified",
             "homepage": "",
+            "repository": "https://github.com/Ambrion/evocms-evo-package-manager",
             "author": "ambrion",
             "require": {
                 "php": "^8.3"
@@ -32,6 +33,7 @@
             "default_branch": "",
             "compatibility": "verified",
             "homepage": "",
+            "repository": "https://github.com/Ambrion/evocms-feature-flags",
             "author": "ambrion",
             "require": {
                 "php": "^8.3",
@@ -50,6 +52,7 @@
             "default_branch": "",
             "compatibility": "verified",
             "homepage": "",
+            "repository": "https://github.com/Dmi3yy/dDocs",
             "author": "dmi3yy",
             "require": {
                 "php": "^8.3",
@@ -72,6 +75,7 @@
             "default_branch": "",
             "compatibility": "verified",
             "homepage": "",
+            "repository": "https://github.com/Dmi3yy/dTui-editor",
             "author": "dmi3yy",
             "require": {
                 "php": "^8.3",
@@ -91,6 +95,7 @@
             "default_branch": "",
             "compatibility": "verified",
             "homepage": "",
+            "repository": "",
             "author": "elcreator",
             "require": {
                 "php": "^8.3",
@@ -107,7 +112,8 @@
             "versions": [],
             "default_branch": "master",
             "compatibility": "unknown",
-            "homepage": "https://github.com/evocms-community/clientsettings",
+            "homepage": "",
+            "repository": "https://github.com/evocms-community/clientsettings",
             "author": "evocms-community",
             "require": {}
         },
@@ -120,7 +126,8 @@
             "versions": [],
             "default_branch": "master",
             "compatibility": "unknown",
-            "homepage": "https://github.com/evocms-community/commerce",
+            "homepage": "",
+            "repository": "https://github.com/evocms-community/commerce",
             "author": "evocms-community",
             "require": {}
         },
@@ -133,7 +140,8 @@
             "versions": [],
             "default_branch": "master",
             "compatibility": "unknown",
-            "homepage": "https://github.com/evocms-community/DLInstagram",
+            "homepage": "",
+            "repository": "https://github.com/evocms-community/DLInstagram",
             "author": "evocms-community",
             "require": {}
         },
@@ -146,7 +154,8 @@
             "versions": [],
             "default_branch": "master",
             "compatibility": "unknown",
-            "homepage": "https://github.com/evocms-community/faviconcreator",
+            "homepage": "",
+            "repository": "https://github.com/evocms-community/faviconcreator",
             "author": "evocms-community",
             "require": {}
         },
@@ -159,7 +168,8 @@
             "versions": [],
             "default_branch": "master",
             "compatibility": "unknown",
-            "homepage": "https://github.com/evocms-community/lesscompiler",
+            "homepage": "",
+            "repository": "https://github.com/evocms-community/lesscompiler",
             "author": "evocms-community",
             "require": {}
         },
@@ -172,7 +182,8 @@
             "versions": [],
             "default_branch": "master",
             "compatibility": "unknown",
-            "homepage": "https://github.com/evocms-community/pagebuilder",
+            "homepage": "",
+            "repository": "https://github.com/evocms-community/pagebuilder",
             "author": "evocms-community",
             "require": {}
         },
@@ -199,6 +210,7 @@
             "default_branch": "",
             "compatibility": "verified",
             "homepage": "",
+            "repository": "https://github.com/evolution-cms-extras/DocLister",
             "author": "evolution-cms-extras",
             "require": {}
         },
@@ -215,6 +227,7 @@
             "default_branch": "",
             "compatibility": "verified",
             "homepage": "",
+            "repository": "https://github.com/evolution-cms-extras/multifields",
             "author": "evolution-cms-extras",
             "require": {}
         },
@@ -234,6 +247,7 @@
             "default_branch": "",
             "compatibility": "verified",
             "homepage": "",
+            "repository": "https://github.com/evolution-cms-extras/TinyMCE5",
             "author": "evolution-cms-extras",
             "require": {}
         },
@@ -250,6 +264,7 @@
             "default_branch": "",
             "compatibility": "verified",
             "homepage": "",
+            "repository": "https://github.com/evolution-cms/evo-ai",
             "author": "evolution-cms",
             "require": {
                 "evolution-cms/evolution": "^3.5.2",
@@ -270,6 +285,7 @@
             "default_branch": "",
             "compatibility": "verified",
             "homepage": "",
+            "repository": "https://github.com/evolution-cms/eCodemirror",
             "author": "evolution-cms",
             "require": {
                 "php": "^8.3",
@@ -288,6 +304,7 @@
             "default_branch": "",
             "compatibility": "verified",
             "homepage": "",
+            "repository": "https://github.com/evolution-cms/eFilemanager",
             "author": "evolution-cms",
             "require": {
                 "php": "^8.3",
@@ -307,6 +324,7 @@
             "default_branch": "",
             "compatibility": "verified",
             "homepage": "",
+            "repository": "https://github.com/evolution-cms/evo-mcp",
             "author": "evolution-cms",
             "require": {
                 "evolution-cms/evolution": "^3.5.2",
@@ -328,6 +346,7 @@
             "default_branch": "",
             "compatibility": "verified",
             "homepage": "",
+            "repository": "https://github.com/evolution-cms/ePasskeys",
             "author": "evolution-cms",
             "require": {
                 "php": "^8.3",
@@ -347,6 +366,7 @@
             "default_branch": "",
             "compatibility": "verified",
             "homepage": "",
+            "repository": "https://github.com/evolution-cms/eTinyMCE",
             "author": "evolution-cms",
             "require": {
                 "php": "^8.3",
@@ -367,6 +387,7 @@
             "default_branch": "",
             "compatibility": "verified",
             "homepage": "",
+            "repository": "https://github.com/evolution-cms/evo-ai",
             "author": "evolution-cms",
             "require": {
                 "php": "^8.3",
@@ -384,7 +405,8 @@
             "versions": [],
             "default_branch": "master",
             "compatibility": "unknown",
-            "homepage": "https://github.com/extras-evolution/ajaxSearch",
+            "homepage": "",
+            "repository": "https://github.com/extras-evolution/ajaxSearch",
             "author": "extras-evolution",
             "require": {}
         },
@@ -397,7 +419,8 @@
             "versions": [],
             "default_branch": "master",
             "compatibility": "unknown",
-            "homepage": "https://github.com/extras-evolution/Ditto",
+            "homepage": "",
+            "repository": "https://github.com/extras-evolution/Ditto",
             "author": "extras-evolution",
             "require": {}
         },
@@ -410,7 +433,8 @@
             "versions": [],
             "default_branch": "master",
             "compatibility": "unknown",
-            "homepage": "https://github.com/extras-evolution/DocInfo",
+            "homepage": "",
+            "repository": "https://github.com/extras-evolution/DocInfo",
             "author": "extras-evolution",
             "require": {}
         },
@@ -423,7 +447,8 @@
             "versions": [],
             "default_branch": "master",
             "compatibility": "unknown",
-            "homepage": "https://github.com/extras-evolution/eForm",
+            "homepage": "",
+            "repository": "https://github.com/extras-evolution/eForm",
             "author": "extras-evolution",
             "require": {}
         },
@@ -436,7 +461,8 @@
             "versions": [],
             "default_branch": "master",
             "compatibility": "unknown",
-            "homepage": "https://github.com/extras-evolution/ManagerManager",
+            "homepage": "",
+            "repository": "https://github.com/extras-evolution/ManagerManager",
             "author": "extras-evolution",
             "require": {}
         },
@@ -449,7 +475,8 @@
             "versions": [],
             "default_branch": "master",
             "compatibility": "unknown",
-            "homepage": "https://github.com/extras-evolution/MinifyX-for-Evolution",
+            "homepage": "",
+            "repository": "https://github.com/extras-evolution/MinifyX-for-Evolution",
             "author": "extras-evolution",
             "require": {}
         },
@@ -462,7 +489,8 @@
             "versions": [],
             "default_branch": "master",
             "compatibility": "unknown",
-            "homepage": "https://github.com/extras-evolution/multiTV",
+            "homepage": "",
+            "repository": "https://github.com/extras-evolution/multiTV",
             "author": "extras-evolution",
             "require": {}
         },
@@ -475,7 +503,8 @@
             "versions": [],
             "default_branch": "master",
             "compatibility": "unknown",
-            "homepage": "https://github.com/extras-evolution/Shopkeeper",
+            "homepage": "",
+            "repository": "https://github.com/extras-evolution/Shopkeeper",
             "author": "extras-evolution",
             "require": {}
         },
@@ -488,7 +517,8 @@
             "versions": [],
             "default_branch": "master",
             "compatibility": "unknown",
-            "homepage": "https://github.com/extras-evolution/sitemap",
+            "homepage": "",
+            "repository": "https://github.com/extras-evolution/sitemap",
             "author": "extras-evolution",
             "require": {}
         },
@@ -501,7 +531,8 @@
             "versions": [],
             "default_branch": "master",
             "compatibility": "unknown",
-            "homepage": "https://github.com/extras-evolution/Updater",
+            "homepage": "",
+            "repository": "https://github.com/extras-evolution/Updater",
             "author": "extras-evolution",
             "require": {}
         },
@@ -517,6 +548,7 @@
             "default_branch": "",
             "compatibility": "verified",
             "homepage": "https://index-now.ru/?utm_source=evolutioncms_extras&utm_medium=referral&utm_campaign=cms_plugin",
+            "repository": "https://github.com/arseniigruzdev/index-now-ru-evolutioncms",
             "author": "index-now-ru",
             "require": {
                 "php": "^8.3",
@@ -537,6 +569,7 @@
             "default_branch": "",
             "compatibility": "verified",
             "homepage": "",
+            "repository": "https://github.com/AlexandrKlymas/MFConfigure",
             "author": "klym",
             "require": {
                 "php": "^7.4 || ^8.0"
@@ -554,6 +587,7 @@
             "default_branch": "",
             "compatibility": "verified",
             "homepage": "",
+            "repository": "https://github.com/AlexandrKlymas/MFParser",
             "author": "klym",
             "require": {
                 "php": "^7.4 || ^8.0"
@@ -571,6 +605,7 @@
             "default_branch": "",
             "compatibility": "verified",
             "homepage": "",
+            "repository": "https://github.com/Kolya1222/PackageNavigator",
             "author": "roilafx",
             "require": {}
         },
@@ -597,6 +632,7 @@
             "default_branch": "",
             "compatibility": "verified",
             "homepage": "",
+            "repository": "https://github.com/Seiger/sCommerce",
             "author": "seiger",
             "require": {
                 "php": "^8.4",
@@ -628,6 +664,7 @@
             "default_branch": "",
             "compatibility": "verified",
             "homepage": "",
+            "repository": "https://github.com/Seiger/sGallery",
             "author": "seiger",
             "require": {
                 "php": "^8.3",
@@ -647,6 +684,7 @@
             "default_branch": "",
             "compatibility": "verified",
             "homepage": "",
+            "repository": "https://github.com/Seiger/sMailer",
             "author": "seiger",
             "require": {
                 "php": "^8"
@@ -664,6 +702,7 @@
             "default_branch": "",
             "compatibility": "verified",
             "homepage": "",
+            "repository": "https://github.com/Seiger/sOffers",
             "author": "seiger",
             "require": {
                 "php": ">=7.4"
@@ -688,6 +727,7 @@
             "default_branch": "",
             "compatibility": "verified",
             "homepage": "",
+            "repository": "https://github.com/Seiger/sSettings",
             "author": "seiger",
             "require": {
                 "php": "^8"

@@ -7,6 +7,7 @@ use hkyss\Extras\Domain\Coordinate;
 use hkyss\Extras\Domain\Extra;
 use hkyss\Extras\Domain\ExtraFormat;
 use hkyss\Extras\Domain\InstalledState;
+use hkyss\Extras\Domain\WebUrl;
 use hkyss\Extras\Installer\InstallerRegistry;
 use hkyss\Extras\Record\InstallRecordStore;
 use hkyss\Extras\Support\Paths;
@@ -107,6 +108,7 @@ class InstalledExtras
             'title' => $extra->title(),
             'description' => $this->pick($manifest['description'] ?? null, $extra->description()),
             'homepage' => $this->pick($manifest['homepage'] ?? null, $extra->homepage()),
+            'repository' => $this->pick(WebUrl::from($manifest['support']['source'] ?? null), $extra->repository()),
             'author' => $extra->author(),
             'type' => (string) ($manifest['type'] ?? ''),
             'latest' => $extra->defaultVersion(),

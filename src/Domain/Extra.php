@@ -15,6 +15,7 @@ final class Extra
     private CompatibilityStatus $compatibility;
     private string $sourceName;
     private string $homepage;
+    private string $repository;
     private string $author;
     /** @var array<string,string> */
     private array $requires;
@@ -34,6 +35,7 @@ final class Extra
         ?CompatibilityStatus $compatibility = null,
         string $sourceName = '',
         string $homepage = '',
+        string $repository = '',
         string $author = '',
         array $requires = []
     ) {
@@ -50,6 +52,7 @@ final class Extra
         $this->compatibility = $compatibility ?? CompatibilityStatus::forFormat($format);
         $this->sourceName = $sourceName;
         $this->homepage = $homepage;
+        $this->repository = $repository;
         $this->author = $author !== '' ? $author : $coordinate->namespace();
         $this->requires = $requires;
     }
@@ -128,6 +131,11 @@ final class Extra
         return $this->homepage;
     }
 
+    public function repository(): string
+    {
+        return $this->repository;
+    }
+
     public function author(): string
     {
         return $this->author;
@@ -179,6 +187,7 @@ final class Extra
             'compatibility' => $this->compatibility->value,
             'source' => $this->sourceName,
             'homepage' => $this->homepage,
+            'repository' => $this->repository,
             'author' => $this->author,
             'require' => $this->requires,
         ];
@@ -198,6 +207,7 @@ final class Extra
             CompatibilityStatus::fromNullable($data['compatibility'] ?? null),
             (string) ($data['source'] ?? ''),
             (string) ($data['homepage'] ?? ''),
+            (string) ($data['repository'] ?? ''),
             (string) ($data['author'] ?? ''),
             (array) ($data['require'] ?? [])
         );

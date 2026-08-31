@@ -51,6 +51,22 @@ class SnapshotSourceTest extends TestCase
         }
     }
 
+    /** Both legacy sources are GitHub organisations, so every legacy row knows its repository. */
+    public function testLegacyEntriesCarryTheRepositoryTheyCameFrom(): void
+    {
+        foreach ($this->bundled()->all() as $extra) {
+            if ($extra->format() !== ExtraFormat::Legacy) {
+                continue;
+            }
+
+            self::assertStringStartsWith(
+                'https://github.com/',
+                $extra->repository(),
+                (string) $extra->coordinate()
+            );
+        }
+    }
+
     public function testFindsByCoordinateIgnoringCase(): void
     {
         $first = $this->bundled()->all()[0];
@@ -93,7 +109,10 @@ class SnapshotSourceTest extends TestCase
         $path = tempnam(sys_get_temp_dir(), 'snap');
         file_put_contents($path, (string) json_encode($document));
 
-        self::assertCount(3, (new SnapshotSource('rt', $path))->all());
+        $reloaded = (new SnapshotSource('rt', $path))->all();
+
+        self::assertCount(3, $reloaded);
+        self::assertSame($extras[0]->repository(), $reloaded[0]->repository());
 
         @unlink($path);
     }

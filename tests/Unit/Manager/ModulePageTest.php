@@ -47,6 +47,15 @@ class ModulePageTest extends TestCase
         self::assertSame($tabs, substr_count($this->page(), 'tpSettings.addTabPage('));
     }
 
+    public function testTheScriptLinksTheRepositoryTheEndpointHandsIt(): void
+    {
+        $rows = (string) file_get_contents(dirname(__DIR__, 3) . '/src/Manager/InstalledExtras.php');
+        $script = (string) file_get_contents(ManagerModule::assetsPath() . '/modules/Extras/js/module.js');
+
+        self::assertStringContainsString("'repository' =>", $rows);
+        self::assertStringContainsString('extra.repository', $script);
+    }
+
     public function testThePageAndTheRoutesAgreeOnWhereTheEndpointsAre(): void
     {
         $routes = (string) file_get_contents(dirname(__DIR__, 3) . '/src/Http/routes/api/v1.php');

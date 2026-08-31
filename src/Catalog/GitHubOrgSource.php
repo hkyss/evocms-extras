@@ -6,6 +6,7 @@ use hkyss\Extras\Domain\CompatibilityStatus;
 use hkyss\Extras\Domain\Coordinate;
 use hkyss\Extras\Domain\Extra;
 use hkyss\Extras\Domain\ExtraFormat;
+use hkyss\Extras\Domain\WebUrl;
 use hkyss\Extras\Support\Http;
 
 class GitHubOrgSource implements CatalogSource
@@ -175,6 +176,7 @@ class GitHubOrgSource implements CatalogSource
             (string) ($repo['default_branch'] ?? 'master'),
             CompatibilityStatus::Unknown,
             $this->name,
+            WebUrl::from($repo['homepage'] ?? null),
             (string) ($repo['html_url'] ?? ''),
             $coordinate->namespace()
         );

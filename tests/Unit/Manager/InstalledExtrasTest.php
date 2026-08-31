@@ -112,6 +112,7 @@ class InstalledExtrasTest extends TestCase
         self::assertSame('', $row['version']);
         self::assertSame('2.0', $row['latest']);
         self::assertSame('from the catalog', $row['description']);
+        self::assertSame('https://github.com/acme/listed', $row['repository']);
         self::assertTrue($row['listed']);
     }
 
@@ -120,11 +121,13 @@ class InstalledExtrasTest extends TestCase
         $this->tree->put('core/vendor/acme/listed/composer.json', (string) json_encode([
             'description' => 'what the installed copy says',
             'type' => 'evolutioncms-plugin',
+            'support' => ['source' => 'https://github.com/acme/listed-renamed.git'],
         ]));
 
         $row = $this->subject([])->describe($this->extra(), InstalledState::present('1.2.3', '^1.0'), true);
 
         self::assertSame('what the installed copy says', $row['description']);
+        self::assertSame('https://github.com/acme/listed-renamed', $row['repository']);
         self::assertSame('evolutioncms-plugin', $row['type']);
         self::assertTrue($row['installed']);
         self::assertSame('^1.0', $row['constraint']);
@@ -146,6 +149,7 @@ class InstalledExtrasTest extends TestCase
             'description' => 'from the catalog',
             'latest_release' => '2.0',
             'versions' => ['2.0', '1.0'],
+            'repository' => 'https://github.com/acme/listed',
             'compatibility' => 'verified',
         ]);
     }

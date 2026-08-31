@@ -6,6 +6,7 @@ use hkyss\Extras\Domain\CompatibilityStatus;
 use hkyss\Extras\Domain\Coordinate;
 use hkyss\Extras\Domain\Extra;
 use hkyss\Extras\Domain\ExtraFormat;
+use hkyss\Extras\Domain\WebUrl;
 use hkyss\Extras\Support\Http;
 
 class PackagistSource implements CatalogSource
@@ -139,6 +140,7 @@ class PackagistSource implements CatalogSource
             CompatibilityStatus::Verified,
             $this->name,
             (string) ($newest['homepage'] ?? ''),
+            WebUrl::from($newest['source']['url'] ?? null),
             $coordinate->namespace(),
             self::requirements((array) ($newest['require'] ?? []))
         );
