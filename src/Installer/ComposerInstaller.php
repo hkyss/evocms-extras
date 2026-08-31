@@ -169,7 +169,7 @@ class ComposerInstaller implements Installer, EnumeratesInstalled
             }
 
             $source = $packageDir . trim((string) ($entry['source'] ?? ''), '/\\');
-            $destination = $publishBase . trim((string) ($entry['destination'] ?? ''), '/\\');
+            $destination = rtrim($publishBase . trim((string) ($entry['destination'] ?? ''), '/\\'), '/\\');
 
             $comparison = PublishedAssets::compare($source, $destination);
 
