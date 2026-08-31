@@ -13,6 +13,10 @@ class FakeSiteElements extends SiteElements
     public array $switchedOff = [];
     /** @var list<string> */
     public array $switchedOn = [];
+    /** @var list<string> */
+    public array $aside = [];
+    /** @var list<string> */
+    public array $named = [];
 
     /** @var array<string, list<SiteElement>> */
     private array $rows = [];
@@ -61,13 +65,25 @@ class FakeSiteElements extends SiteElements
         return true;
     }
 
-    public function enable(ElementType $type, int $id): bool
+    public function setAside(SiteElement $element, string $suffix): bool
+    {
+        if (!$this->disable($element)) {
+            return false;
+        }
+
+        $this->aside[] = $element->name() . $suffix;
+
+        return true;
+    }
+
+    public function restore(ElementType $type, int $id, string $name): bool
     {
         if (in_array($id, $this->missing, true)) {
             return false;
         }
 
         $this->switchedOn[] = $type->value . '/' . $id;
+        $this->named[] = $name;
 
         return true;
     }

@@ -94,7 +94,12 @@ class TakeoverPlannerTest extends TestCase
         self::assertSame('extras-evolution/Ditto', (string) $steps[0]->coordinate());
         self::assertSame('2.1', $steps[0]->version());
         self::assertSame([$plugin, $snippet], $steps[0]->elements(), 'plugins are read before snippets');
-        self::assertSame([], $steps[0]->disabled(), 'an adopted extra is written over, not switched off');
+        self::assertSame(
+            [$plugin, $snippet],
+            $steps[0]->disabled(),
+            'the rows that are there go aside, and the extra is installed beside them'
+        );
+        self::assertTrue($steps[0]->action()->setsAside());
     }
 
     public function testAVersionTheCatalogDoesNotPublishIsNotPinned(): void

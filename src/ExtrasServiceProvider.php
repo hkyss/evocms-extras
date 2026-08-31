@@ -256,7 +256,8 @@ class ExtrasServiceProvider extends ServiceProvider
         $this->app->singleton(Takeover::class, fn () => new Takeover(
             $this->app->make(InstallerRegistry::class),
             $this->app->make(SiteElements::class),
-            $this->app->make(TakeoverRecordStore::class)
+            $this->app->make(TakeoverRecordStore::class),
+            (string) $this->config('extras.legacy.backup_suffix', '.old')
         ));
     }
 

@@ -62,12 +62,52 @@ class SiteElementsTest extends TestCase
         self::assertTrue($this->elements->disable($element));
         self::assertSame(1, (int) $this->tables->row('site_plugins', $id)['disabled']);
 
-        self::assertTrue($this->elements->enable(ElementType::Plugin, $id));
+        self::assertTrue($this->elements->restore(ElementType::Plugin, $id, 'CodeMirror'));
         self::assertSame(0, (int) $this->tables->row('site_plugins', $id)['disabled']);
+    }
+
+    public function testARowSetAsideChangesItsNameSoAnInstallerWillNotFindIt(): void
+    {
+        $id = $this->tables->insert('site_plugins', ['name' => 'Updater', 'description' => '<strong>0.9.2</strong>']);
+        $element = $this->elements->listing(ElementType::Plugin)[0];
+
+        self::assertTrue($this->elements->setAside($element, '.old'));
+
+        $row = $this->tables->row('site_plugins', $id);
+
+        self::assertSame('Updater.old', $row['name']);
+        self::assertSame(1, (int) $row['disabled']);
+
+        self::assertTrue($this->elements->restore(ElementType::Plugin, $id, 'Updater'));
+
+        $row = $this->tables->row('site_plugins', $id);
+
+        self::assertSame('Updater', $row['name']);
+        self::assertSame(0, (int) $row['disabled']);
+    }
+
+    public function testARowIsNotSetAsideOntoANameAlreadyTaken(): void
+    {
+        $this->tables->insert('site_plugins', ['name' => 'Updater.old', 'description' => 'kept from last time']);
+        $this->tables->insert('site_plugins', ['name' => 'Updater', 'description' => '<strong>0.9.2</strong>']);
+
+        $element = $this->elements->listing(ElementType::Plugin)[1];
+
+        self::assertFalse($this->elements->setAside($element, '.old'));
+        self::assertSame('Updater', $this->tables->row('site_plugins', $element->id())['name']);
+    }
+
+    public function testASetAsideNameIsCutToFitTheColumn(): void
+    {
+        $name = str_repeat('a', 50);
+        $id = $this->tables->insert('site_plugins', ['name' => $name, 'description' => '<strong>1.0</strong>']);
+
+        self::assertTrue($this->elements->setAside($this->elements->listing(ElementType::Plugin)[0], '.old'));
+        self::assertSame(str_repeat('a', 46) . '.old', $this->tables->row('site_plugins', $id)['name']);
     }
 
     public function testARowThatIsNoLongerThereSaysSo(): void
     {
-        self::assertFalse($this->elements->enable(ElementType::Plugin, 404));
+        self::assertFalse($this->elements->restore(ElementType::Plugin, 404, 'CodeMirror'));
     }
 }

@@ -296,8 +296,11 @@ format has no uninstall, and this package removes only what it has a record of.
 - **retire** the legacy manager's own module. This package is what replaces it, so nothing is
   installed in its place. A row the catalog answers for with a package that is *already* installed
   is retired too, for the same reason.
-- **adopt** a legacy extra the site is already running: it is installed again through here, over
-  the rows that are already there, so it gains an install record and can be removed afterwards.
+- **adopt** a legacy extra the site is already running: the rows it has are set aside — renamed
+  with the same `.old` suffix a backed-up file gets, and switched off — and the extra is installed
+  again through here beside them, so it gains an install record and can be removed afterwards. Set
+  aside rather than written over: an installer of the legacy format finds its elements by name, so
+  a row left under its own would be overwritten and there would be nothing left to switch back on.
   The version is the one the site is running, where the catalog publishes that one — taking a site
   off the version it chose is an update, not a takeover.
 - **replace** a row the catalog answers for with a Composer package: the row goes dark and the
@@ -331,9 +334,9 @@ retire
   └─ ● switch off module Extras — this package is the manager now
 
 adopt
-  installed through this tool, over the rows already there
-  ├─ ● install evocms-community/AboutEvoWidget over plugin AboutEvoWidget
-  └─ ● install extras-evolution/Updater over plugin Updater
+  set aside, and the same extra installed again through this tool
+  ├─ ● set plugin AboutEvoWidget aside and install evocms-community/AboutEvoWidget
+  └─ ● set plugin Updater aside and install extras-evolution/Updater
 
 skip
   left as it is
@@ -345,6 +348,10 @@ skip
 
 On PHP 8.3 the `CodeMirror` row moves out of `skip` and into `replace`: the plugin goes dark and
 `evolution-cms/ecodemirror` is installed in its place.
+
+The manager shows both copies afterwards. `Updater.old` is switched off and exactly as the site
+had it, down to the version in its description; `Updater` beside it is the one this tool installed
+and the one the site runs. `--restore` deletes the second and gives the first its name back.
 
 One install that fails takes the whole takeover with it: what the run had already switched off
 comes back on, and the site is left as it was found.

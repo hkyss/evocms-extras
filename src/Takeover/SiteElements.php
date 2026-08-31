@@ -12,6 +12,9 @@ use Illuminate\Support\Facades\DB;
  */
 class SiteElements
 {
+    /** What every element table gives a name, and what a set-aside one has to fit into. */
+    private const NAME_LENGTH = 50;
+
     private ?ConnectionInterface $connection;
 
     public function __construct(?ConnectionInterface $connection = null)
@@ -39,12 +42,30 @@ class SiteElements
 
     public function disable(SiteElement $element): bool
     {
-        return $this->setDisabled($element->type(), $element->id(), true);
+        return $this->write($element->type(), $element->id(), ['disabled' => 1]);
     }
 
-    public function enable(ElementType $type, int $id): bool
+    /**
+     * Out of the way and switched off, under a name nothing looks for. An installer of the
+     * legacy format finds its elements by name and would write straight over this row, so
+     * setting it aside is what leaves the site with two of them: the copy that was here, and
+     * the one this tool put in its place.
+     */
+    public function setAside(SiteElement $element, string $suffix): bool
     {
-        return $this->setDisabled($type, $id, false);
+        $name = $this->asideName($element->name(), $suffix);
+
+        if ($name === '' || $this->taken($element->type(), $name, $element->id())) {
+            return false;
+        }
+
+        return $this->write($element->type(), $element->id(), ['name' => $name, 'disabled' => 1]);
+    }
+
+    /** Back under its own name and on again, whichever of the two a takeover had changed. */
+    public function restore(ElementType $type, int $id, string $name): bool
+    {
+        return $this->write($type, $id, ['name' => $name, 'disabled' => 0]);
     }
 
     /** @return list<SiteElement> */
@@ -73,17 +94,32 @@ class SiteElements
         return $elements;
     }
 
-    private function setDisabled(ElementType $type, int $id, bool $disabled): bool
+    /** @param array<string,mixed> $columns */
+    private function write(ElementType $type, int $id, array $columns): bool
     {
         if (!$this->db()->table($type->table())->where('id', $id)->exists()) {
             return false;
         }
 
-        $this->db()->table($type->table())
-            ->where('id', $id)
-            ->update(['disabled' => $disabled ? 1 : 0]);
+        $this->db()->table($type->table())->where('id', $id)->update($columns);
 
         return true;
+    }
+
+    /** The column holds 50 characters, and the suffix is the half that has to survive. */
+    private function asideName(string $name, string $suffix): string
+    {
+        $room = self::NAME_LENGTH - mb_strlen($suffix);
+
+        return $room < 1 ? '' : mb_substr($name, 0, $room) . $suffix;
+    }
+
+    private function taken(ElementType $type, string $name, int $except): bool
+    {
+        return $this->db()->table($type->table())
+            ->where('name', $name)
+            ->where('id', '!=', $except)
+            ->exists();
     }
 
     private function db(): ConnectionInterface

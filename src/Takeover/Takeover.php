@@ -18,17 +18,21 @@ class Takeover
     private InstallerRegistry $installers;
     private SiteElements $site;
     private TakeoverRecordStore $records;
+    private string $aside;
     private SiteCache $cache;
 
+    /** @param string $aside what a row set aside is called, on the same terms as a backed-up file */
     public function __construct(
         InstallerRegistry $installers,
         SiteElements $site,
         TakeoverRecordStore $records,
+        string $aside = '.old',
         ?SiteCache $cache = null
     ) {
         $this->installers = $installers;
         $this->site = $site;
         $this->records = $records;
+        $this->aside = $aside;
         $this->cache = $cache ?? new SiteCache();
     }
 
@@ -54,17 +58,18 @@ class Takeover
         $left = 0;
 
         foreach ($steps as $step) {
-            $disabled = [];
+            $off = $this->switchOff($step);
+            $notes = array_merge($notes, $off['notes']);
 
-            foreach ($step->disabled() as $element) {
-                if (!$this->site->disable($element)) {
-                    $notes[] = 'not there any more: ' . $element->label();
+            if ($off['refused'] !== '') {
+                $notes = array_merge($notes, $this->putBack($off['off']));
+                $notes[] = 'left as it is: ' . $step->summary() . ' — ' . $off['refused'];
+                $left++;
 
-                    continue;
-                }
-
-                $disabled[] = $element;
+                continue;
             }
+
+            $disabled = $off['off'];
 
             // Written before the install rather than after it: a run that dies inside Composer
             // still leaves the row that switches the site back on.
@@ -156,6 +161,65 @@ class Takeover
     }
 
     /**
+     * The rows this step takes out of the way, and why it cannot be done where it cannot.
+     *
+     * A row that has gone since the plan was read is nothing to switch off, and a replacement
+     * carries on without it. One that cannot be set aside stops its step: the installer would
+     * find it by name and write over it, and there would be nothing left to switch back on.
+     *
+     * @return array{off:list<SiteElement>,refused:string,notes:list<string>}
+     */
+    private function switchOff(TakeoverStep $step): array
+    {
+        $off = [];
+        $notes = [];
+
+        foreach ($step->disabled() as $element) {
+            if ($step->action()->setsAside()) {
+                if (!$this->site->setAside($element, $this->aside)) {
+                    return [
+                        'off' => $off,
+                        'refused' => $element->label() . ' cannot be set aside: it is gone, or a row'
+                            . ' is called ' . $element->name() . $this->aside . ' already',
+                        'notes' => $notes,
+                    ];
+                }
+
+                $off[] = $element;
+
+                continue;
+            }
+
+            if (!$this->site->disable($element)) {
+                $notes[] = 'not there any more: ' . $element->label();
+
+                continue;
+            }
+
+            $off[] = $element;
+        }
+
+        return ['off' => $off, 'refused' => '', 'notes' => $notes];
+    }
+
+    /**
+     * @param  list<SiteElement> $elements
+     * @return list<string>      one line for every row that is no longer there to put back
+     */
+    private function putBack(array $elements): array
+    {
+        $notes = [];
+
+        foreach ($elements as $element) {
+            if (!$this->site->restore($element->type(), $element->id(), $element->name())) {
+                $notes[] = 'gone, nothing to put back: ' . $element->label();
+            }
+        }
+
+        return $notes;
+    }
+
+    /**
      * @param list<TakeoverRecord> $records
      */
     private function undo(array $records): Outcome
@@ -185,20 +249,16 @@ class Takeover
                 $removed++;
             }
 
-            foreach ($record->elementList() as $element) {
-                if ($this->site->enable($element->type(), $element->id())) {
-                    $enabled++;
+            $elements = $record->elementList();
+            $back = $this->putBack($elements);
 
-                    continue;
-                }
-
-                $notes[] = 'gone, nothing to switch back on: ' . $element->label();
-            }
+            $enabled += count($elements) - count($back);
+            $notes = array_merge($notes, $back);
 
             $this->records->forget($record);
         }
 
-        $message = sprintf('%d element(s) switched back on, %d extra(s) removed', $enabled, $removed);
+        $message = sprintf('%d element(s) put back, %d extra(s) removed', $enabled, $removed);
 
         return $failed === 0
             ? Outcome::success($message, $notes)

@@ -111,7 +111,7 @@ class TakeoverTest extends TestCase
         self::assertSame('evolution-cms/ecodemirror', $records->written[0]->coordinate);
     }
 
-    public function testAnAdoptedExtraIsInstalledWithNothingSwitchedOff(): void
+    public function testAnAdoptedExtraSetsTheRowAsideAndInstallsBesideIt(): void
     {
         $snippet = new SiteElement(ElementType::Snippet, 2, 'Ditto', '2.1');
         $site = new FakeSiteElements([$snippet]);
@@ -122,9 +122,44 @@ class TakeoverTest extends TestCase
             TakeoverStep::adopt($this->extra('extras-evolution/Ditto', ExtraFormat::Legacy), [$snippet], '2.1'),
         ]));
 
-        self::assertSame([], $site->switchedOff);
+        self::assertSame(['snippets/ditto'], $site->switchedOff);
+        self::assertSame(['Ditto.old'], $site->aside, 'out from under the name the installer looks for');
         self::assertSame(['install extras-evolution/Ditto@2.1'], $installer->applied);
-        self::assertSame([], $records->written[0]->elementList());
+        self::assertCount(1, $records->written[0]->elementList());
+    }
+
+    public function testAnAdoptionThatCannotSetARowAsideChangesNothing(): void
+    {
+        $snippet = new SiteElement(ElementType::Snippet, 2, 'Ditto', '2.1');
+        $site = new FakeSiteElements([$snippet], [], [2]);
+        $records = new RememberedTakeovers();
+        $installer = new RecordingInstaller();
+
+        $outcome = $this->takeover($installer, $site, $records)->apply(new TakeoverPlan([
+            TakeoverStep::adopt($this->extra('extras-evolution/Ditto', ExtraFormat::Legacy), [$snippet], '2.1'),
+        ]));
+
+        self::assertTrue($outcome->isSuccessful());
+        self::assertStringContainsString('1 left as it was', $outcome->message());
+        self::assertSame([], $installer->applied, 'the installer would have written over the row');
+        self::assertSame([], $records->written);
+    }
+
+    public function testARestoreGivesARowItsOwnNameBack(): void
+    {
+        $snippet = new SiteElement(ElementType::Snippet, 2, 'Ditto', '2.1');
+        $site = new FakeSiteElements([$snippet]);
+        $records = new RememberedTakeovers();
+        $takeover = $this->takeover(new RecordingInstaller(), $site, $records);
+
+        $takeover->apply(new TakeoverPlan([
+            TakeoverStep::adopt($this->extra('extras-evolution/Ditto', ExtraFormat::Legacy), [$snippet], '2.1'),
+        ]));
+        $takeover->restore();
+
+        self::assertSame(['snippets/2'], $site->switchedOn);
+        self::assertSame(['Ditto'], $site->named);
+        self::assertSame([], $records->written);
     }
 
     public function testTheLegacyManagerIsRememberedWithoutACoordinate(): void

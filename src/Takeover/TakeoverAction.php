@@ -9,10 +9,20 @@ enum TakeoverAction: string
     case Adopt = 'adopt';
     case Skip = 'skip';
 
-    /** Whether the site's own rows go dark; an adopted extra is written over, not switched off. */
+    /** Whether the rows the site has go dark. Everything a takeover acts on does. */
     public function disables(): bool
     {
-        return $this === self::Retire || $this === self::Replace;
+        return $this !== self::Skip;
+    }
+
+    /**
+     * Whether they go dark under another name as well. An installer of the legacy format finds
+     * its elements by name, so a row left under its own would be written over rather than
+     * replaced, and there would be nothing to switch back on.
+     */
+    public function setsAside(): bool
+    {
+        return $this === self::Adopt;
     }
 
     public function installs(): bool
@@ -24,8 +34,8 @@ enum TakeoverAction: string
     {
         return match ($this) {
             self::Retire => 'switched off and not replaced: this package is what replaces it',
-            self::Replace => 'switched off and installed again from the catalog',
-            self::Adopt => 'installed through this tool, over the rows already there',
+            self::Replace => 'switched off, and the package the catalog answers with put in its place',
+            self::Adopt => 'set aside, and the same extra installed again through this tool',
             self::Skip => 'left as it is',
         };
     }

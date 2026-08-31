@@ -78,7 +78,7 @@ final class TakeoverStep
         return $this->elements;
     }
 
-    /** @return list<SiteElement> What a restore has to switch back on, which is nothing for an adoption. */
+    /** @return list<SiteElement> What a restore has to put back under its own name and switch on. */
     public function disabled(): array
     {
         return $this->action->disables() ? $this->elements : [];
@@ -97,7 +97,7 @@ final class TakeoverStep
         return match ($this->action) {
             TakeoverAction::Retire => 'switch off ' . $rows . ' — ' . $this->reason,
             TakeoverAction::Replace => 'switch off ' . $rows . ' and install ' . $coordinate,
-            TakeoverAction::Adopt => 'install ' . $coordinate . ' over ' . $rows,
+            TakeoverAction::Adopt => 'set ' . $rows . ' aside and install ' . $coordinate,
             TakeoverAction::Skip => 'leave ' . $rows . ' alone — ' . $this->reason,
         };
     }
