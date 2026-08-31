@@ -5,6 +5,32 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), version
 their options, the `Installer` interface, the catalog snapshot schema — is stable: a breaking
 change needs a major version.
 
+## [1.2.0] - 2026-08-31
+
+### Added
+
+- A link to the repository on every row of the module. Legacy extras had one and Composer ones
+  did not: a package declares a homepage only when its author bothered to, and the url Composer
+  clones from — the one Packagist always carries — was never read. Both formats now carry a
+  `repository` beside the homepage, the module marks it next to the name with the forge's own
+  icon, and `extra:info` prints it. An installed package answers for itself, from the
+  `support.source` of the copy in `core/vendor`, so the tab needs no network for it either.
+- `repository` in the catalog snapshot, filled for every entry a source can name. The schema
+  stays at 1: an older document loads with the field empty and its rows simply have no link.
+
+### Changed
+
+- A legacy extra's homepage is now the site its repository points at rather than the repository
+  itself, which the new field carries. GitHub keeps that field as it was typed, so a value no
+  browser could follow — a bare domain — is dropped instead of rendered into a link that would
+  lead back into the manager.
+
+### Fixed
+
+- The module wrote urls straight into attributes with only `&`, `<` and `>` escaped, so a quote
+  in a homepage — a field the catalog takes from whoever published the package — closed the
+  attribute it sat in.
+
 ## [1.1.2] - 2026-08-28
 
 ### Fixed
@@ -245,7 +271,8 @@ First release. Targets Evolution CMS CE 3.1.x.
 - Every legacy entry ships as `unknown`; none has been verified on Evolution CMS 3 yet.
 - Schema applied by a legacy extra is not rolled back on removal.
 
-[Unreleased]: https://github.com/hkyss/evocms-extras/compare/v1.1.2...HEAD
+[Unreleased]: https://github.com/hkyss/evocms-extras/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/hkyss/evocms-extras/compare/v1.1.2...v1.2.0
 [1.1.2]: https://github.com/hkyss/evocms-extras/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/hkyss/evocms-extras/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/hkyss/evocms-extras/compare/v1.0.1...v1.1.0
