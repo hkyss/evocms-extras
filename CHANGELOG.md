@@ -5,6 +5,45 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), version
 their options, the `Installer` interface, the catalog snapshot schema — is stable: a breaking
 change needs a major version.
 
+## [1.3.0] - 2026-08-31
+
+### Added
+
+- `extra:takeover`, which puts what the legacy manager left on the site under this one. Evolution
+  ships an extras module of its own — the page under `assets/modules/store` — and everything
+  installed through it is a set of rows nothing can take back afterwards: the format has no
+  uninstall, and this package refuses to remove what it has no record of. The command switches
+  that module off, since this package is what replaces it; installs a legacy extra the site is
+  already running through here, at the version it is running where the catalog publishes that
+  one, so it gains a record and can be removed later; and switches off a row the catalog answers
+  for with a Composer package, which is installed in its place. Nothing else is touched — an
+  element whose description carries no version was typed into the manager rather than written by
+  a package, and one the catalog cannot name has nothing to install in its place. Nothing outside
+  the catalog is ever switched off — the legacy manager's own module is the one exception, and it
+  is what the command exists for. A replacement this installation could not install is left out of
+  the plan rather than failing it: Composer would refuse over the same `php` or `ext-*`
+  requirement, and the row it would have replaced is better off running. So is one whose source
+  turns out to hold no package at all, which only the download can say — nothing was attempted for
+  it, so it is a row fewer in the takeover rather than a takeover that failed.
+- `extra:takeover --restore`, which hands all of it back: what the takeover installed is removed
+  through the installer that put it there, and every row it switched off comes on again. One
+  install that fails takes the whole takeover with it, so a run that cannot finish leaves the site
+  as it found it. `extras_takeover_records` is the ledger both directions read, which is why a
+  removal has to restore before it rolls the migrations back rather than after.
+
+### Fixed
+
+- Removing a legacy extra put an overwritten element's code back and left its description as the
+  extra had written it. The legacy format keeps the version in that field — `<strong>2.1</strong>`
+  ahead of the text — so an element the site had before the install came back describing a version
+  it was no longer running, and nothing could tell afterwards what it had said. Install records now
+  carry the previous description beside the previous code, and a removal puts both back. A record
+  written before this carries no description and restores the code alone, as it did.
+- Installing a legacy extra over an element already on the site switched that element off. Rows
+  under the same name with a different description are disabled as conflicts, and the row being
+  written was one of them — a version bump is a description that changed — so the install landed
+  the new code and left it dark. The row a write is for is no longer a conflict with itself.
+
 ## [1.2.1] - 2026-08-31
 
 ### Fixed
@@ -288,7 +327,8 @@ First release. Targets Evolution CMS CE 3.1.x.
 - Every legacy entry ships as `unknown`; none has been verified on Evolution CMS 3 yet.
 - Schema applied by a legacy extra is not rolled back on removal.
 
-[Unreleased]: https://github.com/hkyss/evocms-extras/compare/v1.2.1...HEAD
+[Unreleased]: https://github.com/hkyss/evocms-extras/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/hkyss/evocms-extras/compare/v1.2.1...v1.3.0
 [1.2.1]: https://github.com/hkyss/evocms-extras/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/hkyss/evocms-extras/compare/v1.1.2...v1.2.0
 [1.1.2]: https://github.com/hkyss/evocms-extras/compare/v1.1.1...v1.1.2
