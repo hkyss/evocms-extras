@@ -62,7 +62,7 @@ class ElementWriter
         $table = $descriptor->type()->table();
         $column = $descriptor->type()->codeColumn();
 
-        $this->disableConflicts($descriptor);
+        $this->disableConflicts($descriptor, $preview['id']);
 
         if ($preview['action'] === 'update') {
             $existing = $this->findByName($descriptor);
@@ -140,8 +140,12 @@ class ElementWriter
             ->first();
     }
 
-    /** Same-name rows with a different description are disabled, never deleted. */
-    private function disableConflicts(ElementDescriptor $descriptor): void
+    /**
+     * Same-name rows with a different description are disabled, never deleted — every one of
+     * them except the row this write is for. A version bump changes the description, so
+     * sweeping that one too switched off the very element that had just been installed.
+     */
+    private function disableConflicts(ElementDescriptor $descriptor, ?int $written): void
     {
         $table = $descriptor->type()->table();
 
@@ -155,10 +159,15 @@ class ElementWriter
             $this->db()->table($table)->whereIn('name', $legacyNames)->update(['disabled' => 1]);
         }
 
-        $this->db()->table($table)
+        $conflicts = $this->db()->table($table)
             ->where('name', $descriptor->name())
-            ->where('description', '!=', $descriptor->description())
-            ->update(['disabled' => 1]);
+            ->where('description', '!=', $descriptor->description());
+
+        if ($written !== null) {
+            $conflicts->where('id', '!=', $written);
+        }
+
+        $conflicts->update(['disabled' => 1]);
     }
 
     /** Unknown event names are skipped: they belong to a newer core or are a typo. */
