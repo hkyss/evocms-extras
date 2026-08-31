@@ -71,11 +71,7 @@ class ComposerInstaller implements Installer, EnumeratesInstalled
             ['coordinate' => $coordinate, 'constraint' => $constraint]
         );
 
-        $plan->step(
-            StepKind::ComposerRun,
-            "composer update {$coordinate} --with-dependencies",
-            ['coordinate' => $coordinate, 'mode' => 'package']
-        );
+        $this->planComposerRun($plan, $coordinate);
 
         return $plan;
     }
@@ -148,11 +144,7 @@ class ComposerInstaller implements Installer, EnumeratesInstalled
             ['coordinate' => $coordinate]
         );
 
-        $plan->step(
-            StepKind::ComposerRun,
-            'composer update (resolve the tree without ' . $coordinate . ')',
-            ['coordinate' => $coordinate, 'mode' => 'all']
-        );
+        $this->planComposerRun($plan, $coordinate);
 
         $plan->step(StepKind::RecordDelete, "forget {$coordinate}", ['coordinate' => $coordinate]);
 
@@ -227,6 +219,15 @@ class ComposerInstaller implements Installer, EnumeratesInstalled
         }
     }
 
+    private function planComposerRun(InstallPlan $plan, string $coordinate): void
+    {
+        $plan->step(
+            StepKind::ComposerRun,
+            "composer update {$coordinate} --with-dependencies",
+            ['coordinate' => $coordinate, 'mode' => 'package']
+        );
+    }
+
     private function applyInstall(InstallPlan $plan): Outcome
     {
         $coordinate = (string) $plan->coordinate();
@@ -272,7 +273,7 @@ class ComposerInstaller implements Installer, EnumeratesInstalled
 
         $this->manifest->remove($coordinate);
 
-        $result = $this->runner->updateAll();
+        $result = $this->runner->updatePackage($coordinate);
 
         if (!$result->isSuccessful()) {
             $this->manifest->restore($snapshot);

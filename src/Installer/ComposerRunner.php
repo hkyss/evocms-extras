@@ -24,23 +24,16 @@ class ComposerRunner
         return class_exists(Application::class);
     }
 
-    /** Touches the named package and its dependencies instead of the whole tree. */
+    /**
+     * Composer is itself a dependency of the site it manages, so an update left unfiltered
+     * replaces the files this process is running from — the filter keeps it out of the run.
+     */
     public function updatePackage(string $coordinate): ComposerResult
     {
         return $this->run([
             'command' => 'update',
             'packages' => [$coordinate],
             '--with-dependencies' => true,
-            '--no-interaction' => true,
-            '--no-dev' => true,
-            '--optimize-autoloader' => true,
-        ]);
-    }
-
-    public function updateAll(): ComposerResult
-    {
-        return $this->run([
-            'command' => 'update',
             '--no-interaction' => true,
             '--no-dev' => true,
             '--optimize-autoloader' => true,

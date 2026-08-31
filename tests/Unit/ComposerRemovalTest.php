@@ -15,12 +15,15 @@ use hkyss\Extras\Support\Paths;
 use hkyss\Extras\Tests\Support\TempTree;
 use PHPUnit\Framework\TestCase;
 
-/** A runner that answers with the code it was given and reports what the tree held while it ran. */
+/** A runner that answers with the code it was given and records the request and the tree it saw. */
 class RecordingRunner extends ComposerRunner
 {
     public bool $providerWasThere = true;
 
     public bool $compiledListWasThere = true;
+
+    /** @var array<string,mixed> */
+    public array $arguments = [];
 
     private int $exitCode;
 
@@ -37,8 +40,10 @@ class RecordingRunner extends ComposerRunner
         $this->compiled = $compiled;
     }
 
-    public function updateAll(): ComposerResult
+    /** @param array<string,mixed> $arguments */
+    public function run(array $arguments): ComposerResult
     {
+        $this->arguments = $arguments;
         $this->providerWasThere = is_file($this->provider);
         $this->compiledListWasThere = is_file($this->compiled);
 
@@ -66,6 +71,15 @@ class ComposerRemovalTest extends TestCase
         $this->assertFalse($runner->compiledListWasThere);
         $this->assertTrue($outcome->isSuccessful());
         $this->assertFileDoesNotExist($paths->providersDir() . 'DemoServiceProvider.php');
+    }
+
+    public function testARemovalAsksComposerForThePackageAloneRatherThanTheWholeTree(): void
+    {
+        [$installer, $runner, , $plan] = $this->removal(0);
+
+        $installer->apply($plan);
+
+        $this->assertSame(['vendor/package'], $runner->arguments['packages'] ?? []);
     }
 
     public function testAFailedComposerRunPutsTheProviderBack(): void
