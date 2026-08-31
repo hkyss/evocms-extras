@@ -337,12 +337,13 @@ class LegacyInstaller implements Installer, EnumeratesInstalled, HoldsArchives
                 continue;
             }
 
-            $plan->step(StepKind::ElementUpsert, 'restore ' . $label . ' to its previous code', [
+            $plan->step(StepKind::ElementUpsert, 'restore ' . $label . ' to what it was', [
                 'type' => $type->value,
                 'id' => $id,
                 'name' => (string) ($element['name'] ?? ''),
                 'action' => 'restore',
                 'previous_code' => (string) ($element['previous_code'] ?? ''),
+                'previous_description' => $element['previous_description'] ?? null,
             ]);
         }
 
@@ -501,7 +502,14 @@ class LegacyInstaller implements Installer, EnumeratesInstalled, HoldsArchives
             $type = ElementType::tryFrom((string) $step->get('type'));
 
             if ($type !== null) {
-                $this->elements->restoreCode($type, (int) $step->get('id'), (string) $step->get('previous_code'));
+                $description = $step->get('previous_description');
+
+                $this->elements->restore(
+                    $type,
+                    (int) $step->get('id'),
+                    (string) $step->get('previous_code'),
+                    is_string($description) ? $description : null
+                );
                 $restored++;
             }
         }
@@ -544,6 +552,7 @@ class LegacyInstaller implements Installer, EnumeratesInstalled, HoldsArchives
                 'id' => $written['id'],
                 'action' => $written['action'],
                 'previous_code' => $written['previous_code'],
+                'previous_description' => $written['previous_description'],
             ];
         }
 
@@ -568,8 +577,10 @@ class LegacyInstaller implements Installer, EnumeratesInstalled, HoldsArchives
         foreach ($fresh as $element) {
             $key = (string) $element['type'] . '/' . (string) $element['name'];
 
-            if (isset($merged[$key]) && ($element['previous_code'] ?? null) === null) {
-                $element['previous_code'] = $merged[$key]['previous_code'] ?? null;
+            foreach (['previous_code', 'previous_description'] as $before) {
+                if (isset($merged[$key]) && ($element[$before] ?? null) === null) {
+                    $element[$before] = $merged[$key][$before] ?? null;
+                }
             }
 
             if (isset($merged[$key]) && ($merged[$key]['action'] ?? '') === 'insert') {

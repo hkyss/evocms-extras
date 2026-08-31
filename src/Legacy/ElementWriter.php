@@ -23,39 +23,45 @@ class ElementWriter
         $this->merger = $merger ?? new PropertyMerger();
     }
 
-    /** @return array{action:string,id:int|null,previous_code:string|null,reason:string} */
+    /**
+     * @return array{action:string,id:int|null,previous_code:string|null,previous_description:string|null,reason:string}
+     */
     public function preview(ElementDescriptor $descriptor): array
     {
         $existing = $this->findByName($descriptor);
+        $empty = ['id' => null, 'previous_code' => null, 'previous_description' => null, 'reason' => ''];
 
         if ($existing === null) {
-            return ['action' => 'insert', 'id' => null, 'previous_code' => null, 'reason' => ''];
+            return ['action' => 'insert'] + $empty;
         }
 
         if (!$descriptor->mayOverwrite()) {
-            return [
-                'action' => 'skip',
-                'id' => (int) $existing->id,
-                'previous_code' => null,
-                'reason' => 'the descriptor declares @overwrite false',
-            ];
+            return ['action' => 'skip', 'reason' => 'the descriptor declares @overwrite false']
+                + $empty
+                + ['id' => (int) $existing->id];
         }
 
         return [
             'action' => 'update',
             'id' => (int) $existing->id,
             'previous_code' => (string) ($existing->{$descriptor->type()->codeColumn()} ?? ''),
+            'previous_description' => (string) ($existing->description ?? ''),
             'reason' => '',
         ];
     }
 
-    /** @return array{action:string,id:int|null,previous_code:string|null} */
+    /** @return array{action:string,id:int|null,previous_code:string|null,previous_description:string|null} */
     public function write(ElementDescriptor $descriptor): array
     {
         $preview = $this->preview($descriptor);
 
         if ($preview['action'] === 'skip') {
-            return ['action' => 'skip', 'id' => $preview['id'], 'previous_code' => null];
+            return [
+                'action' => 'skip',
+                'id' => $preview['id'],
+                'previous_code' => null,
+                'previous_description' => null,
+            ];
         }
 
         $categoryId = $this->resolveCategory($descriptor->category());
@@ -79,6 +85,8 @@ class ElementWriter
 
             $this->syncEvents($descriptor, (int) $preview['id']);
 
+            unset($preview['reason']);
+
             return $preview;
         }
 
@@ -101,7 +109,7 @@ class ElementWriter
         $id = (int) $this->db()->table($table)->insertGetId($row);
         $this->syncEvents($descriptor, $id);
 
-        return ['action' => 'insert', 'id' => $id, 'previous_code' => null];
+        return ['action' => 'insert', 'id' => $id, 'previous_code' => null, 'previous_description' => null];
     }
 
     /** Failures are not swallowed; the caller decides whether the statement counts as applied. */
@@ -110,11 +118,16 @@ class ElementWriter
         $this->db()->statement($sql);
     }
 
-    public function restoreCode(ElementType $type, int $id, string $code): bool
+    /** The description goes back with the code: it is where the legacy format keeps the version. */
+    public function restore(ElementType $type, int $id, string $code, ?string $description = null): bool
     {
-        return $this->db()->table($type->table())
-            ->where('id', $id)
-            ->update([$type->codeColumn() => $code]) > 0;
+        $columns = [$type->codeColumn() => $code];
+
+        if ($description !== null) {
+            $columns['description'] = $description;
+        }
+
+        return $this->db()->table($type->table())->where('id', $id)->update($columns) > 0;
     }
 
     public function delete(ElementType $type, int $id): bool

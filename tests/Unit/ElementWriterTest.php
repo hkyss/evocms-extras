@@ -54,6 +54,36 @@ class ElementWriterTest extends TestCase
         self::assertSame(1, (int) $this->tables->row('site_plugins', $duplicate)['disabled']);
     }
 
+    public function testAWriteRemembersWhatTheRowSaidBeforeIt(): void
+    {
+        $id = $this->tables->insert('site_plugins', [
+            'name' => 'Ditto',
+            'description' => '<strong>2.1</strong> document lister',
+            'plugincode' => '// the code that was there',
+        ]);
+
+        $written = $this->writer->write($this->descriptor('<strong>3.0</strong> document lister'));
+
+        self::assertSame('// the code that was there', $written['previous_code']);
+        self::assertSame('<strong>2.1</strong> document lister', $written['previous_description']);
+
+        $this->writer->restore(
+            ElementType::Plugin,
+            $id,
+            (string) $written['previous_code'],
+            $written['previous_description']
+        );
+
+        $row = $this->tables->row('site_plugins', $id);
+
+        self::assertSame('// the code that was there', $row['plugincode']);
+        self::assertSame(
+            '<strong>2.1</strong> document lister',
+            $row['description'],
+            'the description is where the legacy format keeps the version, so it goes back too'
+        );
+    }
+
     private function descriptor(string $description): ElementDescriptor
     {
         return new ElementDescriptor(ElementType::Plugin, 'Ditto', $description, '// code');
