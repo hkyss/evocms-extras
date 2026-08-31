@@ -317,7 +317,13 @@ running. Plugins, modules and snippets are in scope; templates, chunks and TVs a
 template switched off is a page that stops working.
 
 An extra whose source turns out to hold no package at all — which only the download can say — is
-left as it was too, and the run says so and carries on. Nothing was attempted for it, so it is a
+left as it was too, and the run says so and carries on.
+
+`takeover.ignore` names rows to leave alone whatever the catalog answers with. `Updater` ships in
+it: `extras-evolution/Updater` publishes no tag, so a takeover would install its default branch
+over the release Evolution ships, and the element that arrives carries no version in its
+description — which is where Evolution's own `OutdatedExtrasCheck` reads one, so the manager warns
+on every page about a plugin this tool had just installed. Nothing was attempted for it, so it is a
 row fewer in the takeover rather than a takeover that failed.
 
 A stock Evolution CE 3.1 install, on PHP 8.2:

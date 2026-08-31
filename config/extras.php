@@ -115,14 +115,22 @@ return [
     | format writes and a hand-written element does not.
     |
     | Replacements name the ones the site does not call by the catalog's name;
-    | ignored ones are left exactly as they are.
+    | ignored ones are left exactly as they are, whatever the catalog says.
     |
     */
     'takeover' => [
         'replacements' => [
             'CodeMirror' => 'evolution-cms/ecodemirror',
         ],
-        'ignore' => [],
+
+        /*
+         * Updater: extras-evolution/Updater publishes no tag at all, so a takeover would
+         * install its default branch over the release Evolution ships — and the element that
+         * arrives carries no version in its description, which is where the core's own
+         * OutdatedExtrasCheck reads one. The manager then warns, in every page of it, about a
+         * plugin this tool had just installed.
+         */
+        'ignore' => ['Updater'],
     ],
 
 ];
