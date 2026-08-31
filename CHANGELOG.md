@@ -5,6 +5,26 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), version
 their options, the `Installer` interface, the catalog snapshot schema — is stable: a breaking
 change needs a major version.
 
+## [1.4.0] - 2026-08-31
+
+### Changed
+
+- An adopted extra no longer takes over the rows the site already had; the rows are set aside and
+  it is installed beside them. Installing over them was the legacy format's own semantics — an
+  installer finds its elements by name and writes into the row it finds — but it left a manager
+  page on which nothing had visibly happened: the same names, all of them still on, and no way to
+  see what the site had before. A row is now renamed with the `.old` suffix a backed-up file gets
+  and switched off, and the extra installs into rows of its own. The old copy stays readable and
+  exactly as it was, `--restore` deletes what was installed and gives it its name back, and a row
+  that cannot be set aside — because something is called that already — stops its own step rather
+  than being written over.
+- `Updater` ships in `takeover.ignore`, so a takeover leaves it where it is.
+  `extras-evolution/Updater` publishes no tag, so the adoption installed its default branch over
+  the release Evolution ships, and the element that arrives carries no version in its description
+  — which is where the core's own `OutdatedExtrasCheck` reads one. Every manager page then warned
+  that `Updater (version )` was outdated and had to be updated from the Extras module, about a
+  plugin this tool had installed a moment earlier.
+
 ## [1.3.0] - 2026-08-31
 
 ### Added
@@ -327,7 +347,8 @@ First release. Targets Evolution CMS CE 3.1.x.
 - Every legacy entry ships as `unknown`; none has been verified on Evolution CMS 3 yet.
 - Schema applied by a legacy extra is not rolled back on removal.
 
-[Unreleased]: https://github.com/hkyss/evocms-extras/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/hkyss/evocms-extras/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/hkyss/evocms-extras/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/hkyss/evocms-extras/compare/v1.2.1...v1.3.0
 [1.2.1]: https://github.com/hkyss/evocms-extras/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/hkyss/evocms-extras/compare/v1.1.2...v1.2.0
