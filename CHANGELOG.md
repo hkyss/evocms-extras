@@ -5,6 +5,23 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), version
 their options, the `Installer` interface, the catalog snapshot schema — is stable: a breaking
 change needs a major version.
 
+## [1.2.1] - 2026-08-31
+
+### Fixed
+
+- Removing a Composer extra could leave the site with a provider naming a class that is no
+  longer on disk. The removal asked Composer to resolve the whole tree, and Evolution requires
+  `composer/composer` without an upper bound, so any release published since put Composer
+  itself into the transaction — and `ComposerRunner` drives it in-process, out of the copy in
+  `core/vendor`, so the run replaced the files it was executing from. It died reading its own
+  `InstalledVersions.php` while writing `vendor/composer/installed.php`: Composer guards that
+  read, but its error handler turns the warning into an exception before the guard is reached.
+  By then the lock and the vendor tree had been rewritten, and a rollback that puts back only
+  the manifest and the provider file undoes neither. A removal now asks for the package alone,
+  the way `composer remove` does, and Composer stays out of its own transaction.
+- The plan printed a published file as `assets//plugins/…` where a package publishes into the
+  assets root and names no destination of its own.
+
 ## [1.2.0] - 2026-08-31
 
 ### Added
@@ -271,7 +288,8 @@ First release. Targets Evolution CMS CE 3.1.x.
 - Every legacy entry ships as `unknown`; none has been verified on Evolution CMS 3 yet.
 - Schema applied by a legacy extra is not rolled back on removal.
 
-[Unreleased]: https://github.com/hkyss/evocms-extras/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/hkyss/evocms-extras/compare/v1.2.1...HEAD
+[1.2.1]: https://github.com/hkyss/evocms-extras/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/hkyss/evocms-extras/compare/v1.1.2...v1.2.0
 [1.1.2]: https://github.com/hkyss/evocms-extras/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/hkyss/evocms-extras/compare/v1.1.0...v1.1.1
