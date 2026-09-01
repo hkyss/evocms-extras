@@ -66,10 +66,6 @@ class ExtrasServiceProvider extends ServiceProvider
             __DIR__ . '/../config/extras.php' => $this->configTarget(),
         ], 'extras-config');
 
-        $this->publishes([
-            ManagerModule::assetsPath() => $this->assetsTarget(),
-        ], 'extras-assets');
-
         if ($this->app->runningInConsole()) {
             $this->commands([
                 HelpCommand::class,
@@ -292,13 +288,6 @@ class ExtrasServiceProvider extends ServiceProvider
         );
 
         Event::listen('evolution.OnManagerMenuPrerender', MenuListener::class);
-    }
-
-    private function assetsTarget(): string
-    {
-        return defined('MODX_BASE_PATH')
-            ? rtrim((string) MODX_BASE_PATH, '/\\') . '/assets'
-            : base_path('assets');
     }
 
     private function tablePrefix(): string

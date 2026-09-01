@@ -34,9 +34,15 @@ final class ManagerModule
         return self::packagePath() . '/resources/module.php';
     }
 
-    public static function assetsPath(): string
+    /**
+     * Written into the page rather than published: a copy in the doc root goes stale the
+     * first time a release is installed without --force.
+     *
+     * @return array{css: string, js: string}
+     */
+    public static function inline(): array
     {
-        return self::packagePath() . '/assets';
+        return ['css' => self::read('module.css'), 'js' => self::read('module.js')];
     }
 
     public static function url(): string
@@ -44,16 +50,11 @@ final class ManagerModule
         return 'index.php?a=112&id=' . self::id();
     }
 
-    /** Cache key for the published copies of the two files below; they are copied byte for byte. */
-    public static function assetsVersion(): string
+    private static function read(string $file): string
     {
-        $newest = 0;
+        $path = self::packagePath() . '/resources/' . $file;
 
-        foreach (['css/module.css', 'js/module.js'] as $asset) {
-            $newest = max($newest, (int) @filemtime(self::assetsPath() . '/modules/Extras/' . $asset));
-        }
-
-        return $newest > 0 ? (string) $newest : '1';
+        return is_file($path) ? (string) file_get_contents($path) : '';
     }
 
     /**

@@ -28,15 +28,12 @@ class ModulePageTest extends TestCase
         self::assertStringContainsString('<body class="module">', $this->page());
     }
 
-    public function testEveryAssetThePageAsksForIsOneThePackagePublishes(): void
+    public function testThePageCarriesItsOwnCssAndJsRatherThanAskingTheDocRoot(): void
     {
-        preg_match_all('~/assets/(modules/Extras/[^"?]+)~', $this->page(), $matches);
-
-        self::assertNotEmpty($matches[1]);
-
-        foreach ($matches[1] as $relative) {
-            self::assertFileExists(ManagerModule::assetsPath() . '/' . $relative);
-        }
+        self::assertStringNotContainsString('/assets/modules/Extras', $this->page());
+        self::assertStringContainsString('ManagerModule::inline()', $this->page());
+        self::assertNotSame('', ManagerModule::inline()['css']);
+        self::assertNotSame('', ManagerModule::inline()['js']);
     }
 
     public function testEveryTabIsHandedToTheTabPane(): void
@@ -50,7 +47,7 @@ class ModulePageTest extends TestCase
     public function testTheScriptLinksTheRepositoryTheEndpointHandsIt(): void
     {
         $rows = (string) file_get_contents(dirname(__DIR__, 3) . '/src/Manager/InstalledExtras.php');
-        $script = (string) file_get_contents(ManagerModule::assetsPath() . '/modules/Extras/js/module.js');
+        $script = ManagerModule::inline()['js'];
 
         self::assertStringContainsString("'repository' =>", $rows);
         self::assertStringContainsString('extra.repository', $script);
@@ -59,7 +56,7 @@ class ModulePageTest extends TestCase
     public function testThePageAndTheRoutesAgreeOnWhereTheEndpointsAre(): void
     {
         $routes = (string) file_get_contents(dirname(__DIR__, 3) . '/src/Http/routes/api/v1.php');
-        $script = (string) file_get_contents(ManagerModule::assetsPath() . '/modules/Extras/js/module.js');
+        $script = ManagerModule::inline()['js'];
 
         self::assertStringContainsString("'prefix' => 'api/v1/extras/admin'", $routes);
         self::assertStringContainsString("this.adminUrl = '/api/v1/extras/admin'", $script);

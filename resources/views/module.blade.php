@@ -1,4 +1,4 @@
-@php($version = \hkyss\Extras\Manager\ManagerModule::assetsVersion())
+@php($assets = \hkyss\Extras\Manager\ManagerModule::inline())
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -6,12 +6,12 @@
     <title>Extras</title>
 
     <link rel="stylesheet" href="media/style/default/css/styles.min.css">
-    <link rel="stylesheet" href="/assets/modules/Extras/css/module.css?v={{ $version }}">
+    <style>{!! $assets['css'] !!}</style>
 
     <script type="text/javascript" src="media/script/tabpane.js"></script>
     <script type="text/javascript" src="media/script/jquery/jquery.min.js"></script>
 
-    <script type="text/javascript" src="/assets/modules/Extras/js/module.js?v={{ $version }}"></script>
+    <script>{!! $assets['js'] !!}</script>
     <script>
       const module = new Module();
     </script>

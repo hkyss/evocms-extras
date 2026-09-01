@@ -67,7 +67,7 @@
         "test": "phpunit",
         "cs": "php-cs-fixer fix --dry-run --diff",
         "cs:fix": "php-cs-fixer fix",
-        "stan": "phpstan analyse",
+        "stan": "phpstan analyse --memory-limit=1G",
         "check": [
             "@cs",
             "@stan",

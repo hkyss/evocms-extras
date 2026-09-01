@@ -5,6 +5,25 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), version
 their options, the `Installer` interface, the catalog snapshot schema — is stable: a breaking
 change needs a major version.
 
+## [1.5.0] - 2026-09-01
+
+### Changed
+
+- The manager module's stylesheet and script are written into its page instead of being
+  published under `assets/modules/Extras`. Nothing of this package reaches the doc root any
+  more, and `vendor:publish --tag=extras-assets` is gone with it — the install no longer has
+  that step, and neither does an update.
+
+### Fixed
+
+- A module page that asked for a new version of an old file. The `?v=` was the modification
+  time of the file in the package, and what the browser fetched was the published copy: an
+  update that did not republish with `--force` changed the address and served the previous
+  release's script under it. Nothing is published now, so the page and the code are the same
+  release by construction.
+- `composer stan` runs with a 1 GB memory limit, which is what analysing this package needs;
+  without it `composer check` died halfway through.
+
 ## [1.4.1] - 2026-09-01
 
 ### Changed
@@ -358,7 +377,8 @@ First release. Targets Evolution CMS CE 3.1.x.
 - Every legacy entry ships as `unknown`; none has been verified on Evolution CMS 3 yet.
 - Schema applied by a legacy extra is not rolled back on removal.
 
-[Unreleased]: https://github.com/hkyss/evocms-extras/compare/v1.4.1...HEAD
+[Unreleased]: https://github.com/hkyss/evocms-extras/compare/v1.5.0...HEAD
+[1.5.0]: https://github.com/hkyss/evocms-extras/compare/v1.4.1...v1.5.0
 [1.4.1]: https://github.com/hkyss/evocms-extras/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/hkyss/evocms-extras/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/hkyss/evocms-extras/compare/v1.2.1...v1.3.0

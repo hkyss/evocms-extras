@@ -25,16 +25,12 @@ success and leaves the requirement in the manifest.
 cd core
 php artisan package:installrequire hkyss/evocms-extras "^1.3"
 php artisan migrate
-php artisan vendor:publish --tag=extras-assets
 php artisan extra:doctor
 php artisan extra:takeover --dry-run
 ```
 
 Run `migrate`. Legacy extras refuse to install without the record table, since there would be no
 way to remove them afterwards.
-
-`vendor:publish` lays the manager module's stylesheet and script into the doc root, where the
-browser can reach them. Skip it and the page opens unstyled; see [In the manager](#in-the-manager).
 
 `extra:doctor` checks the things Composer cannot: PHP version, `ext-zip`, a writable
 `custom/composer.json`, whether `composer-merge-plugin` is enabled, whether `GITHUB_PAT` is set.
@@ -52,7 +48,8 @@ php artisan vendor:publish --tag=extras-config
 ## In the manager
 
 The package registers a module of its own and puts it in the manager header, beside Modules
-rather than inside it. It opens on two tabs.
+rather than inside it. Its page carries its own stylesheet and script, so nothing of this
+package is published into the doc root. It opens on two tabs.
 
 **Installed** is what this tool manages — the requirements in `core/custom/composer.json` and the
 legacy install records — with the version, the compatibility status and, for a legacy extra, how

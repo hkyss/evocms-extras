@@ -17,9 +17,8 @@ class ManagerModuleTest extends TestCase
     public function testCarriesThePageAndTheAssetsItAsksFor(): void
     {
         self::assertFileExists(ManagerModule::file());
-        self::assertFileExists(ManagerModule::assetsPath() . '/modules/Extras/css/module.css');
-        self::assertFileExists(ManagerModule::assetsPath() . '/modules/Extras/js/module.js');
-        self::assertNotSame('1', ManagerModule::assetsVersion());
+        self::assertNotSame('', ManagerModule::inline()['css']);
+        self::assertNotSame('', ManagerModule::inline()['js']);
     }
 
     public function testAddsATopLevelEntryWithoutTouchingTheRest(): void
