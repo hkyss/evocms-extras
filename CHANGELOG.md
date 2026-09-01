@@ -5,6 +5,17 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), version
 their options, the `Installer` interface, the catalog snapshot schema — is stable: a breaking
 change needs a major version.
 
+## [1.4.1] - 2026-09-01
+
+### Changed
+
+- The code is unchanged from 1.4.0. Packagist names, for every version from 1.0.1 on, a commit
+  this repository no longer holds: the history was rewritten, the tags moved with it, and the
+  metadata kept the commits the tags used to point at. GitHub still serves such a commit by its
+  sha, so an install goes through and unpacks the tree from before the rewrite — and the same
+  install fails outright once GitHub collects the commit. A new tag is a version Packagist reads
+  fresh, so `^1.4` resolves to a commit the repository has.
+
 ## [1.4.0] - 2026-08-31
 
 ### Changed
@@ -347,7 +358,8 @@ First release. Targets Evolution CMS CE 3.1.x.
 - Every legacy entry ships as `unknown`; none has been verified on Evolution CMS 3 yet.
 - Schema applied by a legacy extra is not rolled back on removal.
 
-[Unreleased]: https://github.com/hkyss/evocms-extras/compare/v1.4.0...HEAD
+[Unreleased]: https://github.com/hkyss/evocms-extras/compare/v1.4.1...HEAD
+[1.4.1]: https://github.com/hkyss/evocms-extras/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/hkyss/evocms-extras/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/hkyss/evocms-extras/compare/v1.2.1...v1.3.0
 [1.2.1]: https://github.com/hkyss/evocms-extras/compare/v1.2.0...v1.2.1
