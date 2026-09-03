@@ -214,8 +214,8 @@ const Module = class {
 
     const counted = [];
 
-    if (extra.files) counted.push(`${Number(extra.files)} ${this.plural(extra.files, 'файл', 'файла', 'файлов')}`);
-    if (extra.elements) counted.push(`${Number(extra.elements)} ${this.plural(extra.elements, 'элемент', 'элемента', 'элементов')}`);
+    if (extra.files) counted.push(`${this.number(extra.files)} ${this.plural(extra.files, 'файл', 'файла', 'файлов')}`);
+    if (extra.elements) counted.push(`${this.number(extra.elements)} ${this.plural(extra.elements, 'элемент', 'элемента', 'элементов')}`);
 
     const at = this.moment(extra.installed_at);
 
@@ -460,6 +460,12 @@ const Module = class {
     if (tail === 1) return one;
 
     return many;
+  }
+
+  number(value) {
+    const parsed = Number(value);
+
+    return Number.isFinite(parsed) ? parsed.toLocaleString('ru-RU') : '0';
   }
 
   text(value) {
