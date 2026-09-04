@@ -13,8 +13,8 @@ final class Outcome
     private array $output;
 
     /**
-     * @param list<string> $notes  What was left behind and needs attention.
-     * @param list<string> $output Raw output of an external tool, when one ran.
+     * @param list<string> $notes
+     * @param list<string> $output
      */
     private function __construct(bool $successful, string $message, array $notes = [], array $output = [])
     {

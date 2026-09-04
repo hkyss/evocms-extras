@@ -9,16 +9,14 @@ enum TakeoverAction: string
     case Adopt = 'adopt';
     case Skip = 'skip';
 
-    /** Whether the rows the site has go dark. Everything a takeover acts on does. */
     public function disables(): bool
     {
         return $this !== self::Skip;
     }
 
     /**
-     * Whether they go dark under another name as well. An installer of the legacy format finds
-     * its elements by name, so a row left under its own would be written over rather than
-     * replaced, and there would be nothing to switch back on.
+     * An installer of the legacy format finds its elements by name, so a row left under its own
+     * would be written over rather than replaced.
      */
     public function setsAside(): bool
     {

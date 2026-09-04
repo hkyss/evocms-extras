@@ -12,10 +12,7 @@ use hkyss\Extras\Installer\InstallerRegistry;
 use hkyss\Extras\Record\InstallRecordStore;
 use hkyss\Extras\Support\Paths;
 
-/**
- * What the site itself can answer about an extra: the manifest, the install records and the
- * copy in vendor. Removal and the vendor tab go through here, so neither waits on the network.
- */
+/** Everything here is answered from the site itself, so neither removal nor the vendor tab waits on the network. */
 class InstalledExtras
 {
     private InstallerRegistry $installers;
@@ -35,7 +32,7 @@ class InstalledExtras
         $this->paths = $paths;
     }
 
-    /** @return array<string, array{state:InstalledState,format:ExtraFormat}> keyed by lowercase coordinate */
+    /** @return array<string, array{state:InstalledState,format:ExtraFormat}> */
     public function map(): array
     {
         $map = [];
@@ -92,7 +89,7 @@ class InstalledExtras
     }
 
     /**
-     * @param bool $listed whether the catalog carries it, or it is only here
+     * @param bool $listed
      * @return array<string,mixed>
      */
     public function describe(Extra $extra, InstalledState $state, bool $listed): array

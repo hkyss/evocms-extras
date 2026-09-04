@@ -6,10 +6,7 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Support\Facades\DB;
 
-/**
- * Writes elements the way the legacy installer did, except it hands the previous code
- * back to the caller instead of overwriting it for good.
- */
+/** The previous code is handed back to the caller instead of being overwritten for good. */
 class ElementWriter
 {
     private ?ConnectionInterface $connection;
@@ -154,9 +151,8 @@ class ElementWriter
     }
 
     /**
-     * Same-name rows with a different description are disabled, never deleted — every one of
-     * them except the row this write is for. A version bump changes the description, so
-     * sweeping that one too switched off the very element that had just been installed.
+     * A version bump changes the description, so sweeping the row this write is for would switch
+     * off the very element that had just been installed.
      */
     private function disableConflicts(ElementDescriptor $descriptor, ?int $written): void
     {

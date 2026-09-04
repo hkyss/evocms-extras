@@ -104,10 +104,7 @@ class PackagesController
             return $this->refuse('Другая установка ещё идёт. Дождитесь, пока она закончится.', 409);
         }
 
-        /**
-         * Composer resolves the whole tree, which outlasts the default time limit, and an
-         * abandoned request would leave the manifest edited and vendor untouched.
-         */
+        /** Composer resolves the whole tree, which outlasts the default time limit. */
         @set_time_limit(0);
         ignore_user_abort(true);
 

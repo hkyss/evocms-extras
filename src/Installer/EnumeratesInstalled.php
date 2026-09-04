@@ -10,7 +10,7 @@ interface EnumeratesInstalled
     public function format(): ExtraFormat;
 
     /**
-     * @return array<string, InstalledState> keyed by coordinate
+     * @return array<string, InstalledState>
      */
     public function installed(): array;
 }

@@ -22,11 +22,7 @@ return new class () extends Migration {
         });
     }
 
-    /**
-     * The table only, and the site is left as the takeover put it. What a removal has to hand
-     * back is handed back by `extra:takeover --restore`, which reads these rows and so has to
-     * run while they are still here — before the migrations, the way the removal is written.
-     */
+    /** `extra:takeover --restore` reads these rows, so it has to run before the migrations. */
     public function down(): void
     {
         Schema::dropIfExists('extras_takeover_records');

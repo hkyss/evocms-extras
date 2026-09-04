@@ -26,7 +26,7 @@ final class SelectPrompt
 
     /**
      * @param list<array{value:string,label?:string,hint?:string,search?:string}> $rows
-     * @return list<string>|null Chosen values, or null when the user backed out
+     * @return list<string>|null
      */
     public function open(string $title, array $rows, bool $multiple = false, int $viewport = 0): ?array
     {

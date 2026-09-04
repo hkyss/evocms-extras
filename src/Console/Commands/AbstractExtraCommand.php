@@ -61,7 +61,7 @@ abstract class AbstractExtraCommand extends Command
 
     /**
      * @param list<array{value:string,label?:string,hint?:string,search?:string}> $rows
-     * @return list<string>|null null when the user backed out
+     * @return list<string>|null
      */
     protected function choose(string $title, array $rows, bool $multiple = true): ?array
     {
@@ -123,11 +123,8 @@ abstract class AbstractExtraCommand extends Command
     }
 
     /**
-     * Composer's own flag name, and the escape hatch the platform block needs: the constraint
-     * comes from the catalog, which can be stale or simply wrong, and a check that cannot be
-     * overridden at all would make a bad catalog entry unfixable from here.
-     *
-     * Commands that never meet a platform requirement do not declare it.
+     * Composer's own flag name: the constraint comes from the catalog, which can be stale, and a
+     * check that cannot be overridden would make a bad entry unfixable from here.
      */
     protected function ignoresPlatformRequirements(): bool
     {

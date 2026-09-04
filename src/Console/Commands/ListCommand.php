@@ -225,7 +225,7 @@ class ListCommand extends AbstractExtraCommand
 
     /**
      * @param array{extra:Extra,state:InstalledState} $entry
-     * @return int|null exit status, or null to carry on browsing
+     * @return int|null
      */
     private function act(array $entry): ?int
     {

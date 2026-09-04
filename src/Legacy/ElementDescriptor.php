@@ -91,7 +91,7 @@ final class ElementDescriptor
         return $this->splitList($this->tag('events'));
     }
 
-    /** @return list<string> An empty list means every install set. */
+    /** @return list<string> */
     public function installSets(): array
     {
         return array_map('strtolower', $this->splitList($this->tag('installset')));
@@ -104,7 +104,7 @@ final class ElementDescriptor
         return $sets === [] || in_array(strtolower($set), $sets, true);
     }
 
-    /** @return list<string> Older element names this one supersedes. */
+    /** @return list<string> */
     public function legacyNames(): array
     {
         return $this->splitList($this->tag('legacy_names'));

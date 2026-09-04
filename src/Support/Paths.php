@@ -121,9 +121,8 @@ final class Paths
     }
 
     /**
-     * What a deletion emptied, back up to the tree it was written into. An extra owns the
-     * directories it laid down and nothing else can tell they were its, so a removal that only
-     * unlinks files leaves its own skeleton behind.
+     * An extra owns the directories it laid down and nothing else can tell they were its, so a
+     * removal that only unlinks files leaves its own skeleton behind.
      */
     public function pruneEmptyDirectories(string $path, string $stopAt): int
     {

@@ -560,8 +560,6 @@ class LegacyInstaller implements Installer, EnumeratesInstalled, HoldsArchives
     }
 
     /**
-     * Keeps elements from earlier installs so an update does not make them unremovable.
-     *
      * @param list<array<string,mixed>> $fresh
      * @return list<array<string,mixed>>
      */

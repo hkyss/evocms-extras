@@ -329,9 +329,8 @@ class ComposerInstaller implements Installer, EnumeratesInstalled
     }
 
     /**
-     * The provider files this removal plans to drop, taken out now and returned by path so a
-     * Composer run that fails can put them back. The compiled list goes with them: it is what
-     * the next boot reads, and it is rebuilt from the directory on its own.
+     * Taken out now and returned by path so a Composer run that fails can put them back; the
+     * compiled list goes with them, because it is what the next boot reads.
      *
      * @return array<string,string>
      */

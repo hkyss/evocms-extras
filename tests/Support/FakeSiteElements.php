@@ -27,8 +27,8 @@ class FakeSiteElements extends SiteElements
 
     /**
      * @param list<SiteElement> $rows
-     * @param list<SiteElement> $managers rows the legacy manager runs from
-     * @param list<int>         $missing  ids no longer on the site
+     * @param list<SiteElement> $managers
+     * @param list<int>         $missing
      */
     public function __construct(array $rows = [], array $managers = [], array $missing = [])
     {

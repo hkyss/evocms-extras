@@ -60,8 +60,6 @@ class SqlScript
     }
 
     /**
-     * Splits on `;` without breaking string literals or comments.
-     *
      * @return list<string>
      */
     private static function split(string $contents): array

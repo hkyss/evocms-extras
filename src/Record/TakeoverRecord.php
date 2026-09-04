@@ -9,8 +9,6 @@ use hkyss\Extras\Takeover\TakeoverAction;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * What a takeover did to one extra, kept so a removal can undo exactly that and nothing else.
- *
  * @property int    $id
  * @property string $coordinate
  * @property string $format

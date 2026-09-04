@@ -35,9 +35,6 @@ final class ManagerModule
     }
 
     /**
-     * Written into the page rather than published: a copy in the doc root goes stale the
-     * first time a release is installed without --force.
-     *
      * @return array{css: string, js: string}
      */
     public static function inline(): array

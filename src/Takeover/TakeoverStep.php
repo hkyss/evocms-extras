@@ -78,7 +78,7 @@ final class TakeoverStep
         return $this->elements;
     }
 
-    /** @return list<SiteElement> What a restore has to put back under its own name and switch on. */
+    /** @return list<SiteElement> */
     public function disabled(): array
     {
         return $this->action->disables() ? $this->elements : [];

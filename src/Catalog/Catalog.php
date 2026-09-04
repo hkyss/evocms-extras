@@ -31,7 +31,7 @@ class Catalog
         return $this->sources;
     }
 
-    /** @return list<Extra> Source order decides duplicates: the first hit wins. */
+    /** @return list<Extra> */
     public function all(): array
     {
         if ($this->merged !== null) {
@@ -96,7 +96,7 @@ class Catalog
         return $results;
     }
 
-    /** @return array<string,string> Sources that could not answer, and why. */
+    /** @return array<string,string> */
     public function problems(): array
     {
         $problems = [];

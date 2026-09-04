@@ -64,10 +64,7 @@
             vertical-align: top;
         }
 
-        /*
-         * The plan opens as a row of one cell, which is first and last at once and would
-         * otherwise take the last column's width and nowrap.
-         */
+        /* The plan's single cell is first and last at once, so it would otherwise take the last column's width and nowrap. */
         & tr:not(.module__plan-row) > :first-child {
             width: 34%;
         }
@@ -297,10 +294,7 @@
             }
         }
 
-        /*
-         * The theme paints btn-secondary white on white, which stops reading as a button
-         * on this panel.
-         */
+        /* The theme paints btn-secondary white on white, which stops reading as a button on this panel. */
         & .btn-secondary {
             background-color: #eceeef;
             border-color: #ccd0d3;

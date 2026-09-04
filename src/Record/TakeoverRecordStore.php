@@ -27,7 +27,7 @@ class TakeoverRecordStore
         return $this->available;
     }
 
-    /** @return list<TakeoverRecord> Newest first: a restore undoes in the order it was done. */
+    /** @return list<TakeoverRecord> */
     public function all(): array
     {
         if (!$this->isAvailable()) {
@@ -37,7 +37,7 @@ class TakeoverRecordStore
         return TakeoverRecord::query()->orderByDesc('id')->get()->all();
     }
 
-    /** @param list<SiteElement> $disabled what was actually switched off, which is what comes back */
+    /** @param list<SiteElement> $disabled */
     public function put(TakeoverStep $step, array $disabled): ?TakeoverRecord
     {
         if (!$this->isAvailable()) {

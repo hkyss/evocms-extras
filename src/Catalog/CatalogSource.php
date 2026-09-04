@@ -9,7 +9,7 @@ interface CatalogSource
 {
     public function name(): string;
 
-    /** @return list<Extra> Empty on failure; one dead source must not hide the others. */
+    /** @return list<Extra> */
     public function all(): array;
 
     public function find(Coordinate $coordinate): ?Extra;

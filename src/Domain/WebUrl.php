@@ -3,8 +3,8 @@
 namespace hkyss\Extras\Domain;
 
 /**
- * Composer records the url it clones from and GitHub keeps a homepage as it was typed;
- * a link the manager renders has to be one a browser can follow.
+ * Composer records the url it clones from and GitHub keeps a homepage as it was typed, and
+ * neither is always one a browser can follow.
  */
 final class WebUrl
 {

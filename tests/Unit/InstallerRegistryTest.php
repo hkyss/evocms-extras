@@ -91,11 +91,7 @@ class InstallerRegistryTest extends TestCase
         self::assertSame([], (new InstallerRegistry())->installed());
     }
 
-    /**
-     * The enumeration was added after 1.0.0's interface was settled, so it lives in its own
-     * interface: an installer written against Installer alone still works, it simply
-     * contributes nothing to the installed list.
-     */
+    /** The enumeration was added after 1.0.0's interface was settled, so it lives in its own interface. */
     public function testAnInstallerThatCannotEnumerateIsSkippedRatherThanFatal(): void
     {
         $plain = new class () implements Installer {

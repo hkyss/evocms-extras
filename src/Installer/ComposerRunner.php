@@ -24,10 +24,7 @@ class ComposerRunner
         return class_exists(Application::class);
     }
 
-    /**
-     * Composer is itself a dependency of the site it manages, so an update left unfiltered
-     * replaces the files this process is running from — the filter keeps it out of the run.
-     */
+    /** Composer is itself a dependency of the site it manages, so an update left unfiltered replaces the files this process runs from. */
     public function updatePackage(string $coordinate): ComposerResult
     {
         return $this->run([

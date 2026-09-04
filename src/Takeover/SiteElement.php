@@ -27,10 +27,7 @@ final class SiteElement
         $this->disabled = $disabled;
     }
 
-    /**
-     * The legacy package format puts the version in bold ahead of the description and nothing
-     * else writes there, so a row that carries one was installed from a transport package.
-     */
+    /** The legacy package format puts the version in bold ahead of the description, and nothing else writes there. */
     public static function versionIn(string $description): string
     {
         return preg_match('~<strong>\s*v?([0-9][0-9A-Za-z.\-]*)\s*</strong>~i', $description, $match) === 1

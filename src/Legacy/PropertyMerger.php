@@ -2,10 +2,7 @@
 
 namespace hkyss\Extras\Legacy;
 
-/**
- * Merges element property strings on update: the author owns the definition, the user
- * owns the configured value.
- */
+/** The author owns the definition, the user owns the configured value. */
 class PropertyMerger
 {
     public function merge(string $incoming, string $existing): string
@@ -92,8 +89,6 @@ class PropertyMerger
     }
 
     /**
-     * The value is the last segment: text fields have three, menus have four.
-     *
      * @return array<string,string>
      */
     public function values(string $properties): array
@@ -108,8 +103,6 @@ class PropertyMerger
     }
 
     /**
-     * Splits on `&` while leaving HTML entities in captions intact.
-     *
      * @return list<string>
      */
     private function chunks(string $properties): array

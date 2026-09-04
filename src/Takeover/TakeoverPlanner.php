@@ -11,16 +11,12 @@ use hkyss\Extras\Installer\PlatformCheck;
 use hkyss\Extras\Legacy\ElementType;
 use hkyss\Extras\Record\InstallRecordStore;
 
-/**
- * What the site is running that this package does not manage yet, and what to do about each of
- * them. Reads the site and the catalog; changes neither.
- */
 class TakeoverPlanner
 {
     /** The legacy manager is renamed on every site whose manager speaks something else. */
     private const LEGACY_MANAGER = 'assets/modules/store/core.php';
 
-    /** The three that execute code. A template or a chunk switched off is a page that stops working. */
+    /** A template or a chunk switched off is a page that stops working, so only the three that execute code. */
     private const SCOPE = [ElementType::Plugin, ElementType::Module, ElementType::Snippet];
 
     private Catalog $catalog;
@@ -35,8 +31,8 @@ class TakeoverPlanner
     private ?array $index = null;
 
     /**
-     * @param array<string,string> $replacements element name to the coordinate that supersedes it
-     * @param list<string>         $ignored      element names a takeover leaves alone
+     * @param array<string,string> $replacements
+     * @param list<string>         $ignored
      */
     public function __construct(
         Catalog $catalog,
@@ -96,7 +92,7 @@ class TakeoverPlanner
         return new TakeoverPlan(array_merge($steps, $skipped));
     }
 
-    /** @return list<SiteElement> The rows the legacy manager runs from, disabled ones aside. */
+    /** @return list<SiteElement> */
     private function legacyManager(): array
     {
         return array_values(array_filter(
@@ -106,8 +102,8 @@ class TakeoverPlanner
     }
 
     /**
-     * Rows nothing here owns yet. A disabled one is left where it is: somebody switched it off,
-     * and a takeover is not the place to decide it should come back.
+     * A disabled row is left where it is: somebody switched it off, and a takeover is not the
+     * place to decide it should come back.
      *
      * @param array<string,bool> $spokenFor
      * @return list<SiteElement>
@@ -170,9 +166,8 @@ class TakeoverPlanner
     }
 
     /**
-     * A takeover is one thing that has to work end to end, so a replacement this installation
-     * could not install is left out of the plan rather than failing it: Composer would refuse
-     * for the same reason, and the row it would have replaced is better off running.
+     * A replacement this installation could not install is left out of the plan rather than
+     * failing it, and the row it would have replaced is better off running.
      */
     private function unmet(Extra $extra): ?string
     {
@@ -190,9 +185,6 @@ class TakeoverPlanner
     }
 
     /**
-     * A legacy extra is adopted at the version the site is already running, where the catalog
-     * publishes that one: taking a site off the version it chose is an update, not a takeover.
-     *
      * @param list<SiteElement> $elements
      */
     private function versionOn(Extra $extra, array $elements): string
@@ -224,9 +216,6 @@ class TakeoverPlanner
     }
 
     /**
-     * The catalog by every name a site could call an extra: its title, and the second half of
-     * its coordinate. Source order decides a collision, the way the catalog itself does.
-     *
      * @return array<string,Extra>
      */
     private function index(): array
@@ -251,9 +240,6 @@ class TakeoverPlanner
     }
 
     /**
-     * Elements written by an install this package has a record of. They are already managed;
-     * a takeover has nothing to add to them.
-     *
      * @return array<string,bool>
      */
     private function owned(): array

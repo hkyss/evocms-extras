@@ -7,10 +7,7 @@ use hkyss\Extras\Exceptions\InstallationException;
 use hkyss\Extras\Support\Http;
 use hkyss\Extras\Support\PublishedAssets;
 
-/**
- * A downloaded and unpacked legacy extra: assets/ goes to the site, install/assets holds
- * element descriptors, install/setup.data.sql is optional.
- */
+/** assets/ goes to the site, install/assets holds element descriptors, install/setup.data.sql is optional. */
 class LegacyArchive
 {
     private string $root;

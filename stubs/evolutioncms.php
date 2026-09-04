@@ -1,9 +1,6 @@
 <?php
 
-/**
- * What this package reaches for in an Evolution CMS installation. The CMS cannot be declared
- * as a Composer dependency, so static analysis is given the surface instead.
- */
+/** The CMS cannot be declared as a Composer dependency, so static analysis is given the surface instead. */
 
 namespace EvolutionCMS {
     class Core

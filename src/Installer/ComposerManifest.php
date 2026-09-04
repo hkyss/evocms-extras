@@ -122,7 +122,7 @@ class ComposerManifest
         }
     }
 
-    /** @return array<string,mixed> Matches what the core creates, so our file is indistinguishable. */
+    /** @return array<string,mixed> */
     private function skeleton(): array
     {
         return [

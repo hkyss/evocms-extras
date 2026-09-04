@@ -39,7 +39,7 @@ class InstallerRegistry
     }
 
     /**
-     * @return array<string, array{state:InstalledState,format:ExtraFormat}> keyed by coordinate
+     * @return array<string, array{state:InstalledState,format:ExtraFormat}>
      */
     public function installed(): array
     {

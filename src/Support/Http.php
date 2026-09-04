@@ -30,7 +30,7 @@ class Http
 
     /**
      * @param array<string,scalar> $query
-     * @return array<mixed>|null Null on any failure; catalog sources must survive a dead network.
+     * @return array<mixed>|null
      */
     public function json(string $url, array $query = [], bool $github = false): ?array
     {

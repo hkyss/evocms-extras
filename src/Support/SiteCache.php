@@ -6,8 +6,7 @@ use Throwable;
 
 /**
  * Evolution evaluates plugins, snippets and modules out of a compiled cache rather than out of
- * the tables, so an element a removal deleted keeps firing until the cache is written again —
- * and one whose files went with it takes the manager down with a fatal.
+ * the tables, so an element a removal deleted keeps firing until the cache is written again.
  */
 class SiteCache
 {

@@ -21,7 +21,7 @@ class Takeover
     private string $aside;
     private SiteCache $cache;
 
-    /** @param string $aside what a row set aside is called, on the same terms as a backed-up file */
+    /** @param string $aside */
     public function __construct(
         InstallerRegistry $installers,
         SiteElements $site,
@@ -142,9 +142,6 @@ class Takeover
     }
 
     /**
-     * One extra failing is the whole takeover failing: the site is left as it was found, and
-     * whatever this run had already changed goes back before it says so.
-     *
      * @param list<TakeoverRecord> $done
      * @param list<string>         $notes
      */
@@ -161,11 +158,8 @@ class Takeover
     }
 
     /**
-     * The rows this step takes out of the way, and why it cannot be done where it cannot.
-     *
-     * A row that has gone since the plan was read is nothing to switch off, and a replacement
-     * carries on without it. One that cannot be set aside stops its step: the installer would
-     * find it by name and write over it, and there would be nothing left to switch back on.
+     * A row that cannot be set aside stops its step: the installer would find it by name and write
+     * over it, leaving nothing to switch back on.
      *
      * @return array{off:list<SiteElement>,refused:string,notes:list<string>}
      */
@@ -204,7 +198,7 @@ class Takeover
 
     /**
      * @param  list<SiteElement> $elements
-     * @return list<string>      one line for every row that is no longer there to put back
+     * @return list<string>
      */
     private function putBack(array $elements): array
     {
@@ -296,18 +290,16 @@ class Takeover
                 return Outcome::failure(implode('; ', $plan->forbidden()));
             }
 
-            // A blocked plan with nothing in it is blocked over something no force gets past —
-            // an archive that turned out not to hold a package has no steps to apply. Nothing
-            // was attempted, so it is not a failed takeover; it is one row fewer in it.
+            // An archive that turned out not to hold a package has no steps to apply, so it is one row
+            // fewer in the takeover rather than a failed one.
             if ($plan->isEmpty() && $plan->blockers() !== []) {
                 return Outcome::noop(implode('; ', $plan->blockers()));
             }
 
             $outcome = $installer->apply($plan);
 
-            // Blockers are not a reason to stop here the way they are for an install somebody
-            // asked for: what the site is already running has answered the compatibility
-            // question by running. They are still said out loud.
+            // What the site is already running has answered the compatibility question by running, so a
+            // blocker here is said out loud rather than acted on.
             foreach ($plan->blockers() as $blocker) {
                 $outcome = $outcome->withNote('done regardless: ' . $blocker);
             }

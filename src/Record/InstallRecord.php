@@ -45,13 +45,13 @@ class InstallRecord extends Model
         'updated_at' => 'datetime',
     ];
 
-    /** @return array<string,string> Relative path to its sha256 at install time. */
+    /** @return array<string,string> */
     public function fileList(): array
     {
         return array_filter((array) ($this->files ?? []), 'is_string');
     }
 
-    /** @return array<string,string> Site path to the path of its backup. */
+    /** @return array<string,string> */
     public function backupMap(): array
     {
         return array_filter((array) ($this->backups ?? []), 'is_string');

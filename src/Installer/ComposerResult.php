@@ -31,7 +31,7 @@ final class ComposerResult
         return $this->output;
     }
 
-    /** @return list<string> The reason Composer refused is usually at the end. */
+    /** @return list<string> */
     public function tail(int $lines = 12): array
     {
         return array_slice($this->output, -$lines);

@@ -8,7 +8,7 @@ final class ListState
     /** @var list<Option> */
     private array $options;
 
-    /** @var list<int> indexes into $options, in display order */
+    /** @var list<int> */
     private array $visible;
 
     private string $filter = '';

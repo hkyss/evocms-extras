@@ -42,13 +42,13 @@ class PublishedAssets
         return $result;
     }
 
-    /** @return list<string> Files safe to delete: byte for byte what the package shipped. */
+    /** @return list<string> */
     public function identical(): array
     {
         return $this->identical;
     }
 
-    /** @return list<string> Files the user has edited since install. */
+    /** @return list<string> */
     public function modified(): array
     {
         return $this->modified;

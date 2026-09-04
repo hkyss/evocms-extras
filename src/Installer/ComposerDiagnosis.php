@@ -11,8 +11,8 @@ final class ComposerDiagnosis
     private const NOT_FOUND = '~requires (\S+/\S+),? it could not be found~i';
 
     /**
-     * @param list<string> $output Composer's captured output, line by line
-     * @return list<string> plain-language notes, empty when nothing is recognised
+     * @param list<string> $output
+     * @return list<string>
      */
     public static function explain(array $output): array
     {

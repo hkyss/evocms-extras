@@ -96,12 +96,7 @@ class CommandArchiveCleanupTest extends TestCase
         self::assertSame([], $this->installer->leftovers());
     }
 
-    /**
-     * runOne() is the one place that discards what planning unpacked, so a command that takes
-     * an installer of its own leaks again; the browse path in extra:list is why this is worth
-     * guarding. What plans outside a command — Takeover — discards for itself, and has a test
-     * of its own that says so.
-     */
+    /** runOne() is the one place that discards what planning unpacked, so a command that takes an installer of its own leaks again. */
     public function testCommandsPlanOnlyThroughRunOne(): void
     {
         foreach ((array) glob(dirname(__DIR__, 2) . '/src/Console/Commands/*.php') as $file) {

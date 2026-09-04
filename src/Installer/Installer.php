@@ -10,8 +10,6 @@ interface Installer
     public function supports(Extra $extra): bool;
 
     /**
-     * Builds the plan without touching the site; it may still hit the network.
-     *
      * @throws \hkyss\Extras\Exceptions\ExtrasException when no plan can be built
      */
     public function plan(Extra $extra, Intent $intent, string $version = ''): InstallPlan;

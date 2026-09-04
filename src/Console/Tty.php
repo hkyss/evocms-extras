@@ -47,10 +47,8 @@ final class Tty
     }
 
     /**
-     * A pty is not a person. CI runners allocate one to get coloured logs, and so does
-     * `docker exec -t` in a Makefile; a prompt there waits for a keypress that never comes and
-     * the job hangs instead of failing. Every runner worth naming sets CI, so that is the
-     * signal: no prompt, take the unattended path.
+     * A pty is not a person: CI runners allocate one for coloured logs, and so does `docker exec
+     * -t`, so CI is the signal rather than the terminal.
      */
     public static function runsUnattended(): bool
     {
@@ -78,7 +76,7 @@ final class Tty
         return trim((string) @shell_exec('command -v stty 2>/dev/null')) !== '';
     }
 
-    /** @return array{0:string,1:string} the key, and the unconsumed remainder */
+    /** @return array{0:string,1:string} */
     public static function take(string $bytes): array
     {
         if ($bytes === '') {

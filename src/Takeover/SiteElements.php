@@ -6,10 +6,6 @@ use hkyss\Extras\Legacy\ElementType;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Support\Facades\DB;
 
-/**
- * The element tables as a takeover needs them: which rows are there, and one switch per row.
- * Writing an element from a descriptor stays ElementWriter's; this only flips `disabled`.
- */
 class SiteElements
 {
     /** What every element table gives a name, and what a set-aside one has to fit into. */
@@ -29,9 +25,8 @@ class SiteElements
     }
 
     /**
-     * Rows whose body mentions the needle. The only way to recognise an element that has been
-     * renamed — and the legacy manager's own module is renamed on every site whose manager
-     * speaks something other than English.
+     * The only way to recognise an element that has been renamed, which the legacy manager's own
+     * module is on every site whose manager speaks something other than English.
      *
      * @return list<SiteElement>
      */
@@ -46,10 +41,8 @@ class SiteElements
     }
 
     /**
-     * Out of the way and switched off, under a name nothing looks for. An installer of the
-     * legacy format finds its elements by name and would write straight over this row, so
-     * setting it aside is what leaves the site with two of them: the copy that was here, and
-     * the one this tool put in its place.
+     * An installer of the legacy format finds its elements by name and would write straight over
+     * this row, so setting it aside is what leaves the site with both copies.
      */
     public function setAside(SiteElement $element, string $suffix): bool
     {

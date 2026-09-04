@@ -3,9 +3,8 @@
 namespace hkyss\Extras\Manager;
 
 /**
- * One writer at a time. Two composer runs over one core/vendor is how a package directory
- * goes missing from under something still walking it, and the page cannot stop its own
- * buttons: they grey out for the document that pressed them and nowhere else.
+ * Two composer runs over one core/vendor is how a package directory goes missing from under
+ * something still walking it, and the page's buttons grey out only for the document that pressed them.
  */
 class Mutex
 {
