@@ -20,8 +20,12 @@ class CatalogSourceTest extends TestCase
     /** @param array<string,mixed> $payload */
     private function http(array $payload): Http
     {
-        $responses = [new Response(200, [], (string) json_encode($payload))];
+        return $this->httpQueue([new Response(200, [], (string) json_encode($payload))]);
+    }
 
+    /** @param list<Response> $responses */
+    private function httpQueue(array $responses): Http
+    {
         return new Http(new Client(['handler' => HandlerStack::create(new MockHandler($responses))]));
     }
 
@@ -78,5 +82,39 @@ class CatalogSourceTest extends TestCase
         self::assertNotNull($extra);
         self::assertSame('https://github.com/acme/thing', $extra->repository());
         self::assertSame('', $extra->homepage());
+    }
+
+    public function testAnAccountThatIsNotAnOrganisationIsWalkedAllTheSame(): void
+    {
+        $http = $this->httpQueue([
+            new Response(404, [], (string) json_encode(['message' => 'Not Found'])),
+            new Response(200, [], (string) json_encode([[
+                'name' => 'thing',
+                'full_name' => 'Acme/thing',
+                'html_url' => 'https://github.com/Acme/thing',
+                'default_branch' => 'master',
+            ]])),
+        ]);
+
+        $extras = (new GitHubOrgSource($http, $this->cache(), 'Acme'))->all();
+
+        self::assertCount(1, $extras);
+        self::assertSame('acme/thing', $extras[0]->coordinate()->key());
+    }
+
+    public function testAnOrganisationIsNotAskedAboutTwice(): void
+    {
+        $http = $this->httpQueue([
+            new Response(200, [], (string) json_encode([[
+                'name' => 'thing',
+                'full_name' => 'acme/thing',
+                'html_url' => 'https://github.com/acme/thing',
+                'default_branch' => 'master',
+            ]])),
+        ]);
+
+        $extras = (new GitHubOrgSource($http, $this->cache(), 'acme'))->all();
+
+        self::assertCount(1, $extras);
     }
 }

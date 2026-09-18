@@ -396,6 +396,15 @@ Sources are configured in order, and the first one holding a coordinate wins:
 ],
 ```
 
+`github-org` reads a personal account as readily as an organisation: GitHub answers 404 for
+`/orgs/<person>`, so the driver asks `/users/<person>` instead. What ships is the ecosystem's two
+organisations and nobody's own account — an author who publishes from theirs is a row a project
+adds for itself:
+
+```php
+['driver' => 'github-org', 'name' => 'Some Author', 'organization' => 'some-author'],
+```
+
 The snapshot ships with the package and comes first. Walking the legacy organisations costs
 hundreds of GitHub requests against an anonymous limit of 60 per hour, and compatibility statuses
 have nowhere else to live.

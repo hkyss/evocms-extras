@@ -108,44 +108,48 @@ class GitHubOrgSource implements CatalogSource
     /** @return list<array<string,mixed>> */
     private function repositories(): array
     {
-        $cached = $this->cache->remember('github-org-' . strtolower($this->organization), function (): array {
-            $all = [];
-
-            for ($page = 1; $page <= 4; $page++) {
-                $batch = $this->http->json(
-                    self::API . '/orgs/' . $this->organization . '/repos',
-                    ['per_page' => 100, 'page' => $page, 'sort' => 'pushed'],
-                    true
-                );
-
-                if (!is_array($batch) || $batch === [] || isset($batch['message'])) {
-                    break;
-                }
-
-                foreach ($batch as $repo) {
-                    if (is_array($repo)) {
-                        $all[] = $repo;
-                    }
-                }
-
-                if (count($batch) < 100) {
-                    break;
-                }
-            }
-
-            return $all;
-        });
+        $cached = $this->cache->remember(
+            'github-org-' . strtolower($this->organization),
+            fn (): array => $this->walk(self::API . '/orgs/' . $this->organization . '/repos')
+                ?: $this->walk(self::API . '/users/' . $this->organization . '/repos')
+        );
 
         if ($cached === []) {
             $this->unavailable = $this->http->hasGithubToken()
-                ? "GitHub returned nothing for organisation '{$this->organization}'"
-                : "GitHub returned nothing for organisation '{$this->organization}'; "
+                ? "GitHub returned nothing for '{$this->organization}'"
+                : "GitHub returned nothing for '{$this->organization}'; "
                     . 'anonymous requests are capped at 60 per hour, set GITHUB_PAT';
 
             return [];
         }
 
         return $cached;
+    }
+
+    /** @return list<array<string,mixed>> */
+    private function walk(string $url): array
+    {
+        $all = [];
+
+        for ($page = 1; $page <= 4; $page++) {
+            $batch = $this->http->json($url, ['per_page' => 100, 'page' => $page, 'sort' => 'pushed'], true);
+
+            if (!is_array($batch) || $batch === [] || isset($batch['message'])) {
+                break;
+            }
+
+            foreach ($batch as $repo) {
+                if (is_array($repo)) {
+                    $all[] = $repo;
+                }
+            }
+
+            if (count($batch) < 100) {
+                break;
+            }
+        }
+
+        return $all;
     }
 
     /** @param array<string,mixed> $repo */

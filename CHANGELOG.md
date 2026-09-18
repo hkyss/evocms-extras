@@ -5,6 +5,16 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), version
 their options, the `Installer` interface, the catalog snapshot schema — is stable: a breaking
 change needs a major version.
 
+## [1.6.0] - 2026-09-18
+
+### Added
+
+- A personal GitHub account works as a catalog source. GitHub answers 404 for
+  `/orgs/<person>/repos` rather than listing what they have, so the `github-org` driver asks
+  `/users/<person>/repos` when the organisation endpoint says there is none. Resolving a single
+  coordinate already worked, because that goes through `/repos/<owner>/<repo>` — only listing and
+  searching were blind. No such account ships as a source: a project adds the ones it wants.
+
 ## [1.5.1] - 2026-09-03
 
 ### Fixed
@@ -384,7 +394,8 @@ First release. Targets Evolution CMS CE 3.1.x.
 - Every legacy entry ships as `unknown`; none has been verified on Evolution CMS 3 yet.
 - Schema applied by a legacy extra is not rolled back on removal.
 
-[Unreleased]: https://github.com/hkyss/evocms-extras/compare/v1.5.1...HEAD
+[Unreleased]: https://github.com/hkyss/evocms-extras/compare/v1.6.0...HEAD
+[1.6.0]: https://github.com/hkyss/evocms-extras/compare/v1.5.1...v1.6.0
 [1.5.1]: https://github.com/hkyss/evocms-extras/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/hkyss/evocms-extras/compare/v1.4.1...v1.5.0
 [1.4.1]: https://github.com/hkyss/evocms-extras/compare/v1.4.0...v1.4.1
