@@ -5,6 +5,16 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), version
 their options, the `Installer` interface, the catalog snapshot schema — is stable: a breaking
 change needs a major version.
 
+## [1.6.1] - 2026-10-15
+
+### Security
+
+- An install or a removal another site posted with a manager's session is refused. The module's
+  endpoints checked only that a manager was signed in, so any page that manager opened could post
+  to `/api/v1/extras/admin/extras/{vendor}/{package}`. A write — anything but GET, HEAD and
+  OPTIONS — now answers 403 without `X-Requested-With`, which a form on another site cannot set and
+  the module's jQuery always sends. A visitor who is not signed in gets 401 rather than 403.
+
 ## [1.6.0] - 2026-09-18
 
 ### Added

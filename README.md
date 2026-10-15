@@ -76,7 +76,9 @@ running from.
 One write at a time: an install or a removal takes a lock, and a second request while one is
 running is answered `409` rather than left to run two Composer resolutions over one `core/vendor`.
 
-The endpoints live under `/api/v1/extras/admin` and answer to a signed-in manager and nobody else.
+The endpoints live under `/api/v1/extras/admin` and answer to a signed-in manager and nobody else;
+a write — an install or a removal — also has to carry `X-Requested-With`, which the module's jQuery
+sends and a form on another site cannot.
 
 ## Formats
 
