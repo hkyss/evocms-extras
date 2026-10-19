@@ -442,11 +442,11 @@ const Module = class {
   }
 
   errorText(xhr) {
-    return this.messages(xhr?.responseJSON?.errors);
+    return this.messages(xhr?.responseJSON);
   }
 
-  messages(errors) {
-    const list = Object.values(errors || {}).flat();
+  messages(answer) {
+    const list = [answer?.message, ...Object.values(answer?.errors || {}).flat()].filter(Boolean);
 
     return list.length > 0 ? list.join(' ') : 'Не удалось выполнить запрос.';
   }

@@ -5,6 +5,15 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), version
 their options, the `Installer` interface, the catalog snapshot schema — is stable: a breaking
 change needs a major version.
 
+## [1.6.2] - 2026-10-19
+
+### Changed
+
+- The module's endpoints answer in the shape the qmedia-by packages answer in: `{"success": true,
+  "data": ...}`, or a refusal with its sentence in `message` and `errors` an empty object, where it
+  used to sit under `errors.message`. A failed install keeps its notes and Composer's output under
+  `data`, which the module prints under the sentence.
+
 ## [1.6.1] - 2026-10-15
 
 ### Security

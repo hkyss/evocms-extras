@@ -17,6 +17,7 @@ use hkyss\Extras\Manager\ManagerModule;
 use hkyss\Extras\Manager\Mutex;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use stdClass;
 
 class PackagesController
 {
@@ -137,15 +138,22 @@ class PackagesController
             $this->mutex->release();
         }
 
+        $log = [
+            'message' => $outcome->message(),
+            'notes' => $outcome->notes(),
+            'output' => $outcome->output(),
+        ];
+
+        if ($outcome->isSuccessful()) {
+            return response()->json(['success' => true, 'data' => $log]);
+        }
+
         return response()->json([
-            'success' => $outcome->isSuccessful(),
-            'data' => [
-                'message' => $outcome->message(),
-                'notes' => $outcome->notes(),
-                'output' => $outcome->output(),
-            ],
-            'errors' => $outcome->isSuccessful() ? [] : ['message' => $outcome->message()],
-        ], $outcome->isSuccessful() ? 200 : 422);
+            'success' => false,
+            'message' => $outcome->message(),
+            'errors' => new stdClass(),
+            'data' => $log,
+        ], 422);
     }
 
     private function intent(Request $request): Intent
@@ -209,9 +217,6 @@ class PackagesController
 
     private function refuse(string $message, int $status): JsonResponse
     {
-        return response()->json([
-            'success' => false,
-            'errors' => ['message' => $message],
-        ], $status);
+        return response()->json(['success' => false, 'message' => $message, 'errors' => new stdClass()], $status);
     }
 }

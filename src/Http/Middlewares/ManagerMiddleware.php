@@ -5,6 +5,7 @@ namespace hkyss\Extras\Http\Middlewares;
 use Closure;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use stdClass;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -33,6 +34,6 @@ class ManagerMiddleware
 
     private function refuse(string $message, int $status): JsonResponse
     {
-        return new JsonResponse(['success' => false, 'errors' => ['message' => $message]], $status);
+        return new JsonResponse(['success' => false, 'message' => $message, 'errors' => new stdClass()], $status);
     }
 }

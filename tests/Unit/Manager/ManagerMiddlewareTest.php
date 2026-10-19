@@ -16,7 +16,7 @@ class ManagerMiddlewareTest extends TestCase
 
         self::assertSame(401, $answer->getStatusCode());
         self::assertSame(
-            ['success' => false, 'errors' => ['message' => 'Доступ только для администраторов.']],
+            ['success' => false, 'message' => 'Доступ только для администраторов.', 'errors' => []],
             json_decode((string) $answer->getContent(), true)
         );
     }
@@ -33,7 +33,7 @@ class ManagerMiddlewareTest extends TestCase
 
         self::assertSame(403, $answer->getStatusCode());
         self::assertSame(
-            ['success' => false, 'errors' => ['message' => 'Запрос отклонён: он пришёл не со страницы сайта.']],
+            ['success' => false, 'message' => 'Запрос отклонён: он пришёл не со страницы сайта.', 'errors' => []],
             json_decode((string) $answer->getContent(), true)
         );
     }
