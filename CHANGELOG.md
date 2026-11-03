@@ -5,6 +5,16 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), version
 their options, the `Installer` interface, the catalog snapshot schema — is stable: a breaking
 change needs a major version.
 
+## [1.6.3] - 2026-11-03
+
+### Fixed
+
+- Composer runs inside `extras.composer.memory_limit` again. The limit was handed over as
+  `COMPOSER_MEMORY_LIMIT`, which only `bin/composer` reads, and Composer runs in-process here, so an
+  install was left with the CLI's own limit — 128M by default — and an update with dependencies
+  died of it (`extra:install evolution-cms-extras/multifields` on a site with the shop). The limit
+  is now set on the process for the run and put back after it.
+
 ## [1.6.2] - 2026-10-19
 
 ### Changed

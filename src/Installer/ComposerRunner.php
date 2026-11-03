@@ -45,11 +45,11 @@ class ComposerRunner
         }
 
         $previousHome = getenv('COMPOSER_HOME');
-        $previousMemory = getenv('COMPOSER_MEMORY_LIMIT');
         $previousCwd = getcwd();
+        $previousMemory = ini_get('memory_limit');
 
         putenv('COMPOSER_HOME=' . $this->paths->composerHome());
-        putenv('COMPOSER_MEMORY_LIMIT=' . $this->memoryLimit);
+        @ini_set('memory_limit', $this->memoryLimit);
         @chdir($this->paths->core());
 
         $output = new BufferedOutput();
@@ -68,7 +68,7 @@ class ComposerRunner
             }
 
             $this->restoreEnv('COMPOSER_HOME', $previousHome);
-            $this->restoreEnv('COMPOSER_MEMORY_LIMIT', $previousMemory);
+            @ini_set('memory_limit', $previousMemory);
         }
 
         return new ComposerResult($exitCode, $this->lines($output->fetch()));
