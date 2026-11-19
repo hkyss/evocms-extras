@@ -87,6 +87,69 @@ class LegacyInstallerTest extends TestCase
         self::assertSame(['assets/snippets/extra/extra.php'], array_keys($this->record()->fileList()));
     }
 
+    public function testAFileTheInstallReplacedIsBackedUpOutsideTheDocumentRoot(): void
+    {
+        $this->site->put('assets/lib/config.php', 'the site\'s own');
+        $this->http->serve(['assets/lib/config.php' => 'the extra\'s']);
+
+        $this->install('1.0');
+
+        self::assertFileDoesNotExist($this->site->path('assets/lib/config.php.old'));
+        self::assertSame(
+            ['assets/lib/config.php' => $this->site->path('core/storage/extras/backups/vendor/extra/assets/lib/config.php')],
+            $this->record()->backupMap()
+        );
+
+        $this->remove();
+
+        self::assertSame('the site\'s own', file_get_contents($this->site->path('assets/lib/config.php')));
+        self::assertDirectoryDoesNotExist($this->site->path('core/storage/extras/backups/vendor/extra'));
+    }
+
+    public function testTheSitesOwnCopySurvivesTwoUpdates(): void
+    {
+        $this->site->put('assets/lib/config.php', 'the site\'s own');
+        $this->http->serve(['assets/lib/config.php' => 'one']);
+        $this->install('1.0');
+
+        $this->http->serve(['assets/lib/config.php' => 'two']);
+        $this->install('1.1');
+        $this->http->serve(['assets/lib/config.php' => 'three']);
+        $this->install('1.2');
+
+        self::assertSame('three', file_get_contents($this->site->path('assets/lib/config.php')));
+
+        $this->remove();
+
+        self::assertSame('the site\'s own', file_get_contents($this->site->path('assets/lib/config.php')));
+    }
+
+    public function testAnUpdateLeavesAFileYouEditedAndSaysSo(): void
+    {
+        $this->http->serve(['assets/snippets/extra/extra.php' => 'one']);
+        $this->install('1.0');
+        $this->site->put('assets/snippets/extra/extra.php', 'edited');
+
+        $this->http->serve(['assets/snippets/extra/extra.php' => 'two']);
+        $plan = $this->installer->plan($this->extra, Intent::Update, '1.1');
+        $this->installer->apply($plan);
+
+        self::assertSame('edited', file_get_contents($this->site->path('assets/snippets/extra/extra.php')));
+        self::assertStringContainsString('assets/snippets/extra/extra.php', implode(' ', $plan->warnings()));
+    }
+
+    public function testAFileAnOlderVersionBroughtIsStillRemoved(): void
+    {
+        $this->http->serve(['assets/snippets/extra/old.php' => 'old', 'assets/snippets/extra/extra.php' => 'one']);
+        $this->install('1.0');
+        $this->http->serve(['assets/snippets/extra/extra.php' => 'two']);
+        $this->install('1.1');
+
+        $this->remove();
+
+        self::assertFileDoesNotExist($this->site->path('assets/snippets/extra/old.php'));
+    }
+
     public function testARefThatIsNotAGitRefIsRefusedBeforeAnythingIsFetched(): void
     {
         $this->http->serve(['assets/snippets/extra/extra.php' => 'extra']);

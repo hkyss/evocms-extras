@@ -21,7 +21,6 @@ class LegacyInstaller implements Installer, EnumeratesInstalled, HoldsArchives
     private Http $http;
     private InstallRecordStore $records;
     private ElementWriter $elements;
-    private string $backupSuffix;
     private string $installSet;
     /** @var list<string> */
     private array $requireConfirmation;
@@ -37,7 +36,6 @@ class LegacyInstaller implements Installer, EnumeratesInstalled, HoldsArchives
         InstallRecordStore $records,
         ElementWriter $elements,
         string $tablePrefix = '',
-        string $backupSuffix = '.old',
         string $installSet = 'base',
         array $requireConfirmation = ['unknown', 'incompatible'],
         ?SiteCache $cache = null
@@ -47,7 +45,6 @@ class LegacyInstaller implements Installer, EnumeratesInstalled, HoldsArchives
         $this->records = $records;
         $this->elements = $elements;
         $this->tablePrefix = $tablePrefix;
-        $this->backupSuffix = $backupSuffix;
         $this->installSet = $installSet;
         $this->requireConfirmation = $requireConfirmation;
         $this->cache = $cache ?? new SiteCache();
@@ -163,41 +160,53 @@ class LegacyInstaller implements Installer, EnumeratesInstalled, HoldsArchives
 
         $source = $archive->assetsDir();
         $destination = rtrim($this->paths->base(), '/\\') . DIRECTORY_SEPARATOR . 'assets';
+        $backups = $this->paths->backupDir($plan->coordinate());
 
-        foreach ($archive->assetFiles() as $relative) {
-            $from = $source . DIRECTORY_SEPARATOR . $relative;
-            $to = $destination . DIRECTORY_SEPARATOR . $relative;
+        foreach ($archive->assetFiles() as $file) {
+            $relative = 'assets/' . $file;
+            $from = $source . DIRECTORY_SEPARATOR . $file;
+            $to = $destination . DIRECTORY_SEPARATOR . $file;
             $hash = (string) hash_file('sha256', $from);
+            $copy = ['from' => $from, 'to' => $to, 'relative' => $relative, 'hash' => $hash];
 
             if (!is_file($to)) {
-                $plan->step(StepKind::FileCopy, 'create assets/' . $relative, [
-                    'from' => $from,
+                $plan->step(StepKind::FileCopy, 'create ' . $relative, $copy);
+
+                continue;
+            }
+
+            $current = (string) hash_file('sha256', $to);
+
+            if ($current === $hash) {
+                $plan->add($this->keep($relative, $to, $hash, $owned));
+
+                continue;
+            }
+
+            if (isset($owned[$relative]) && $owned[$relative] === $current) {
+                $plan->step(StepKind::FileCopy, 'update ' . $relative, $copy);
+
+                continue;
+            }
+
+            if (isset($owned[$relative])) {
+                $plan->step(StepKind::FileKeep, 'keep (modified) ' . $relative, [
                     'to' => $to,
-                    'relative' => 'assets/' . $relative,
-                    'hash' => $hash,
+                    'relative' => $relative,
+                    'hash' => $owned[$relative],
                 ]);
+                $plan->warn(sprintf('%s was changed on the site after it was installed and is left as it is', $relative));
 
                 continue;
             }
 
-            if (hash_file('sha256', $to) === $hash) {
-                $plan->add($this->keep('assets/' . $relative, $to, $hash, $owned));
-
-                continue;
-            }
-
-            $plan->step(StepKind::FileBackup, 'back up assets/' . $relative . ' → ' . $this->backupSuffix, [
+            $plan->step(StepKind::FileBackup, 'back up ' . $relative, [
                 'to' => $to,
-                'backup' => $to . $this->backupSuffix,
-                'relative' => 'assets/' . $relative,
+                'backup' => $backups . $relative,
+                'relative' => $relative,
             ]);
 
-            $plan->step(StepKind::FileCopy, 'overwrite assets/' . $relative, [
-                'from' => $from,
-                'to' => $to,
-                'relative' => 'assets/' . $relative,
-                'hash' => $hash,
-            ]);
+            $plan->step(StepKind::FileCopy, 'overwrite ' . $relative, $copy);
         }
     }
 
@@ -380,6 +389,11 @@ class LegacyInstaller implements Installer, EnumeratesInstalled, HoldsArchives
                 case StepKind::FileBackup:
                     $target = (string) $step->get('to');
                     $backup = (string) $step->get('backup');
+                    $directory = dirname($backup);
+
+                    if (!is_dir($directory) && !@mkdir($directory, 0775, true) && !is_dir($directory)) {
+                        return Outcome::failure("Cannot create directory '{$directory}'", $notes);
+                    }
 
                     if (is_file($target) && @copy($target, $backup)) {
                         $backups[(string) $step->get('relative')] = $backup;
@@ -437,10 +451,12 @@ class LegacyInstaller implements Installer, EnumeratesInstalled, HoldsArchives
             }
         }
 
+        $previous = $this->records->find($plan->coordinate());
+
         $this->records->put($plan->coordinate(), ExtraFormat::Legacy->value, [
             'version' => $plan->toVersion(),
-            'files' => $files,
-            'backups' => $backups,
+            'files' => $files + ($previous?->fileList() ?? []),
+            'backups' => ($previous?->backupMap() ?? []) + $backups,
             'elements' => $this->mergeElements($plan, $elements),
             'sql_hashes' => $this->mergeSqlHashes($plan, $sqlHashes),
         ]);
@@ -481,6 +497,7 @@ class LegacyInstaller implements Installer, EnumeratesInstalled, HoldsArchives
 
             if (is_string($backup) && is_file($backup) && @copy($backup, $path)) {
                 @unlink($backup);
+                $this->paths->pruneEmptyDirectories($backup, $this->paths->core() . 'storage');
                 $restored++;
 
                 continue;

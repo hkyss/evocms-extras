@@ -2,6 +2,7 @@
 
 namespace hkyss\Extras\Support;
 
+use hkyss\Extras\Domain\Coordinate;
 use hkyss\Extras\Exceptions\ExtrasException;
 
 final class Paths
@@ -90,6 +91,12 @@ final class Paths
     public function cacheDir(): string
     {
         return $this->core . 'custom' . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR . 'extras';
+    }
+
+    public function backupDir(Coordinate $coordinate): string
+    {
+        return $this->core . 'storage' . DIRECTORY_SEPARATOR . 'extras' . DIRECTORY_SEPARATOR . 'backups'
+            . DIRECTORY_SEPARATOR . $coordinate->key() . DIRECTORY_SEPARATOR;
     }
 
     public function packageDir(string $coordinate): string

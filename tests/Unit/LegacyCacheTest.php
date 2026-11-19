@@ -74,7 +74,6 @@ class LegacyCacheTest extends TestCase
             new SilentRecords(),
             $elements,
             '',
-            '.old',
             'base',
             ['unknown', 'incompatible'],
             $cache

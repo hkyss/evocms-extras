@@ -56,7 +56,7 @@ return [
         'memory_limit' => env('EXTRAS_COMPOSER_MEMORY_LIMIT', '-1'),
     ],
 
-    // Statuses listed under require_confirmation need an explicit --force to install.
+    // Statuses listed under require_confirmation need an explicit --force to install; backup_suffix renames the rows a takeover sets aside.
     'legacy' => [
         'backup_suffix' => '.old',
         'require_confirmation' => ['unknown', 'incompatible'],
