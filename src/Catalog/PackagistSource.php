@@ -44,14 +44,14 @@ class PackagistSource implements CatalogSource
             return $this->extras;
         }
 
-        $names = $this->cache->remember('packagist-names', function (): array {
+        $names = $this->cache->remember('packagist-names', function (): ?array {
             $collected = [];
 
             foreach ($this->types as $type) {
                 $payload = $this->http->json(self::LIST_URL, ['type' => $type]);
 
                 if ($payload === null) {
-                    continue;
+                    return null;
                 }
 
                 foreach ((array) ($payload['packageNames'] ?? []) as $name) {
@@ -62,7 +62,7 @@ class PackagistSource implements CatalogSource
             }
 
             return array_keys($collected);
-        });
+        }) ?? [];
 
         if ($names === []) {
             $this->unavailable = 'Packagist returned no packages for types ' . implode(', ', $this->types);
@@ -175,8 +175,8 @@ class PackagistSource implements CatalogSource
     {
         $stable = $this->cache->remember(
             'packagist-' . $coordinate->key(),
-            fn () => $this->http->json(sprintf(self::METADATA_URL, $coordinate->key())) ?? []
-        );
+            fn () => $this->http->json(sprintf(self::METADATA_URL, $coordinate->key()))
+        ) ?? [];
 
         $releases = $stable['packages'][$coordinate->key()] ?? [];
 
@@ -186,8 +186,8 @@ class PackagistSource implements CatalogSource
 
         $dev = $this->cache->remember(
             'packagist-dev-' . $coordinate->key(),
-            fn () => $this->http->json(sprintf(self::METADATA_DEV_URL, $coordinate->key())) ?? []
-        );
+            fn () => $this->http->json(sprintf(self::METADATA_DEV_URL, $coordinate->key()))
+        ) ?? [];
 
         $releases = $dev['packages'][$coordinate->key()] ?? [];
 

@@ -17,6 +17,9 @@ use PHPUnit\Framework\TestCase;
 /** Where the two links a row carries — the repository and the site — come from. */
 class CatalogSourceTest extends TestCase
 {
+    /** @var list<string> */
+    private array $directories = [];
+
     /** @param array<string,mixed> $payload */
     private function http(array $payload): Http
     {
@@ -116,5 +119,67 @@ class CatalogSourceTest extends TestCase
         $extras = (new GitHubOrgSource($http, $this->cache(), 'acme'))->all();
 
         self::assertCount(1, $extras);
+    }
+
+    public function testPackagistDropsAHomepageNoBrowserCouldFollow(): void
+    {
+        $http = $this->http(['packages' => ['acme/thing' => [[
+            'name' => 'acme/thing',
+            'version' => '1.0.0',
+            'homepage' => 'acme.test',
+        ]]]]);
+
+        $extra = (new PackagistSource($http, $this->cache(), []))->find(Coordinate::parse('acme/thing'));
+
+        self::assertNotNull($extra);
+        self::assertSame('', $extra->homepage());
+    }
+
+    public function testAPackagistLookupThatFailedIsAskedAgain(): void
+    {
+        $cache = $this->keptCache();
+        $http = $this->httpQueue([
+            new Response(503),
+            new Response(503),
+            new Response(200, [], (string) json_encode(['packages' => ['acme/thing' => [['version' => '1.0.0']]]])),
+        ]);
+        $source = new PackagistSource($http, $cache, []);
+
+        self::assertNull($source->find(Coordinate::parse('acme/thing')));
+        self::assertNotNull($source->find(Coordinate::parse('acme/thing')));
+    }
+
+    public function testAnOrganisationGitHubDidNotAnswerForIsAskedAgain(): void
+    {
+        $cache = $this->keptCache();
+        $http = $this->httpQueue([
+            new Response(503),
+            new Response(503),
+            new Response(200, [], (string) json_encode([[
+                'name' => 'thing',
+                'full_name' => 'acme/thing',
+                'html_url' => 'https://github.com/acme/thing',
+                'default_branch' => 'master',
+            ]])),
+        ]);
+
+        self::assertSame([], (new GitHubOrgSource($http, $cache, 'acme'))->all());
+        self::assertCount(1, (new GitHubOrgSource($http, $cache, 'acme'))->all());
+    }
+
+    private function keptCache(): CatalogCache
+    {
+        $directory = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'extras-cache-' . bin2hex(random_bytes(6));
+        $this->directories[] = $directory;
+
+        return new CatalogCache(new Paths(sys_get_temp_dir()), 3600, true, $directory);
+    }
+
+    protected function tearDown(): void
+    {
+        foreach ($this->directories as $directory) {
+            array_map('unlink', glob($directory . DIRECTORY_SEPARATOR . '*') ?: []);
+            @rmdir($directory);
+        }
     }
 }

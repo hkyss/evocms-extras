@@ -28,6 +28,10 @@ class LegacyArchive
         ?DocblockParser $parser = null,
         ?string $tempRoot = null
     ): self {
+        if (!self::isRef($ref)) {
+            throw InstallationException::unreadableArchive((string) $coordinate, "'{$ref}' is not a tag, a branch or a commit");
+        }
+
         $tempDir = self::makeTempDir($tempRoot);
         $zip = $tempDir . DIRECTORY_SEPARATOR . 'archive.zip';
         $downloaded = false;
@@ -46,6 +50,14 @@ class LegacyArchive
         }
 
         return new self(self::extract($zip, $tempDir, (string) $coordinate), $tempDir, $parser ?? new DocblockParser());
+    }
+
+    private static function isRef(string $ref): bool
+    {
+        return preg_match('~^[A-Za-z0-9_][A-Za-z0-9._+/-]*$~', $ref) === 1
+            && !str_contains($ref, '..')
+            && !str_contains($ref, '//')
+            && !str_ends_with($ref, '/');
     }
 
     public static function opened(string $root, ?DocblockParser $parser = null): self

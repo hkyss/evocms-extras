@@ -6,6 +6,7 @@ use hkyss\Extras\Domain\CompatibilityStatus;
 use hkyss\Extras\Domain\Coordinate;
 use hkyss\Extras\Domain\Extra;
 use hkyss\Extras\Domain\ExtraFormat;
+use hkyss\Extras\Exceptions\ExtrasException;
 use hkyss\Extras\Installer\Intent;
 use hkyss\Extras\Installer\LegacyInstaller;
 use hkyss\Extras\Legacy\ElementWriter;
@@ -84,6 +85,15 @@ class LegacyInstallerTest extends TestCase
         $this->install('1.1');
 
         self::assertSame(['assets/snippets/extra/extra.php'], array_keys($this->record()->fileList()));
+    }
+
+    public function testARefThatIsNotAGitRefIsRefusedBeforeAnythingIsFetched(): void
+    {
+        $this->http->serve(['assets/snippets/extra/extra.php' => 'extra']);
+
+        $this->expectException(ExtrasException::class);
+
+        $this->installer->plan($this->extra, Intent::Install, '../../other/repo/archive/main');
     }
 
     private function install(string $version): void
