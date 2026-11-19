@@ -5,6 +5,40 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), version
 their options, the `Installer` interface, the catalog snapshot schema — is stable: a breaking
 change needs a major version.
 
+## [1.7.0] - 2026-11-19
+
+The takeover no longer pairs a site row with a package found by name on Packagist, and a legacy
+install keeps a record that removal can rely on.
+
+### Changed
+
+- `extra:takeover` matches a site row by name only to an extra the bundled snapshot or a configured
+  `github-org` source holds. Packagist is open to anyone, so it no longer names a row; a Packagist
+  package can still take one through `takeover.replacements`. The shipped config lists the GitHub
+  organisations ahead of Packagist. A published `config/extras.php` keeps its own order.
+- `extra:install`, `extra:update`, `extra:remove` and `extra:takeover` take the module's writer lock
+  and stop with an error while it is held. `--dry-run` takes none. A lock file that cannot be opened
+  now counts as held.
+- Files a legacy install overwrites are backed up to `core/storage/extras/backups/<vendor>/<package>`
+  instead of `<file>.old` beside them under `assets/`. `legacy.backup_suffix` now only names the rows
+  a takeover sets aside, and `LegacyInstaller` no longer takes it.
+- A legacy install stops at the first file, element or `setup.data.sql` statement that fails, and
+  reports a failure. What it had written is recorded, so `extra:remove` takes it back.
+
+### Fixed
+
+- A file the site had before a legacy install, with the same bytes as the archive's copy, is no
+  longer recorded as the extra's, so removal leaves it.
+- An update merges the install record instead of replacing it. Files an older version brought are
+  still removed, the site's original backup is kept, an unchanged file of the extra is overwritten
+  without a backup, and a file you edited is left with a warning.
+- Updating a plugin keeps its event priorities. Removal restores an element's properties, category
+  and plugin events along with its code, as they were before the first install.
+- A homepage from Packagist or an installed package's `composer.json` becomes a link only if it is
+  `http` or `https`. A legacy version that does not look like a tag, branch or commit is refused.
+- A Packagist or GitHub lookup that failed is no longer cached as empty for an hour.
+- The test suite runs on PHPUnit 9 again, which the lowest dependency set resolves.
+
 ## [1.6.3] - 2026-11-03
 
 ### Fixed
@@ -423,7 +457,8 @@ First release. Targets Evolution CMS CE 3.1.x.
 - Every legacy entry ships as `unknown`; none has been verified on Evolution CMS 3 yet.
 - Schema applied by a legacy extra is not rolled back on removal.
 
-[Unreleased]: https://github.com/hkyss/evocms-extras/compare/v1.6.0...HEAD
+[Unreleased]: https://github.com/hkyss/evocms-extras/compare/v1.7.0...HEAD
+[1.7.0]: https://github.com/hkyss/evocms-extras/compare/v1.6.3...v1.7.0
 [1.6.0]: https://github.com/hkyss/evocms-extras/compare/v1.5.1...v1.6.0
 [1.5.1]: https://github.com/hkyss/evocms-extras/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/hkyss/evocms-extras/compare/v1.4.1...v1.5.0
