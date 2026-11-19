@@ -11,6 +11,8 @@ use hkyss\Extras\Domain\Coordinate;
 use hkyss\Extras\Domain\Extra;
 use hkyss\Extras\Domain\ExtraFormat;
 use hkyss\Extras\Installer\InstallerRegistry;
+use hkyss\Extras\Manager\Mutex;
+use hkyss\Extras\Tests\Support\TempTree;
 use hkyss\Extras\Tests\Support\UnpackingInstaller;
 use Illuminate\Container\Container;
 use PHPUnit\Framework\TestCase;
@@ -22,15 +24,50 @@ use Symfony\Component\Console\Output\BufferedOutput;
 class CommandArchiveCleanupTest extends TestCase
 {
     private UnpackingInstaller $installer;
+    private TempTree $locks;
 
     protected function setUp(): void
     {
         $this->installer = new UnpackingInstaller();
+        $this->locks = TempTree::make('extras-command-lock');
     }
 
     protected function tearDown(): void
     {
         $this->installer->remove();
+        $this->locks->remove();
+    }
+
+    public function testAnInstallWaitsForNoOneAndTouchesNothingWhileAnotherWriterHoldsTheLock(): void
+    {
+        $other = $this->mutex();
+        self::assertTrue($other->acquire());
+
+        $status = $this->install();
+        $other->release();
+
+        self::assertSame(Command::FAILURE, $status);
+        self::assertSame(0, $this->installer->applied);
+    }
+
+    public function testADryRunNeedsNoLock(): void
+    {
+        $other = $this->mutex();
+        self::assertTrue($other->acquire());
+
+        $status = $this->install(['--dry-run' => true]);
+        $other->release();
+
+        self::assertSame(Command::SUCCESS, $status);
+    }
+
+    public function testTheLockIsGivenBackAfterAnInstall(): void
+    {
+        $this->install();
+
+        $other = $this->mutex();
+        self::assertTrue($other->acquire());
+        $other->release();
     }
 
     public function testADryRunDiscardsWhatPlanningUnpacked(): void
@@ -87,7 +124,7 @@ class CommandArchiveCleanupTest extends TestCase
     public function testRemovalTakesTheSameRoute(): void
     {
         $status = $this->execute(
-            new RemoveCommand($this->catalog(), new InstallerRegistry([$this->installer])),
+            new RemoveCommand($this->catalog(), new InstallerRegistry([$this->installer]), $this->mutex()),
             ['coordinates' => ['org/thing'], '--dry-run' => true]
         );
 
@@ -112,11 +149,16 @@ class CommandArchiveCleanupTest extends TestCase
         }
     }
 
+    private function mutex(): Mutex
+    {
+        return new Mutex($this->locks->path('writer.lock'));
+    }
+
     /** @param array<string, mixed> $parameters */
     private function install(array $parameters = []): int
     {
         return $this->execute(
-            new InstallCommand($this->catalog(), new InstallerRegistry([$this->installer])),
+            new InstallCommand($this->catalog(), new InstallerRegistry([$this->installer]), $this->mutex()),
             ['coordinates' => ['org/thing']] + $parameters
         );
     }

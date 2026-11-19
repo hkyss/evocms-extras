@@ -17,13 +17,18 @@ class Mutex
         $this->path = $path;
     }
 
-    /** A lock that cannot be taken at all must not be the thing that stops an install. */
     public function acquire(): bool
     {
-        $handle = @fopen($this->path, 'c');
+        $directory = dirname($this->path);
+
+        if (!is_dir($directory)) {
+            @mkdir($directory, 0775, true);
+        }
+
+        $handle = $this->open();
 
         if ($handle === false) {
-            return true;
+            return false;
         }
 
         if (!@flock($handle, LOCK_EX | LOCK_NB)) {
@@ -35,6 +40,27 @@ class Mutex
         $this->handle = $handle;
 
         return true;
+    }
+
+    /**
+     * The console and the module run as different users, so a lock file the other one created is opened for reading, which is all flock needs.
+     *
+     * @return resource|false
+     */
+    private function open()
+    {
+        $created = !is_file($this->path);
+        $handle = @fopen($this->path, 'c');
+
+        if ($handle === false) {
+            return @fopen($this->path, 'r');
+        }
+
+        if ($created) {
+            @chmod($this->path, 0666);
+        }
+
+        return $handle;
     }
 
     public function release(): void

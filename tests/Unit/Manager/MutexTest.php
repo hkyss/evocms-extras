@@ -44,8 +44,31 @@ class MutexTest extends TestCase
         $mutex->release();
     }
 
-    public function testAnUnwritableLockDoesNotStopTheWork(): void
+    public function testTheLockMakesTheDirectoryItLivesIn(): void
     {
-        self::assertTrue((new Mutex($this->tree->path('nowhere/writer.lock')))->acquire());
+        $mutex = new Mutex($this->tree->path('cache/extras/writer.lock'));
+
+        self::assertTrue($mutex->acquire());
+        $mutex->release();
+    }
+
+    public function testALockFileThisUserCannotWriteStillLocks(): void
+    {
+        $this->tree->put('writer.lock', '');
+        chmod($this->tree->path('writer.lock'), 0444);
+
+        $first = new Mutex($this->tree->path('writer.lock'));
+        $second = new Mutex($this->tree->path('writer.lock'));
+
+        self::assertTrue($first->acquire());
+        self::assertFalse($second->acquire());
+        $first->release();
+    }
+
+    public function testALockThatCannotBeOpenedIsNotTaken(): void
+    {
+        $this->tree->put('blocker', '');
+
+        self::assertFalse((new Mutex($this->tree->path('blocker/writer.lock')))->acquire());
     }
 }

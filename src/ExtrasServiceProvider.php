@@ -202,6 +202,7 @@ class ExtrasServiceProvider extends ServiceProvider
         $this->app->singleton(DoctorCommand::class, fn () => new DoctorCommand(
             $this->app->make(Catalog::class),
             $this->app->make(InstallerRegistry::class),
+            $this->app->make(Mutex::class),
             Paths::isAvailable() ? $this->app->make(Paths::class) : null,
             $this->app->make(ComposerManifest::class),
             $this->app->make(ComposerRunner::class),
@@ -228,8 +229,6 @@ class ExtrasServiceProvider extends ServiceProvider
             $directory = Paths::isAvailable()
                 ? $this->app->make(Paths::class)->cacheDir()
                 : sys_get_temp_dir();
-
-            @mkdir($directory, 0775, true);
 
             return new Mutex(rtrim($directory, '/\\') . DIRECTORY_SEPARATOR . 'writer.lock');
         });

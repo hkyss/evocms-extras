@@ -8,6 +8,7 @@ use hkyss\Extras\Catalog\GitHubOrgSource;
 use hkyss\Extras\Catalog\SnapshotSource;
 use hkyss\Extras\Domain\Extra;
 use hkyss\Extras\Installer\InstallerRegistry;
+use hkyss\Extras\Manager\Mutex;
 
 class CacheCommand extends AbstractExtraCommand
 {
@@ -19,9 +20,9 @@ class CacheCommand extends AbstractExtraCommand
 
     private CatalogCache $cache;
 
-    public function __construct(Catalog $catalog, InstallerRegistry $installers, CatalogCache $cache)
+    public function __construct(Catalog $catalog, InstallerRegistry $installers, Mutex $writer, CatalogCache $cache)
     {
-        parent::__construct($catalog, $installers);
+        parent::__construct($catalog, $installers, $writer);
         $this->cache = $cache;
     }
 

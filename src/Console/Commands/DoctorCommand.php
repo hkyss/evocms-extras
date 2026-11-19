@@ -6,6 +6,7 @@ use hkyss\Extras\Catalog\Catalog;
 use hkyss\Extras\Installer\ComposerManifest;
 use hkyss\Extras\Installer\ComposerRunner;
 use hkyss\Extras\Installer\InstallerRegistry;
+use hkyss\Extras\Manager\Mutex;
 use hkyss\Extras\Record\InstallRecordStore;
 use hkyss\Extras\Support\Http;
 use hkyss\Extras\Support\Paths;
@@ -25,13 +26,14 @@ class DoctorCommand extends AbstractExtraCommand
     public function __construct(
         Catalog $catalog,
         InstallerRegistry $installers,
+        Mutex $writer,
         ?Paths $paths,
         ComposerManifest $manifest,
         ComposerRunner $runner,
         InstallRecordStore $records,
         Http $http
     ) {
-        parent::__construct($catalog, $installers);
+        parent::__construct($catalog, $installers, $writer);
         $this->paths = $paths;
         $this->manifest = $manifest;
         $this->runner = $runner;
