@@ -19,6 +19,7 @@ use hkyss\Extras\Installer\InstallPlan;
 use hkyss\Extras\Installer\Intent;
 use hkyss\Extras\Installer\Outcome;
 use hkyss\Extras\Installer\StepKind;
+use hkyss\Extras\Manager\Mutex;
 use Illuminate\Console\Command;
 
 abstract class AbstractExtraCommand extends Command
@@ -27,6 +28,7 @@ abstract class AbstractExtraCommand extends Command
 
     protected Catalog $catalog;
     protected InstallerRegistry $installers;
+    private Mutex $writer;
 
     private ?Ui $ui = null;
 
@@ -34,11 +36,26 @@ abstract class AbstractExtraCommand extends Command
 
     private ?Tty $tty = null;
 
-    public function __construct(Catalog $catalog, InstallerRegistry $installers)
+    public function __construct(Catalog $catalog, InstallerRegistry $installers, Mutex $writer)
     {
         parent::__construct();
         $this->catalog = $catalog;
         $this->installers = $installers;
+        $this->writer = $writer;
+    }
+
+    /** @param callable():int $work */
+    protected function exclusively(callable $work): int
+    {
+        if (!$this->writer->acquire()) {
+            return $this->bail('Another install or removal is running. Wait for it to finish and try again.');
+        }
+
+        try {
+            return $work();
+        } finally {
+            $this->writer->release();
+        }
     }
 
     protected function ui(): Ui
@@ -327,8 +344,9 @@ abstract class AbstractExtraCommand extends Command
 
         try {
             $installer = $this->installers->for($extra);
+            $work = fn (): int => $this->planAndApply($installer, $extra, $intent, $version, $dryRun, $force);
 
-            return $this->planAndApply($installer, $extra, $intent, $version, $dryRun, $force);
+            return $dryRun ? $work() : $this->exclusively($work);
         } catch (ExtrasException $e) {
             return $this->bail($e->getMessage());
         } finally {

@@ -9,6 +9,7 @@ use hkyss\Extras\Console\Commands\ListCommand;
 use hkyss\Extras\Console\Commands\RemoveCommand;
 use hkyss\Extras\Console\Commands\UpdateCommand;
 use hkyss\Extras\Installer\InstallerRegistry;
+use hkyss\Extras\Manager\Mutex;
 use Illuminate\Console\Parser;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -64,8 +65,8 @@ class CommandDefinitionTest extends TestCase
     public function testCommandsSurviveBeingRegisteredOnAnApplication(): void
     {
         $commands = [
-            new InstallCommand(new Catalog(), new InstallerRegistry()),
-            new UpdateCommand(new Catalog(), new InstallerRegistry()),
+            new InstallCommand(new Catalog(), new InstallerRegistry(), new Mutex(sys_get_temp_dir() . '/extras-definition.lock')),
+            new UpdateCommand(new Catalog(), new InstallerRegistry(), new Mutex(sys_get_temp_dir() . '/extras-definition.lock')),
         ];
 
         foreach ($commands as $command) {
