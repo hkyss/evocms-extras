@@ -15,6 +15,7 @@ use hkyss\Extras\Support\Paths;
 use hkyss\Extras\Support\SiteCache;
 use hkyss\Extras\Tests\Support\ArchiveHttp;
 use hkyss\Extras\Tests\Support\MemoryRecords;
+use hkyss\Extras\Tests\Support\SiteTables;
 use hkyss\Extras\Tests\Support\TempTree;
 use PHPUnit\Framework\TestCase;
 
@@ -28,6 +29,7 @@ class QuietCache extends SiteCache
 class LegacyInstallerTest extends TestCase
 {
     private TempTree $site;
+    private SiteTables $tables;
     private MemoryRecords $records;
     private ArchiveHttp $http;
     private LegacyInstaller $installer;
@@ -38,12 +40,13 @@ class LegacyInstallerTest extends TestCase
         $this->site = TempTree::make('extras-legacy-site');
         $this->site->directory('core');
         $this->records = new MemoryRecords();
+        $this->tables = new SiteTables();
         $this->http = new ArchiveHttp([]);
         $this->installer = new LegacyInstaller(
             new Paths($this->site->path('core'), $this->site->path()),
             $this->http,
             $this->records,
-            new ElementWriter(),
+            new ElementWriter($this->tables->connection()),
             cache: new QuietCache()
         );
         $this->extra = new Extra(
@@ -148,6 +151,44 @@ class LegacyInstallerTest extends TestCase
         $this->remove();
 
         self::assertFileDoesNotExist($this->site->path('assets/snippets/extra/old.php'));
+    }
+
+    public function testAStatementThatFailsStopsTheInstallAndWhatLandedCanBeRemoved(): void
+    {
+        $this->http->serve([
+            'assets/snippets/extra/extra.php' => 'extra',
+            'install/setup.data.sql' => "INSERT INTO nowhere VALUES (1);\nINSERT INTO categories (category) VALUES ('after');",
+        ]);
+
+        $outcome = $this->installer->apply($this->installer->plan($this->extra, Intent::Install, '1.0'));
+
+        self::assertFalse($outcome->isSuccessful());
+        self::assertStringContainsString('setup.data.sql', $outcome->message());
+        self::assertSame(0, $this->tables->connection()->table('categories')->count(), 'nothing after the failed statement runs');
+
+        $this->remove();
+
+        self::assertFileDoesNotExist($this->site->path('assets/snippets/extra/extra.php'));
+    }
+
+    public function testAnUpdateRestoresTheRowAsTheSiteHadItBeforeTheFirstInstall(): void
+    {
+        $id = $this->tables->insert('site_snippets', ['name' => 'Extra', 'description' => 'the site\'s', 'snippet' => '// the site\'s']);
+        $this->http->serve(['install/assets/snippets/Extra.tpl' => $this->snippet('1.0')]);
+        $this->install('1.0');
+        $this->http->serve(['install/assets/snippets/Extra.tpl' => $this->snippet('1.1')]);
+        $this->install('1.1');
+
+        self::assertStringContainsString('1.1', (string) $this->tables->row('site_snippets', $id)['snippet']);
+
+        $this->remove();
+
+        self::assertSame('// the site\'s', $this->tables->row('site_snippets', $id)['snippet']);
+    }
+
+    private function snippet(string $version): string
+    {
+        return "//<?php\n/**\n * Extra\n *\n * <strong>{$version}</strong> an extra\n *\n * @category snippet\n */\nreturn '{$version}';\n";
     }
 
     public function testARefThatIsNotAGitRefIsRefusedBeforeAnythingIsFetched(): void

@@ -84,8 +84,60 @@ class ElementWriterTest extends TestCase
         );
     }
 
-    private function descriptor(string $description): ElementDescriptor
+    public function testAnUpdateKeepsThePriorityAPluginHadOnAnEvent(): void
     {
-        return new ElementDescriptor(ElementType::Plugin, 'Ditto', $description, '// code');
+        $notFound = $this->tables->insert('system_eventnames', ['name' => 'OnPageNotFound']);
+        $init = $this->tables->insert('system_eventnames', ['name' => 'OnWebPageInit']);
+        $other = $this->tables->insert('site_plugins', ['name' => 'Other']);
+        $id = $this->tables->insert('site_plugins', ['name' => 'Ditto', 'description' => '<strong>2.1</strong>']);
+        $this->tables->insert('site_plugin_events', ['pluginid' => $id, 'evtid' => $notFound, 'priority' => 3]);
+        $this->tables->insert('site_plugin_events', ['pluginid' => $other, 'evtid' => $init, 'priority' => 4]);
+
+        $this->writer->write($this->descriptor('<strong>3.0</strong>', ['events' => 'OnPageNotFound,OnWebPageInit']));
+
+        self::assertSame([$notFound => 3, $init => 5], $this->tables->priorities($id));
+    }
+
+    public function testRestorePutsBackWhatTheRowHadBesidesItsCode(): void
+    {
+        $category = $this->tables->insert('categories', ['category' => 'Mine']);
+        $notFound = $this->tables->insert('system_eventnames', ['name' => 'OnPageNotFound']);
+        $this->tables->insert('system_eventnames', ['name' => 'OnWebPageInit']);
+        $id = $this->tables->insert('site_plugins', [
+            'name' => 'Ditto',
+            'description' => '<strong>2.1</strong>',
+            'plugincode' => '// before',
+            'properties' => '&mine=Mine;text;kept',
+            'category' => $category,
+        ]);
+        $this->tables->insert('site_plugin_events', ['pluginid' => $id, 'evtid' => $notFound, 'priority' => 2]);
+
+        $written = $this->writer->write($this->descriptor('<strong>3.0</strong>', [
+            'events' => 'OnWebPageInit',
+            'properties' => '&theirs=Theirs;text;new',
+            'modx_category' => 'Theirs',
+        ]));
+
+        $this->writer->restore(
+            ElementType::Plugin,
+            $id,
+            (string) $written['previous_code'],
+            $written['previous_description'],
+            $written['previous_properties'],
+            $written['previous_category'],
+            $written['previous_events']
+        );
+
+        $row = $this->tables->row('site_plugins', $id);
+
+        self::assertSame('&mine=Mine;text;kept', $row['properties']);
+        self::assertSame($category, (int) $row['category']);
+        self::assertSame([$notFound => 2], $this->tables->priorities($id));
+    }
+
+    /** @param array<string,string> $tags */
+    private function descriptor(string $description, array $tags = []): ElementDescriptor
+    {
+        return new ElementDescriptor(ElementType::Plugin, 'Ditto', $description, '// code', $tags);
     }
 }
