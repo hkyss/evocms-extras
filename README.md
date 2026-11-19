@@ -259,7 +259,7 @@ install evocms-community/pagebuilder  [legacy]
 
   file
     · create assets/plugins/pagebuilder/pagebuilder.php
-    · back up assets/plugins/pagebuilder/lang/en.php → .old
+    · back up assets/plugins/pagebuilder/lang/en.php
     · overwrite assets/plugins/pagebuilder/lang/en.php
   element
     · create plugin PageBuilder
@@ -299,7 +299,7 @@ format has no uninstall, and this package removes only what it has a record of.
   installed in its place. A row the catalog answers for with a package that is *already* installed
   is retired too, for the same reason.
 - **adopt** a legacy extra the site is already running: the rows it has are set aside — renamed
-  with the same `.old` suffix a backed-up file gets, and switched off — and the extra is installed
+  with the `legacy.backup_suffix` suffix, `.old` by default, and switched off — and the extra is installed
   again through here beside them, so it gains an install record and can be removed afterwards. Set
   aside rather than written over: an installer of the legacy format finds its elements by name, so
   a row left under its own would be overwritten and there would be nothing left to switch back on.
@@ -385,7 +385,14 @@ Removal takes back what the extra brought and leaves anything you changed:
 
 - A file is deleted only if it still matches the installed copy byte for byte. Anything you edited
   stays, and the output tells you what was left.
-- Files overwritten during install are restored from their `.old` backups.
+- Files overwritten during install are restored from their backups, which are kept in
+  `core/storage/extras/backups/<vendor>/<package>`, outside the document root. An update backs up
+  only a file that was not the extra's; the site's own copy from before the first install is the
+  one removal puts back.
+- An update writes over a file the extra brought only while it is unchanged. A file you edited is
+  left as it is, and the plan says so.
+- A file an older version brought and a newer one dropped stays in the install record, so removal
+  still takes it.
 - A file the site already had, with the same bytes the archive carries, is the site's and stays.
   Two extras that ship the same library leave it to each other.
 - Elements created by the install are deleted. Elements that existed beforehand are reverted to

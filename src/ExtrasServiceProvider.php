@@ -189,7 +189,6 @@ class ExtrasServiceProvider extends ServiceProvider
                     $this->app->make(InstallRecordStore::class),
                     $this->app->make(ElementWriter::class),
                     $this->tablePrefix(),
-                    (string) $this->config('extras.legacy.backup_suffix', '.old'),
                     (string) $this->config('extras.legacy.install_set', 'base'),
                     array_values(array_filter(
                         (array) $this->config('extras.legacy.require_confirmation', ['unknown', 'incompatible']),
