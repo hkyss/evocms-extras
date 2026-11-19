@@ -104,7 +104,7 @@ class InstalledExtras
             'format' => $extra->format()->value,
             'title' => $extra->title(),
             'description' => $this->pick($manifest['description'] ?? null, $extra->description()),
-            'homepage' => $this->pick($manifest['homepage'] ?? null, $extra->homepage()),
+            'homepage' => $this->pick(WebUrl::from($manifest['homepage'] ?? null), $extra->homepage()),
             'repository' => $this->pick(WebUrl::from($manifest['support']['source'] ?? null), $extra->repository()),
             'author' => $extra->author(),
             'type' => (string) ($manifest['type'] ?? ''),

@@ -88,8 +88,8 @@ class GitHubOrgSource implements CuratedSource
 
         $repo = $this->cache->remember(
             'github-repo-' . $coordinate->key(),
-            fn () => $this->http->json(self::API . '/repos/' . $coordinate, [], true) ?? []
-        );
+            fn () => $this->http->json(self::API . '/repos/' . $coordinate, [], true)
+        ) ?? [];
 
         if (!isset($repo['name'])) {
             return null;
@@ -110,9 +110,9 @@ class GitHubOrgSource implements CuratedSource
     {
         $cached = $this->cache->remember(
             'github-org-' . strtolower($this->organization),
-            fn (): array => $this->walk(self::API . '/orgs/' . $this->organization . '/repos')
-                ?: $this->walk(self::API . '/users/' . $this->organization . '/repos')
-        );
+            fn (): ?array => $this->walk(self::API . '/orgs/' . $this->organization . '/repos')
+                ?? $this->walk(self::API . '/users/' . $this->organization . '/repos')
+        ) ?? [];
 
         if ($cached === []) {
             $this->unavailable = $this->http->hasGithubToken()
@@ -126,15 +126,19 @@ class GitHubOrgSource implements CuratedSource
         return $cached;
     }
 
-    /** @return list<array<string,mixed>> */
-    private function walk(string $url): array
+    /** @return list<array<string,mixed>>|null */
+    private function walk(string $url): ?array
     {
         $all = [];
 
         for ($page = 1; $page <= 4; $page++) {
             $batch = $this->http->json($url, ['per_page' => 100, 'page' => $page, 'sort' => 'pushed'], true);
 
-            if (!is_array($batch) || $batch === [] || isset($batch['message'])) {
+            if (!is_array($batch) || isset($batch['message'])) {
+                return null;
+            }
+
+            if ($batch === []) {
                 break;
             }
 
@@ -191,8 +195,8 @@ class GitHubOrgSource implements CuratedSource
     {
         $payload = $this->cache->remember(
             'github-tags-' . $coordinate->key(),
-            fn () => $this->http->json(self::API . '/repos/' . $coordinate . '/tags', ['per_page' => 20], true) ?? []
-        );
+            fn () => $this->http->json(self::API . '/repos/' . $coordinate . '/tags', ['per_page' => 20], true)
+        ) ?? [];
 
         $tags = [];
 

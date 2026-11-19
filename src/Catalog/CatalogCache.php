@@ -35,7 +35,10 @@ class CatalogCache
         }
 
         $value = $producer();
-        $this->put($key, $value);
+
+        if ($value !== null) {
+            $this->put($key, $value);
+        }
 
         return $value;
     }

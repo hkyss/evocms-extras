@@ -51,7 +51,7 @@ final class Extra
         $this->defaultBranch = $defaultBranch;
         $this->compatibility = $compatibility ?? CompatibilityStatus::forFormat($format);
         $this->sourceName = $sourceName;
-        $this->homepage = $homepage;
+        $this->homepage = WebUrl::from($homepage);
         $this->repository = $repository;
         $this->author = $author !== '' ? $author : $coordinate->namespace();
         $this->requires = $requires;
