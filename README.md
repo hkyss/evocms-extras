@@ -306,6 +306,11 @@ format has no uninstall, and this package removes only what it has a record of.
   package is installed in its place. `CodeMirror` for `evolution-cms/ecodemirror` is the one
   mapping shipped; the rest of the map is yours, under `takeover.replacements`.
 
+A row is matched by name only to an extra the snapshot or a configured GitHub account holds.
+Packagist is left out of that match: anyone can publish a package of an `evolutioncms-*` type
+under any name, and a name is all a site's row has to go on. A Packagist package still takes a
+row through `takeover.replacements`, where you name its coordinate yourself.
+
 Everything else is left exactly as it is — **nothing the catalog cannot name is ever switched
 off**, the legacy manager's own module aside, which is what the command exists for — and the plan
 says why row by row: an element whose description carries no version was typed into the manager
@@ -392,9 +397,9 @@ Sources are configured in order, and the first one holding a coordinate wins:
 ```php
 'sources' => [
     ['driver' => 'snapshot',   'name' => 'Bundled snapshot'],
-    ['driver' => 'packagist',  'name' => 'Packagist', 'types' => ['evolutioncms-plugin', /* … */]],
     ['driver' => 'github-org', 'name' => 'Extras-Evolution', 'organization' => 'extras-evolution'],
     ['driver' => 'github-org', 'name' => 'EvoCMS Community', 'organization' => 'evocms-community'],
+    ['driver' => 'packagist',  'name' => 'Packagist', 'types' => ['evolutioncms-plugin', /* … */]],
 ],
 ```
 

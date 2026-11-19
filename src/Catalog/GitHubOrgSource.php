@@ -9,7 +9,7 @@ use hkyss\Extras\Domain\ExtraFormat;
 use hkyss\Extras\Domain\WebUrl;
 use hkyss\Extras\Support\Http;
 
-class GitHubOrgSource implements CatalogSource
+class GitHubOrgSource implements CuratedSource
 {
     private const API = 'https://api.github.com';
 

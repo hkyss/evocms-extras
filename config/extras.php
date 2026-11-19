@@ -12,17 +12,6 @@ return [
         ],
 
         [
-            'driver' => 'packagist',
-            'name' => 'Packagist',
-            'types' => [
-                'evolutioncms-plugin',
-                'evolutioncms-snippet',
-                'evolutioncms-module',
-                'evolutioncms-package',
-            ],
-        ],
-
-        [
             'driver' => 'github-org',
             'name' => 'Extras-Evolution',
             'organization' => 'extras-evolution',
@@ -32,6 +21,17 @@ return [
             'driver' => 'github-org',
             'name' => 'EvoCMS Community',
             'organization' => 'evocms-community',
+        ],
+
+        [
+            'driver' => 'packagist',
+            'name' => 'Packagist',
+            'types' => [
+                'evolutioncms-plugin',
+                'evolutioncms-snippet',
+                'evolutioncms-module',
+                'evolutioncms-package',
+            ],
         ],
 
     ],

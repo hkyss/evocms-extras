@@ -4,6 +4,7 @@ namespace hkyss\Extras\Tests\Unit;
 
 use hkyss\Extras\Catalog\Catalog;
 use hkyss\Extras\Catalog\CatalogSource;
+use hkyss\Extras\Catalog\SnapshotSource;
 use hkyss\Extras\Domain\CompatibilityStatus;
 use hkyss\Extras\Domain\Coordinate;
 use hkyss\Extras\Domain\Extra;
@@ -78,6 +79,33 @@ class CatalogTest extends TestCase
         self::assertNotNull($found);
         self::assertSame(CompatibilityStatus::Verified, $found->compatibility());
         self::assertCount(1, $catalog->all());
+    }
+
+    public function testCuratedListsOnlyWhatACuratedSourceHolds(): void
+    {
+        $catalog = new Catalog([
+            $this->source('packagist', [$this->extra('anyone/thing'), $this->extra('org/shared', CompatibilityStatus::Unknown)]),
+            new SnapshotSource('snapshot', $this->snapshot(['org/shared', 'org/listed'])),
+        ]);
+
+        $curated = $catalog->curated();
+
+        self::assertSame(['org/listed', 'org/shared'], array_map(static fn (Extra $extra) => $extra->coordinate()->key(), $curated));
+        self::assertSame(CompatibilityStatus::Verified, $curated[1]->compatibility());
+    }
+
+    /** @param list<string> $coordinates */
+    private function snapshot(array $coordinates): string
+    {
+        $path = tempnam(sys_get_temp_dir(), 'extras-snapshot');
+        $extras = array_map(static fn (string $coordinate) => [
+            'coordinate' => $coordinate,
+            'format' => 'legacy',
+            'compatibility' => 'verified',
+        ], $coordinates);
+        file_put_contents((string) $path, (string) json_encode(['schema' => 1, 'extras' => $extras]));
+
+        return (string) $path;
     }
 
     /** A source may list nothing yet still answer a direct lookup, as GitHub does. */

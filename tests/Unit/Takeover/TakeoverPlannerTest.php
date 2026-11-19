@@ -4,6 +4,7 @@ namespace hkyss\Extras\Tests\Unit\Takeover;
 
 use hkyss\Extras\Catalog\Catalog;
 use hkyss\Extras\Catalog\CatalogSource;
+use hkyss\Extras\Catalog\CuratedSource;
 use hkyss\Extras\Domain\Coordinate;
 use hkyss\Extras\Domain\Extra;
 use hkyss\Extras\Domain\ExtraFormat;
@@ -131,6 +132,38 @@ class TakeoverPlannerTest extends TestCase
         self::assertStringContainsString('nothing in the catalog', $steps[0]->reason());
     }
 
+    public function testAnElementOnlyAnOpenRegistryNamesIsLeftAlone(): void
+    {
+        $registry = $this->registry([
+            new Extra(Coordinate::parse('aaa/transalias'), ExtraFormat::Composer, 'TransAlias', 'Anyone could publish this'),
+        ]);
+
+        $steps = $this->planner(
+            new FakeSiteElements([new SiteElement(ElementType::Plugin, 9, 'TransAlias', '1.0.4')]),
+            sources: [$registry]
+        )->plan()->steps();
+
+        self::assertCount(1, $steps);
+        self::assertSame(TakeoverAction::Skip, $steps[0]->action());
+        self::assertStringContainsString('nothing in the catalog', $steps[0]->reason());
+    }
+
+    public function testAnOpenRegistryAheadOfTheCuratedSourcesDoesNotNameTheExtra(): void
+    {
+        $registry = $this->registry([
+            new Extra(Coordinate::parse('extras-evolution/Ditto'), ExtraFormat::Composer, 'Ditto', 'Same coordinate, other code'),
+        ]);
+
+        $steps = $this->planner(
+            new FakeSiteElements([new SiteElement(ElementType::Snippet, 2, 'Ditto', '2.1')]),
+            sources: [$registry],
+            registryFirst: true
+        )->plan()->of(TakeoverAction::Adopt);
+
+        self::assertCount(1, $steps);
+        self::assertSame(ExtraFormat::Legacy, $steps[0]->extra()?->format());
+    }
+
     public function testAReplacementThisInstallationCouldNotInstallIsLeftOutOfThePlan(): void
     {
         $steps = $this->planner(new FakeSiteElements([new SiteElement(ElementType::Plugin, 8, 'efuture', '1.0')]))
@@ -217,16 +250,19 @@ class TakeoverPlannerTest extends TestCase
      * @param array<string,string>          $replacements
      * @param list<string>                  $ignored
      * @param array<string, InstalledState> $installed
+     * @param list<CatalogSource>           $sources
      */
     private function planner(
         FakeSiteElements $site,
         array $replacements = [],
         array $ignored = [],
         ?InstallRecordStore $records = null,
-        array $installed = []
+        array $installed = [],
+        array $sources = [],
+        bool $registryFirst = false
     ): TakeoverPlanner {
         return new TakeoverPlanner(
-            new Catalog([$this->source()]),
+            new Catalog($registryFirst ? [...$sources, $this->source()] : [$this->source(), ...$sources]),
             $site,
             $records ?? new KnownRecords(),
             new InstallerRegistry([
@@ -238,9 +274,46 @@ class TakeoverPlannerTest extends TestCase
         );
     }
 
-    private function source(): CatalogSource
+    /** @param list<Extra> $extras */
+    private function registry(array $extras): CatalogSource
     {
-        return new class () implements CatalogSource {
+        return new class ($extras) implements CatalogSource {
+            /** @param list<Extra> $extras */
+            public function __construct(private array $extras)
+            {
+            }
+
+            public function all(): array
+            {
+                return $this->extras;
+            }
+
+            public function find(Coordinate $coordinate): ?Extra
+            {
+                foreach ($this->extras as $extra) {
+                    if ($extra->coordinate()->equals($coordinate)) {
+                        return $extra;
+                    }
+                }
+
+                return null;
+            }
+
+            public function name(): string
+            {
+                return 'registry';
+            }
+
+            public function unavailableReason(): ?string
+            {
+                return null;
+            }
+        };
+    }
+
+    private function source(): CuratedSource
+    {
+        return new class () implements CuratedSource {
             /** @return list<Extra> */
             public function all(): array
             {
