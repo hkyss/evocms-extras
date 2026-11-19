@@ -12,6 +12,8 @@ class Catalog
     private array $sources;
     /** @var list<Extra>|null */
     private ?array $merged = null;
+    /** @var list<Extra>|null */
+    private ?array $curated = null;
 
     /** @param list<CatalogSource> $sources */
     public function __construct(array $sources = [])
@@ -23,6 +25,7 @@ class Catalog
     {
         $this->sources[] = $source;
         $this->merged = null;
+        $this->curated = null;
     }
 
     /** @return list<CatalogSource> */
@@ -34,13 +37,27 @@ class Catalog
     /** @return list<Extra> */
     public function all(): array
     {
-        if ($this->merged !== null) {
-            return $this->merged;
-        }
+        return $this->merged ??= self::merge($this->sources);
+    }
 
+    /** @return list<Extra> */
+    public function curated(): array
+    {
+        return $this->curated ??= self::merge(array_filter(
+            $this->sources,
+            static fn (CatalogSource $source) => $source instanceof CuratedSource
+        ));
+    }
+
+    /**
+     * @param array<int, CatalogSource> $sources
+     * @return list<Extra>
+     */
+    private static function merge(array $sources): array
+    {
         $byKey = [];
 
-        foreach ($this->sources as $source) {
+        foreach ($sources as $source) {
             foreach ($source->all() as $extra) {
                 $key = $extra->coordinate()->key();
 
@@ -52,8 +69,6 @@ class Catalog
 
         $merged = array_values($byKey);
         usort($merged, static fn (Extra $a, Extra $b) => strcmp($a->coordinate()->key(), $b->coordinate()->key()));
-
-        $this->merged = $merged;
 
         return $merged;
     }

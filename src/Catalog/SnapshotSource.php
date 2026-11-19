@@ -5,7 +5,7 @@ namespace hkyss\Extras\Catalog;
 use hkyss\Extras\Domain\Coordinate;
 use hkyss\Extras\Domain\Extra;
 
-class SnapshotSource implements CatalogSource
+class SnapshotSource implements CuratedSource
 {
     private string $name;
     private string $path;

@@ -226,7 +226,7 @@ class TakeoverPlanner
 
         $index = [];
 
-        foreach ($this->catalog->all() as $extra) {
+        foreach ($this->catalog->curated() as $extra) {
             foreach ([$extra->title(), $extra->coordinate()->name()] as $name) {
                 $key = mb_strtolower(trim($name));
 
