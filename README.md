@@ -383,6 +383,8 @@ Removal takes back what the extra brought and leaves anything you changed:
 - A file is deleted only if it still matches the installed copy byte for byte. Anything you edited
   stays, and the output tells you what was left.
 - Files overwritten during install are restored from their `.old` backups.
+- A file the site already had, with the same bytes the archive carries, is the site's and stays.
+  Two extras that ship the same library leave it to each other.
 - Elements created by the install are deleted. Elements that existed beforehand are reverted to
   their previous code.
 - Elements marked `@overwrite false` in their docblock are never touched. Authors use that tag for

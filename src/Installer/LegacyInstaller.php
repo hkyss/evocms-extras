@@ -95,7 +95,7 @@ class LegacyInstaller implements Installer, EnumeratesInstalled, HoldsArchives
             'ref' => $ref,
         ]);
 
-        $this->planAssets($plan, $archive);
+        $this->planAssets($plan, $archive, $this->records->find($extra->coordinate())?->fileList() ?? []);
         $this->planElements($plan, $archive);
         $this->planSql($plan, $archive, $extra);
 
@@ -154,7 +154,8 @@ class LegacyInstaller implements Installer, EnumeratesInstalled, HoldsArchives
         }
     }
 
-    private function planAssets(InstallPlan $plan, LegacyArchive $archive): void
+    /** @param array<string,string> $owned */
+    private function planAssets(InstallPlan $plan, LegacyArchive $archive, array $owned): void
     {
         if (!$archive->hasAssets()) {
             return;
@@ -180,11 +181,7 @@ class LegacyInstaller implements Installer, EnumeratesInstalled, HoldsArchives
             }
 
             if (hash_file('sha256', $to) === $hash) {
-                $plan->step(StepKind::FileKeep, 'unchanged assets/' . $relative, [
-                    'to' => $to,
-                    'relative' => 'assets/' . $relative,
-                    'hash' => $hash,
-                ]);
+                $plan->add($this->keep('assets/' . $relative, $to, $hash, $owned));
 
                 continue;
             }
@@ -202,6 +199,16 @@ class LegacyInstaller implements Installer, EnumeratesInstalled, HoldsArchives
                 'hash' => $hash,
             ]);
         }
+    }
+
+    /** @param array<string,string> $owned */
+    private function keep(string $relative, string $to, string $hash, array $owned): PlanStep
+    {
+        if (!isset($owned[$relative])) {
+            return new PlanStep(StepKind::FileKeep, 'already on the site ' . $relative, ['to' => $to, 'relative' => $relative]);
+        }
+
+        return new PlanStep(StepKind::FileKeep, 'unchanged ' . $relative, ['to' => $to, 'relative' => $relative, 'hash' => $hash]);
     }
 
     private function planElements(InstallPlan $plan, LegacyArchive $archive): void
