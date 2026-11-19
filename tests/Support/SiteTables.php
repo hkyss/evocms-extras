@@ -33,6 +33,17 @@ class SiteTables
             });
         }
 
+        $this->schema()->create('system_eventnames', static function (Blueprint $blueprint) {
+            $blueprint->increments('id');
+            $blueprint->string('name');
+        });
+
+        $this->schema()->create('site_plugin_events', static function (Blueprint $blueprint) {
+            $blueprint->integer('pluginid');
+            $blueprint->integer('evtid');
+            $blueprint->integer('priority')->default(0);
+        });
+
         $this->schema()->create('categories', static function (Blueprint $blueprint) {
             $blueprint->increments('id');
             $blueprint->string('category');
@@ -48,6 +59,17 @@ class SiteTables
     public function insert(string $table, array $row): int
     {
         return (int) $this->connection()->table($table)->insertGetId($row);
+    }
+
+    /** @return array<int,int> */
+    public function priorities(int $pluginId): array
+    {
+        return $this->connection()->table('site_plugin_events')
+            ->where('pluginid', $pluginId)
+            ->orderBy('evtid')
+            ->pluck('priority', 'evtid')
+            ->map(static fn ($priority) => (int) $priority)
+            ->all();
     }
 
     /** @return array<string,mixed> */

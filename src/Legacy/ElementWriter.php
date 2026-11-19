@@ -47,10 +47,13 @@ class ElementWriter
         ];
     }
 
-    /** @return array{action:string,id:int|null,previous_code:string|null,previous_description:string|null} */
+    /**
+     * @return array{action:string,id:int|null,previous_code:string|null,previous_description:string|null,previous_properties:string|null,previous_category:int|null,previous_events:list<array{evtid:int,priority:int}>|null}
+     */
     public function write(ElementDescriptor $descriptor): array
     {
         $preview = $this->preview($descriptor);
+        $untouched = ['previous_properties' => null, 'previous_category' => null, 'previous_events' => null];
 
         if ($preview['action'] === 'skip') {
             return [
@@ -58,7 +61,7 @@ class ElementWriter
                 'id' => $preview['id'],
                 'previous_code' => null,
                 'previous_description' => null,
-            ];
+            ] + $untouched;
         }
 
         $categoryId = $this->resolveCategory($descriptor->category());
@@ -69,6 +72,11 @@ class ElementWriter
 
         if ($preview['action'] === 'update') {
             $existing = $this->findByName($descriptor);
+            $before = [
+                'previous_properties' => (string) ($existing->properties ?? ''),
+                'previous_category' => (int) ($existing->category ?? 0),
+                'previous_events' => $descriptor->type()->hasEvents() ? $this->eventsOf((int) $preview['id']) : null,
+            ];
 
             $this->db()->table($table)->where('id', $preview['id'])->update([
                 'description' => $descriptor->description(),
@@ -84,7 +92,7 @@ class ElementWriter
 
             unset($preview['reason']);
 
-            return $preview;
+            return $preview + $before;
         }
 
         $row = [
@@ -106,7 +114,7 @@ class ElementWriter
         $id = (int) $this->db()->table($table)->insertGetId($row);
         $this->syncEvents($descriptor, $id);
 
-        return ['action' => 'insert', 'id' => $id, 'previous_code' => null, 'previous_description' => null];
+        return ['action' => 'insert', 'id' => $id, 'previous_code' => null, 'previous_description' => null] + $untouched;
     }
 
     /** Failures are not swallowed; the caller decides whether the statement counts as applied. */
@@ -115,16 +123,43 @@ class ElementWriter
         $this->db()->statement($sql);
     }
 
-    /** The description goes back with the code: it is where the legacy format keeps the version. */
-    public function restore(ElementType $type, int $id, string $code, ?string $description = null): bool
-    {
+    /**
+     * The description goes back with the code: it is where the legacy format keeps the version.
+     *
+     * @param list<array{evtid:int,priority:int}>|null $events
+     */
+    public function restore(
+        ElementType $type,
+        int $id,
+        string $code,
+        ?string $description = null,
+        ?string $properties = null,
+        ?int $category = null,
+        ?array $events = null
+    ): bool {
         $columns = [$type->codeColumn() => $code];
 
-        if ($description !== null) {
-            $columns['description'] = $description;
+        foreach (['description' => $description, 'properties' => $properties, 'category' => $category] as $column => $value) {
+            if ($value !== null) {
+                $columns[$column] = $value;
+            }
         }
 
-        return $this->db()->table($type->table())->where('id', $id)->update($columns) > 0;
+        $restored = $this->db()->table($type->table())->where('id', $id)->update($columns) > 0;
+
+        if ($events !== null && $type->hasEvents()) {
+            $this->db()->table('site_plugin_events')->where('pluginid', $id)->delete();
+
+            foreach ($events as $event) {
+                $this->db()->table('site_plugin_events')->insert([
+                    'pluginid' => $id,
+                    'evtid' => $event['evtid'],
+                    'priority' => $event['priority'],
+                ]);
+            }
+        }
+
+        return $restored;
     }
 
     public function delete(ElementType $type, int $id): bool
@@ -193,6 +228,11 @@ class ElementWriter
         }
 
         $known = $this->db()->table('system_eventnames')->whereIn('name', $events)->pluck('id', 'name');
+        $kept = [];
+
+        foreach ($this->eventsOf($elementId) as $event) {
+            $kept[$event['evtid']] = $event['priority'];
+        }
 
         $this->db()->table('site_plugin_events')->where('pluginid', $elementId)->delete();
 
@@ -200,9 +240,28 @@ class ElementWriter
             $this->db()->table('site_plugin_events')->insert([
                 'pluginid' => $elementId,
                 'evtid' => (int) $eventId,
-                'priority' => 0,
+                'priority' => $kept[(int) $eventId] ?? $this->lastPriority((int) $eventId) + 1,
             ]);
         }
+    }
+
+    /** @return list<array{evtid:int,priority:int}> */
+    private function eventsOf(int $pluginId): array
+    {
+        return $this->db()->table('site_plugin_events')
+            ->where('pluginid', $pluginId)
+            ->orderBy('evtid')
+            ->get(['evtid', 'priority'])
+            ->map(static fn ($row) => ['evtid' => (int) $row->evtid, 'priority' => (int) $row->priority])
+            ->values()
+            ->all();
+    }
+
+    private function lastPriority(int $eventId): int
+    {
+        $last = $this->db()->table('site_plugin_events')->where('evtid', $eventId)->max('priority');
+
+        return $last === null ? -1 : (int) $last;
     }
 
     private function resolveCategory(string $category): int

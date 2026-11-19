@@ -381,6 +381,10 @@ cd core && composer remove hkyss/evocms-extras
 
 ## Removal
 
+A legacy install that hits a file it cannot write, an element it cannot save or a `setup.data.sql`
+statement that fails stops there and reports the failure. What it had already written is recorded,
+so `extra:remove` takes it back.
+
 Removal takes back what the extra brought and leaves anything you changed:
 
 - A file is deleted only if it still matches the installed copy byte for byte. Anything you edited
@@ -395,8 +399,9 @@ Removal takes back what the extra brought and leaves anything you changed:
   still takes it.
 - A file the site already had, with the same bytes the archive carries, is the site's and stays.
   Two extras that ship the same library leave it to each other.
-- Elements created by the install are deleted. Elements that existed beforehand are reverted to
-  their previous code.
+- An update keeps the priority a plugin had on each event; an event the update adds goes last.
+- Elements created by the install are deleted. Elements that existed beforehand get back the code,
+  description, properties, category and plugin events they had before the first install.
 - Elements marked `@overwrite false` in their docblock are never touched. Authors use that tag for
   config chunks people are expected to edit.
 - Schema is not rolled back. Tables and columns an extra created stay, because the format has no
