@@ -4,7 +4,6 @@ namespace hkyss\Extras\Tests\Unit\Manager;
 
 use hkyss\Extras\Http\Middlewares\ManagerMiddleware;
 use Illuminate\Http\Request;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -26,7 +25,7 @@ class ManagerMiddlewareTest extends TestCase
         self::assertSame('passed through', $this->knock(true, 'GET')->getContent());
     }
 
-    #[DataProvider('writes')]
+    /** @dataProvider writes */
     public function testAWriteAnotherSiteSentIsRefused(string $method): void
     {
         $answer = $this->knock(true, $method);
@@ -38,7 +37,7 @@ class ManagerMiddlewareTest extends TestCase
         );
     }
 
-    #[DataProvider('writes')]
+    /** @dataProvider writes */
     public function testAWriteTheModuleSentGoesThrough(string $method): void
     {
         self::assertSame(
